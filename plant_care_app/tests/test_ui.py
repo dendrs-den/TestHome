@@ -77,12 +77,21 @@ class FakeCombo:
 class FakeListbox:
     def __init__(self) -> None:
         self.items: list[str] = []
+        self.selected_index: int | None = None
 
     def delete(self, _start, _end) -> None:
         self.items = []
 
     def insert(self, _where, text: str) -> None:
         self.items.append(text)
+
+    def curselection(self):
+        if self.selected_index is None:
+            return ()
+        return (self.selected_index,)
+
+    def get(self, index: int) -> str:
+        return self.items[index]
 
 
 class FakeStorage:
@@ -118,6 +127,8 @@ def build_app(storage: FakeStorage | None = None):
     app.time_entry = FakeEntry("18:30")
     app.plant_combo = FakeCombo()
     app.plants_list = FakeListbox()
+    app.day_records_list = FakeListbox()
+    app._day_records = []
     app.refresh_all_calls = 0
 
     def refresh_all() -> None:
@@ -289,6 +300,7 @@ def test_init_calls_ui_build_and_refresh(monkeypatch) -> None:
     monkeypatch.setattr(app_module.tk, "IntVar", DummyIntVar)
 
     called = {"build": 0, "refresh": 0}
+    monkeypatch.setattr(app_module.PlantCareApp, "_set_window_icon", lambda self: None)
     monkeypatch.setattr(app_module.PlantCareApp, "_build_ui", lambda self: called.__setitem__("build", called["build"] + 1))
     monkeypatch.setattr(app_module.PlantCareApp, "refresh_all", lambda self: called.__setitem__("refresh", called["refresh"] + 1))
 
@@ -397,3 +409,59 @@ def test_build_ui_creates_widgets_and_binds(monkeypatch) -> None:
     assert "<<CalendarSelected>>" in app.calendar.bound
     assert callable(created_buttons[0])
     assert callable(created_buttons[1])
+
+
+def test_set_window_icon_prefers_ico_and_png(monkeypatch, tmp_path) -> None:
+    app = object.__new__(app_module.PlantCareApp)
+
+    assets = tmp_path / "assets"
+    assets.mkdir(parents=True, exist_ok=True)
+    ico = assets / "app_icon.ico"
+    png = assets / "app_icon.png"
+    ico.write_bytes(b"00")
+    png.write_bytes(b"00")
+
+    calls = {"iconbitmap": None, "iconphoto": False}
+
+    monkeypatch.setattr(app_module.sys, "_MEIPASS", str(tmp_path), raising=False)
+    monkeypatch.setattr(app_module.tk, "PhotoImage", lambda file: object())
+
+    app.iconbitmap = lambda path: calls.__setitem__("iconbitmap", path)
+    app.iconphoto = lambda _default, _img: calls.__setitem__("iconphoto", True)
+
+    app_module.PlantCareApp._set_window_icon(app)
+
+    assert str(ico) == calls["iconbitmap"]
+    assert calls["iconphoto"] is True
+
+
+def test_delete_selected_plant_success() -> None:
+    storage = FakeStorage()
+    storage.plants = [Plant(1, "???????", ""), Plant(2, "?????", "")]
+    storage.delete_plant = lambda plant_id: storage.plants.pop(0)
+    app = build_app(storage)
+    app.plants_list.items = ["#1 ???????", "#2 ?????"]
+    app.plants_list.selected_index = 0
+
+    app_module.PlantCareApp._delete_selected_plant(app)
+
+    assert app.refresh_all_calls == 1
+
+
+def test_delete_selected_watering_success() -> None:
+    storage = FakeStorage()
+    called = {"args": None}
+
+    def delete_watering(plant_id, date, time):
+        called["args"] = (plant_id, date, time)
+
+    storage.delete_watering = delete_watering
+    app = build_app(storage)
+    app._day_records = [(2, "2026-05-15", "08:30")]
+    app.day_records_list.items = ["08:30 - ?????"]
+    app.day_records_list.selected_index = 0
+
+    app_module.PlantCareApp._delete_selected_watering(app)
+
+    assert called["args"] == (2, "2026-05-15", "08:30")
+    assert app.refresh_all_calls == 1
