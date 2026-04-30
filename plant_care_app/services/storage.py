@@ -1,7 +1,6 @@
 ﻿from __future__ import annotations
 
 import json
-from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -80,6 +79,24 @@ class StorageService:
         self.watering.append(record)
         self.save()
         return record
+
+    def delete_plant(self, plant_id: int) -> None:
+        if not any(p.id == plant_id for p in self.plants):
+            raise ValidationError("Растение не найдено")
+        self.plants = [p for p in self.plants if p.id != plant_id]
+        self.watering = [w for w in self.watering if w.plant_id != plant_id]
+        self.save()
+
+    def delete_watering(self, plant_id: int, date: str, time: str) -> None:
+        original_len = len(self.watering)
+        self.watering = [
+            w
+            for w in self.watering
+            if not (w.plant_id == plant_id and w.date == date and w.time == time)
+        ]
+        if len(self.watering) == original_len:
+            raise ValidationError("Запись полива не найдена")
+        self.save()
 
     def get_plant_name(self, plant_id: int) -> str:
         for plant in self.plants:

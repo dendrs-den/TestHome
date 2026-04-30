@@ -149,3 +149,30 @@ def test_get_plant_name_returns_existing_name(data_file: Path) -> None:
     plant = storage.add_plant("?????")
 
     assert storage.get_plant_name(plant.id) == "?????"
+
+
+def test_delete_plant_removes_related_watering(data_file: Path) -> None:
+    storage = StorageService(data_file)
+    storage.load()
+    p1 = storage.add_plant("???????")
+    p2 = storage.add_plant("?????")
+    storage.add_watering(p1.id, "2026-05-15", "10:00")
+    storage.add_watering(p2.id, "2026-05-15", "11:00")
+
+    storage.delete_plant(p1.id)
+
+    assert all(p.id != p1.id for p in storage.plants)
+    assert all(w.plant_id != p1.id for w in storage.watering)
+
+
+def test_delete_watering_removes_only_selected_record(data_file: Path) -> None:
+    storage = StorageService(data_file)
+    storage.load()
+    p1 = storage.add_plant("???????")
+    storage.add_watering(p1.id, "2026-05-15", "10:00")
+    storage.add_watering(p1.id, "2026-05-15", "11:00")
+
+    storage.delete_watering(p1.id, "2026-05-15", "10:00")
+
+    assert len(storage.watering) == 1
+    assert storage.watering[0].time == "11:00"

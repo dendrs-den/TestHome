@@ -1,7 +1,9 @@
 ﻿from __future__ import annotations
 
+import sys
 import tkinter as tk
 from datetime import datetime
+from pathlib import Path
 from tkinter import messagebox, ttk
 
 from tkcalendar import Calendar
@@ -17,7 +19,11 @@ class PlantCareApp(tk.Tk):
         self.geometry("920x600")
 
         self.selected_plant_id: tk.IntVar = tk.IntVar(value=0)
+        self._watering_days: set[str] = set()
+        self._icon_ref: tk.PhotoImage | None = None
+        self._day_records: list[tuple[int, str, str]] = []
 
+        self._set_window_icon()
         self._build_ui()
         self.refresh_all()
 
@@ -28,14 +34,25 @@ class PlantCareApp(tk.Tk):
         right = ttk.Frame(self, padding=12)
         right.pack(side=tk.RIGHT, fill=tk.Y)
 
-        self.calendar = Calendar(left, selectmode="day", date_pattern="yyyy-mm-dd")
+        self.calendar = Calendar(
+            left,
+            selectmode="day",
+            date_pattern="yyyy-mm-dd",
+            locale="ru_RU",
+        )
         self.calendar.tag_config("watering_day_light", background="#dff3e1", foreground="#1f5f2a")
         self.calendar.tag_config("watering_day_heavy", background="#8fd19e", foreground="#103b1a")
         self.calendar.pack(fill=tk.BOTH, expand=True)
         self.calendar.bind("<<CalendarSelected>>", lambda _evt: self._refresh_day_records())
+        self.calendar.bind("<<CalendarMonthChanged>>", lambda _evt: self._apply_flower_day_labels())
 
         self.records_box = tk.Text(left, height=8, state="disabled")
         self.records_box.pack(fill=tk.X, pady=(12, 0))
+        self.day_records_list = tk.Listbox(left, height=6)
+        self.day_records_list.pack(fill=tk.X, pady=(8, 0))
+        ttk.Button(left, text="Удалить выбранный полив", command=self._delete_selected_watering).pack(
+            anchor="e", pady=(6, 0)
+        )
 
         ttk.Label(right, text="Добавить растение").pack(anchor="w")
         self.plant_name_entry = ttk.Entry(right, width=35)
@@ -64,6 +81,27 @@ class PlantCareApp(tk.Tk):
         ttk.Label(right, text="Список растений").pack(anchor="w")
         self.plants_list = tk.Listbox(right, width=38, height=15)
         self.plants_list.pack(anchor="w", fill=tk.X)
+        ttk.Button(right, text="Удалить выбранное растение", command=self._delete_selected_plant).pack(
+            anchor="w", pady=(8, 0)
+        )
+
+    def _set_window_icon(self) -> None:
+        base_dir = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parents[1]))
+        icon_ico = base_dir / "assets" / "app_icon.ico"
+        icon_png = base_dir / "assets" / "app_icon.png"
+
+        if icon_ico.exists():
+            try:
+                self.iconbitmap(str(icon_ico))
+            except tk.TclError:
+                pass
+
+        if icon_png.exists():
+            try:
+                self._icon_ref = tk.PhotoImage(file=str(icon_png))
+                self.iconphoto(True, self._icon_ref)
+            except tk.TclError:
+                pass
 
     def refresh_all(self) -> None:
         self._refresh_plant_controls()
@@ -75,12 +113,33 @@ class PlantCareApp(tk.Tk):
         grouped: dict[str, list[str]] = {}
         for rec in self.storage.watering:
             grouped.setdefault(rec.date, []).append(rec.time)
+        self._watering_days = set(grouped.keys())
 
         for date_str, times in grouped.items():
             day = datetime.strptime(date_str, "%Y-%m-%d").date()
-            marker_text = f"🌸 Поливов: {len(times)}"
+            marker_text = "🌸" if len(times) == 1 else f"🌸 x{len(times)}"
             tag = "watering_day_heavy" if len(times) >= 2 else "watering_day_light"
             self.calendar.calevent_create(day, marker_text, tag)
+        self._apply_flower_day_labels()
+
+    def _apply_flower_day_labels(self) -> None:
+        if not hasattr(self.calendar, "_calendar") or not hasattr(self.calendar, "_date"):
+            return
+        month = self.calendar._date.month
+        year = self.calendar._date.year
+        for week in self.calendar._calendar:
+            for cell in week:
+                text = cell.cget("text").strip()
+                digits = "".join(ch for ch in text if ch.isdigit())
+                if not digits:
+                    continue
+                day_num = int(digits)
+                date_key = f"{year:04d}-{month:02d}-{day_num:02d}"
+                base_text = str(day_num)
+                if date_key in self._watering_days:
+                    cell.configure(text=f"{base_text} 🌸")
+                else:
+                    cell.configure(text=base_text)
 
     def _refresh_plant_controls(self) -> None:
         self.plants_list.delete(0, tk.END)
@@ -98,14 +157,18 @@ class PlantCareApp(tk.Tk):
     def _refresh_day_records(self) -> None:
         selected_date = self.calendar.get_date()
         records = [r for r in self.storage.watering if r.date == selected_date]
+        self._day_records = []
         self.records_box.configure(state="normal")
         self.records_box.delete("1.0", tk.END)
+        self.day_records_list.delete(0, tk.END)
         if not records:
             self.records_box.insert(tk.END, f"На {selected_date} поливов нет")
         else:
             for rec in sorted(records, key=lambda x: x.time):
                 name = self.storage.get_plant_name(rec.plant_id)
                 self.records_box.insert(tk.END, f"{rec.time} - {name}\n")
+                self.day_records_list.insert(tk.END, f"{rec.time} - {name}")
+                self._day_records.append((rec.plant_id, rec.date, rec.time))
         self.records_box.configure(state="disabled")
 
     def _add_plant(self) -> None:
@@ -130,6 +193,33 @@ class PlantCareApp(tk.Tk):
 
         try:
             self.storage.add_watering(plant_id, date, time)
+        except ValidationError as exc:
+            messagebox.showerror("Ошибка", str(exc))
+            return
+        self.refresh_all()
+
+    def _delete_selected_plant(self) -> None:
+        selection = self.plants_list.curselection()
+        if not selection:
+            messagebox.showerror("Ошибка", "Выберите растение для удаления")
+            return
+        selected_line = self.plants_list.get(selection[0])
+        plant_id = int(selected_line.split()[0].lstrip("#"))
+        try:
+            self.storage.delete_plant(plant_id)
+        except ValidationError as exc:
+            messagebox.showerror("Ошибка", str(exc))
+            return
+        self.refresh_all()
+
+    def _delete_selected_watering(self) -> None:
+        selection = self.day_records_list.curselection()
+        if not selection:
+            messagebox.showerror("Ошибка", "Выберите запись полива для удаления")
+            return
+        plant_id, date, time = self._day_records[selection[0]]
+        try:
+            self.storage.delete_watering(plant_id, date, time)
         except ValidationError as exc:
             messagebox.showerror("Ошибка", str(exc))
             return
