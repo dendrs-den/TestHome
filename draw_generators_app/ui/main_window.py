@@ -65,7 +65,7 @@ class MainWindow(QMainWindow):
         self.result_scroll = QScrollArea()
         self.result_scroll.setWidgetResizable(True)
         self.result_scroll.setWidget(self.result_container)
-        self.result_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.result_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.result_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self._last_rounds: list[Round] = []
         self._pulse_timer = QTimer(self)
@@ -166,10 +166,6 @@ class MainWindow(QMainWindow):
             return
 
         self._last_rounds = rounds
-        if len(rounds) > 5:
-            self.result_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        else:
-            self.result_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self._start_shuffle_pulse(rounds)
         self._save_current_settings()
 

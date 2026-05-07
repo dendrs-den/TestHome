@@ -17,8 +17,8 @@ from pprint import pformat
 APP_TITLE_TEXT = "D2W & D4W"
 
 # Shuffle animation configuration.
-ANIMATION_STEP_DELAY_MS = 300
-ANIMATION_STEP_COUNT = 12
+ANIMATION_STEP_DELAY_MS = 70
+ANIMATION_STEP_COUNT = 50
 
 
 SNAKES = [
@@ -105,3 +105,4 @@ def _apply_external_overrides() -> None:
 
 
 _apply_external_overrides()
+
