@@ -2,3 +2,7 @@
 *.py[cod]
 backup_ui_before_animation/
 backup_ui_before_shuffle_pulse/
+.pytest_cache/
+build/
+dist/
+*.spec

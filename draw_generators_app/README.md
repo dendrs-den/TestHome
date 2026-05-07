@@ -6,8 +6,9 @@
 - Python 3.10+
 - PySide6
 - Pytest
+- PyInstaller
 
-## Запуск
+## Быстрый старт
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
@@ -20,5 +21,14 @@ python main.py
 python -m pytest -q
 ```
 
-## Тест-кейсы
-Сценарии ручной проверки лежат в `tests/TESTCASES.md`.
+## Сборка EXE
+```bash
+python -m PyInstaller --onefile --windowed --name DrawGeneratorsApp main.py
+```
+
+Результат сборки: `dist/DrawGeneratorsApp.exe`
+
+## Документация
+- `docs/ARCHITECTURE.md` — архитектура и flow
+- `docs/CONFIG.md` — настройки в `config.py`
+- `tests/TESTCASES.md` — ручные тест-кейсы
