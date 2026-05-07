@@ -1,0 +1,61 @@
+﻿<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1920" height="1080" fill="#000000"/>
+
+  <!-- Top bar -->
+  <rect x="16" y="14" width="170" height="52" fill="#12A9E1"/>
+  <text x="101" y="47" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="middle">Generate</text>
+
+  <rect x="200" y="14" width="130" height="52" fill="#12A9E1"/>
+  <text x="265" y="47" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="middle">Reset</text>
+
+  <text x="1610" y="47" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700">Rounds:</text>
+  <rect x="1715" y="14" width="84" height="52" fill="#12A9E1"/>
+  <text x="1757" y="47" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="middle">5</text>
+
+  <rect x="1816" y="14" width="42" height="42" rx="21" fill="#203040" stroke="#355166"/>
+  <text x="1837" y="42" fill="#F8FCFF" font-family="Segoe UI Symbol, Segoe UI, Arial" font-size="22" text-anchor="middle">⚙</text>
+
+  <!-- Title -->
+  <text x="40" y="132" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="64" font-weight="800">D2W &amp; D4W Draw Generato</text>
+
+  <!-- Rounds -->
+  <text x="960" y="192" fill="#E8F3F9" font-family="Segoe UI, Arial, sans-serif" font-size="42" font-weight="700" text-anchor="middle">Round 1</text>
+  <rect x="40" y="218" width="592" height="76" fill="#12A9E1"/>
+  <rect x="664" y="218" width="592" height="76" fill="#12A9E1"/>
+  <rect x="1288" y="218" width="592" height="76" fill="#12A9E1"/>
+  <text x="336" y="266" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">S4 Head-up Switching Snake</text>
+  <text x="960" y="266" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">V5 Head-up 360°</text>
+  <text x="1584" y="266" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">M1 Head Down Inface Circles</text>
+
+  <text x="960" y="352" fill="#E8F3F9" font-family="Segoe UI, Arial, sans-serif" font-size="42" font-weight="700" text-anchor="middle">Round 2</text>
+  <rect x="40" y="378" width="592" height="76" fill="#12A9E1"/>
+  <rect x="664" y="378" width="592" height="76" fill="#12A9E1"/>
+  <rect x="1288" y="378" width="592" height="76" fill="#12A9E1"/>
+  <text x="336" y="426" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">S2 Head-down Switching Snake</text>
+  <text x="960" y="426" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">V1 Back Layout</text>
+  <text x="1584" y="426" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">M2 Head Up Inface Circles</text>
+
+  <text x="960" y="512" fill="#E8F3F9" font-family="Segoe UI, Arial, sans-serif" font-size="42" font-weight="700" text-anchor="middle">Round 3</text>
+  <rect x="40" y="538" width="592" height="76" fill="#12A9E1"/>
+  <rect x="664" y="538" width="592" height="76" fill="#12A9E1"/>
+  <rect x="1288" y="538" width="592" height="76" fill="#12A9E1"/>
+  <text x="336" y="586" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">S5 Head-down Mixed Snake</text>
+  <text x="960" y="586" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">V4 Head-down 360°</text>
+  <text x="1584" y="586" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">M5 Head Down Shuffler</text>
+
+  <text x="960" y="672" fill="#E8F3F9" font-family="Segoe UI, Arial, sans-serif" font-size="42" font-weight="700" text-anchor="middle">Round 4</text>
+  <rect x="40" y="698" width="592" height="76" fill="#12A9E1"/>
+  <rect x="664" y="698" width="592" height="76" fill="#12A9E1"/>
+  <rect x="1288" y="698" width="592" height="76" fill="#12A9E1"/>
+  <text x="336" y="746" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">S1 Head-down Inface Snake</text>
+  <text x="960" y="746" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">V3 Classic</text>
+  <text x="1584" y="746" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">M3 Mixed Circles</text>
+
+  <text x="960" y="832" fill="#E8F3F9" font-family="Segoe UI, Arial, sans-serif" font-size="42" font-weight="700" text-anchor="middle">Round 5</text>
+  <rect x="40" y="858" width="592" height="76" fill="#12A9E1"/>
+  <rect x="664" y="858" width="592" height="76" fill="#12A9E1"/>
+  <rect x="1288" y="858" width="592" height="76" fill="#12A9E1"/>
+  <text x="336" y="906" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">S6 Head-up Mixed Snake</text>
+  <text x="960" y="906" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">V7 Bottom Loop</text>
+  <text x="1584" y="906" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle">M8 Head Down Inface Shuffler</text>
+</svg>
