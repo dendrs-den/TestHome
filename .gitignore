@@ -1,0 +1,4 @@
+﻿__pycache__/
+*.py[cod]
+backup_ui_before_animation/
+backup_ui_before_shuffle_pulse/
