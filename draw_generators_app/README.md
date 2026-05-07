@@ -28,7 +28,13 @@ python -m PyInstaller --onefile --windowed --name DrawGeneratorsApp main.py
 
 Результат сборки: `dist/DrawGeneratorsApp.exe`
 
+## Внешний конфиг
+При старте приложение ищет `DrawGenerators.cfg` в текущей директории.
+- Если файла нет: создаёт его с параметрами по умолчанию.
+- Если файл есть: берёт из него uppercase-переменные.
+
 ## Документация
 - `docs/ARCHITECTURE.md` — архитектура и flow
 - `docs/CONFIG.md` — настройки в `config.py`
 - `tests/TESTCASES.md` — ручные тест-кейсы
+
