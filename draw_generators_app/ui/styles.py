@@ -60,6 +60,41 @@ QLabel#roundLabel {
     font-weight: 700;
     margin: 6px 0;
 }
+QLabel#settingsColumnTitle {
+    color: #f1f4f7;
+    font-size: 22px;
+    font-weight: 800;
+    margin: 2px 0 4px 0;
+}
+QGroupBox {
+    color: #e8f3f9;
+    border: 1px solid #c2c9ce;
+    margin-top: 12px;
+    padding-top: 10px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 6px;
+    color: #f1f4f7;
+    font-size: 14px;
+    font-weight: 700;
+}
+QWidget#settingsPopup QLabel,
+QWidget#settingsPopup QCheckBox {
+    font-size: 12px;
+}
+QWidget#settingsPopup QGroupBox {
+    border: 1px solid #c2c9ce;
+    margin-top: 9px;
+    padding-top: 6px;
+}
+QWidget#settingsPopup QGroupBox::title {
+    left: 8px;
+    padding: 0 5px;
+    font-size: 12px;
+    font-weight: 700;
+}
 QLabel#resultCard {
     background: #12a9e1;
     color: #ffffff;

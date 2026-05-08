@@ -15,43 +15,118 @@ from pprint import pformat
 
 # UI text configuration.
 APP_TITLE_TEXT = "D2W & D4W"
+DEFAULT_COMPETITION = "D2W_D4W"
 
 # Shuffle animation configuration.
 ANIMATION_STEP_DELAY_MS = 70
 ANIMATION_STEP_COUNT = 50
 
 
-SNAKES = [
-    ("S1", "Head-down Inface Snake"),
-    ("S2", "Head-down Switching Snake"),
-    ("S3", "Head-up Inface Snake"),
-    ("S4", "Head-up Switching Snake"),
-    ("S5", "Head-down Mixed Snake"),
-    ("S6", "Head-up Mixed Snake"),
-]
+COMPETITIONS = {
+    "D2W_D4W": {
+        "title": "D2W & D4W",
+        "snakes": [
+            ("S1", "Head-down Inface Snake"),
+            ("S2", "Head-down Switching Snake"),
+            ("S3", "Head-up Inface Snake"),
+            ("S4", "Head-up Switching Snake"),
+            ("S5", "Head-down Mixed Snake"),
+            ("S6", "Head-up Mixed Snake"),
+        ],
+        "verticals": [
+            ("V1", "Back Layout"),
+            ("V2", "Butterfly"),
+            ("V3", "Classic"),
+            ("V4", "Head-down 360°"),
+            ("V5", "Head-up 360°"),
+            ("V6", "Crossing Classic"),
+            ("V7", "Bottom Loop"),
+            ("V8", "Crossing Layout"),
+        ],
+        "mixers": [
+            ("M1", "Head Down Inface Circles"),
+            ("M2", "Head Up Inface Circles"),
+            ("M3", "Mixed Circles"),
+            ("M4", "Reverse Mixed Circles"),
+            ("M5", "Head Down Shuffler"),
+            ("M6", "Head Up Shuffler"),
+            ("M7", "Mixed Shuffler"),
+            ("M8", "Head Down Inface Shuffler"),
+            ("M9", "Head Up Inface Shuffler"),
+        ],
+    },
+    "DS": {
+        "title": "DS",
+        "snakes": [
+            ("S-1", "Head-down Inface Snake"),
+            ("S-2", "Head-down Switching Snake"),
+            ("S-3", "Head-up Inface Snake"),
+            ("S-4", "Head-up Switching Snake"),
+            ("S-5", "Head-down Mixed Snake"),
+            ("S-6", "Head-up Mixed Snake"),
+            ("S-7", "Head-down Inface 360 Snake"),
+            ("S-8", "Head-up Inface 360 Snake"),
+        ],
+        "verticals": [
+            ("V-1", "Back Layout"),
+            ("V-2", "Butterfly"),
+            ("V-3", "Classic"),
+            ("V-4", "Head-down 360°"),
+            ("V-5", "Head-up 360°"),
+            ("V-6", "Crossing classic"),
+            ("V-7", "Bottom loop"),
+        ],
+        "mixers": [
+            ("M-1", "Head-down Inface Circles"),
+            ("M-2", "Head-up Inface Circles"),
+            ("M-3", "Mixed Circles"),
+            ("M-4", "Reverse Mixed Circles"),
+            ("M-5", "Head-down Shuffler"),
+            ("M-6", "Head-up Shuffler"),
+            ("M-7", "Mixed Shuffler"),
+            ("M-8", "Head-down inface Shuffler"),
+            ("M-9", "Head-up inface Shuffler"),
+        ],
+    },
+}
 
-VERTICALS = [
-    ("V1", "Back Layout"),
-    ("V2", "Butterfly"),
-    ("V3", "Classic"),
-    ("V4", "Head-down 360°"),
-    ("V5", "Head-up 360°"),
-    ("V6", "Crossing Classic"),
-    ("V7", "Bottom Loop"),
-    ("V8", "Crossing Layout"),
-]
 
-MIXERS = [
-    ("M1", "Head Down Inface Circles"),
-    ("M2", "Head Up Inface Circles"),
-    ("M3", "Mixed Circles"),
-    ("M4", "Reverse Mixed Circles"),
-    ("M5", "Head Down Shuffler"),
-    ("M6", "Head Up Shuffler"),
-    ("M7", "Mixed Shuffler"),
-    ("M8", "Head Down Inface Shuffler"),
-    ("M9", "Head Up Inface Shuffler"),
-]
+def _competition_key() -> str:
+    """Return normalized active competition key."""
+    if DEFAULT_COMPETITION in COMPETITIONS:
+        return DEFAULT_COMPETITION
+    return "D2W_D4W"
+
+
+def _active_competition() -> dict[str, object]:
+    """Return active competition dictionary."""
+    return COMPETITIONS[_competition_key()]
+
+
+def get_competition_labels() -> dict[str, str]:
+    """Return mapping: competition key -> title."""
+    return {key: str(value.get("title", key)) for key, value in COMPETITIONS.items()}
+
+
+def get_competition_pools(key: str | None = None) -> tuple[list[tuple[str, str]], list[tuple[str, str]], list[tuple[str, str]]]:
+    """Return snakes, verticals and mixers for requested competition."""
+    selected_key = key if key in COMPETITIONS else _competition_key()
+    selected = COMPETITIONS[selected_key]
+    snakes = list(selected["snakes"])
+    verticals = list(selected["verticals"])
+    mixers = list(selected["mixers"])
+    return snakes, verticals, mixers
+
+
+def get_competition_title(key: str | None = None) -> str:
+    """Return title for requested competition."""
+    selected_key = key if key in COMPETITIONS else _competition_key()
+    return str(COMPETITIONS[selected_key]["title"])
+
+
+# Backward-compatible aliases used across app.
+SNAKES, VERTICALS, MIXERS = get_competition_pools()
+APP_TITLE_TEXT = get_competition_title()
 
 
 def _resolve_external_config_path() -> Path:
@@ -65,12 +140,10 @@ def _build_default_external_config() -> str:
         "\"\"\"External runtime config for DrawGeneratorsApp.\n"
         "Auto-generated on first run.\n"
         "Only UPPERCASE variables are applied.\n\"\"\"\n\n"
-        f"APP_TITLE_TEXT = {APP_TITLE_TEXT!r}\n\n"
+        f"DEFAULT_COMPETITION = {DEFAULT_COMPETITION!r}\n\n"
         f"ANIMATION_STEP_DELAY_MS = {ANIMATION_STEP_DELAY_MS!r}\n"
         f"ANIMATION_STEP_COUNT = {ANIMATION_STEP_COUNT!r}\n\n"
-        f"SNAKES = {pformat(SNAKES, width=88)}\n\n"
-        f"VERTICALS = {pformat(VERTICALS, width=88)}\n\n"
-        f"MIXERS = {pformat(MIXERS, width=88)}\n"
+        f"COMPETITIONS = {pformat(COMPETITIONS, width=100)}\n"
     )
 
 
@@ -105,4 +178,16 @@ def _apply_external_overrides() -> None:
 
 
 _apply_external_overrides()
+
+# Backward compatibility: if external config uses legacy flat pools,
+# map them into D2W_D4W competition.
+if isinstance(globals().get("SNAKES"), list) and isinstance(globals().get("VERTICALS"), list) and isinstance(globals().get("MIXERS"), list):
+    if "D2W_D4W" not in COMPETITIONS:
+        COMPETITIONS["D2W_D4W"] = {"title": "D2W & D4W", "snakes": [], "verticals": [], "mixers": []}
+    COMPETITIONS["D2W_D4W"]["snakes"] = list(globals()["SNAKES"])
+    COMPETITIONS["D2W_D4W"]["verticals"] = list(globals()["VERTICALS"])
+    COMPETITIONS["D2W_D4W"]["mixers"] = list(globals()["MIXERS"])
+
+SNAKES, VERTICALS, MIXERS = get_competition_pools()
+APP_TITLE_TEXT = get_competition_title()
 

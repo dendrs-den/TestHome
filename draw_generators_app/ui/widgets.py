@@ -13,15 +13,26 @@ class ElementGroupWidget(QGroupBox):
     def __init__(self, title: str, elements: list[Element]) -> None:
         super().__init__(title)
         self._map: dict[QCheckBox, Element] = {}
-        layout = QVBoxLayout()
+        self._layout = QVBoxLayout()
+        self._layout.setSpacing(2)
+        self._layout.setContentsMargins(6, 4, 6, 6)
+        self.setLayout(self._layout)
+        self.set_elements(elements)
+
+    def set_elements(self, elements: list[Element]) -> None:
+        """Replace current checkbox list with a new set of elements."""
+        self._map.clear()
+        while self._layout.count():
+            item = self._layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
 
         for element in elements:
             checkbox = QCheckBox(f"{element.code} - {element.name}")
             checkbox.setChecked(True)
             self._map[checkbox] = element
-            layout.addWidget(checkbox)
-
-        self.setLayout(layout)
+            self._layout.addWidget(checkbox)
 
     def selected_elements(self) -> list[Element]:
         """Return all currently selected elements."""
