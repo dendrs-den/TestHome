@@ -41,6 +41,17 @@ QToolButton#exportPdfButton {
     min-height: 28px;
     padding: 2px 8px;
 }
+QToolButton#exportExcelButton {
+    background: #dfdfe2;
+    color: #000000;
+    border: 0px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 700;
+    min-width: 62px;
+    min-height: 28px;
+    padding: 2px 8px;
+}
 QFrame#topSeparator {
     color: #1f3d63;
     background: #1f3d63;
@@ -207,8 +218,8 @@ QLineEdit#participantNumberField {
     color: #4a5560;
     border: 1px solid #aeb5bc;
     border-radius: 10px;
-    padding: 4px 8px;
-    font-size: 30px;
+    padding: 2px 8px;
+    font-size: 28px;
 }
 QWidget#participantRow[captainModeActive="true"][captain="true"] QLineEdit#participantField,
 QWidget#participantRow[captainModeActive="true"][captain="true"] QLineEdit#participantNumberField {
@@ -223,10 +234,10 @@ QWidget#participantRow[captainModeActive="true"][captain="true"][selected="true"
     border: 1px solid #b73843;
 }
 QLineEdit#participantField {
-    min-height: 38px;
+    min-height: 42px;
 }
 QLineEdit#participantNumberField {
-    min-height: 38px;
+    min-height: 42px;
 }
 QWidget#participantRow[editing="true"] QLineEdit#participantField,
 QWidget#participantRow[editing="true"] QLineEdit#participantNumberField,

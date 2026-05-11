@@ -65,6 +65,7 @@ class ParticipantRowWidget(QWidget):
         self._editing = False
         self.setObjectName("participantRow")
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setProperty("captain", participant.is_captain)
 
         layout = QHBoxLayout()
@@ -93,6 +94,7 @@ class ParticipantRowWidget(QWidget):
         self.captain_checkbox.setChecked(participant.is_captain)
         self.captain_checkbox.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.captain_checkbox.setFixedSize(18, 18)
+        self.captain_checkbox.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self.captain_cell = QWidget()
         self.captain_cell.setObjectName("participantCaptainCell")
@@ -113,6 +115,8 @@ class ParticipantRowWidget(QWidget):
         self.edit_button.setFixedWidth(72)
         self.delete_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.edit_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.delete_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.edit_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.delete_button.setVisible(False)
         self.edit_button.setVisible(False)
 
@@ -239,11 +243,19 @@ class MainWindow(QMainWindow):
         self.settings_toggle.setObjectName("settingsToggle")
         self.settings_toggle.setText("⚙")
         self.settings_toggle.setToolTip("Show or hide settings panel")
+        self.settings_toggle.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self.export_pdf_button = QToolButton()
         self.export_pdf_button.setObjectName("exportPdfButton")
         self.export_pdf_button.setText("PDF")
         self.export_pdf_button.setToolTip("Export current generation result to PDF")
+        self.export_pdf_button.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        self.export_excel_button = QToolButton()
+        self.export_excel_button.setObjectName("exportExcelButton")
+        self.export_excel_button.setText("XLSX")
+        self.export_excel_button.setToolTip("Export current generation result to Excel")
+        self.export_excel_button.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self.result_container = QWidget()
         self.result_container.setObjectName("resultsPanel")
@@ -275,6 +287,7 @@ class MainWindow(QMainWindow):
 
         self.settings_toggle.clicked.connect(self.on_toggle_settings_clicked)
         self.export_pdf_button.clicked.connect(self.on_export_pdf_clicked)
+        self.export_excel_button.clicked.connect(self.on_export_excel_clicked)
 
         self._build_ui()
         self._load_session_settings()
@@ -301,6 +314,7 @@ class MainWindow(QMainWindow):
         right_layout = QHBoxLayout()
         right_layout.setContentsMargins(0, 0, 0, 0)
         right_layout.setSpacing(10)
+        right_layout.addWidget(self.export_excel_button)
         right_layout.addWidget(self.export_pdf_button)
         right_layout.addWidget(self.settings_toggle)
         self.right_controls.setLayout(right_layout)
@@ -346,6 +360,7 @@ class MainWindow(QMainWindow):
         rounds_label.setObjectName("settingsRoundsLabel")
         self.round_count = QComboBox()
         self.round_count.setObjectName("roundCountBox")
+        self.round_count.setCursor(Qt.CursorShape.PointingHandCursor)
         for value in range(1, config.MAX_ROUND_COUNT + 1):
             self.round_count.addItem(str(value), value)
         default_index = max(0, min(config.MAX_ROUND_COUNT - 1, config.DEFAULT_ROUND_COUNT - 1))
@@ -356,6 +371,7 @@ class MainWindow(QMainWindow):
         team_size_label.setObjectName("settingsRoundsLabel")
         self.team_size = QComboBox()
         self.team_size.setObjectName("roundCountBox")
+        self.team_size.setCursor(Qt.CursorShape.PointingHandCursor)
         for value in range(config.MIN_TEAM_SIZE, config.MAX_TEAM_SIZE + 1):
             self.team_size.addItem(str(value), value)
         team_size_default_idx = self.team_size.findData(config.DEFAULT_TEAM_SIZE)
@@ -364,10 +380,12 @@ class MainWindow(QMainWindow):
         self.captain_mode_checkbox = QCheckBox("Captain")
         self.captain_mode_checkbox.setObjectName("captainModeCheckbox")
         self.captain_mode_checkbox.setChecked(False)
+        self.captain_mode_checkbox.setCursor(Qt.CursorShape.PointingHandCursor)
         self.captain_mode_checkbox.toggled.connect(self._on_captain_mode_changed)
 
         self.add_button = QPushButton("Add +")
         self.add_button.setObjectName("actionButton")
+        self.add_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.add_button.clicked.connect(self._on_add_participant)
 
         rounds_row.addWidget(rounds_label)
@@ -1162,6 +1180,90 @@ class MainWindow(QMainWindow):
             return
 
         QMessageBox.information(self, "Export PDF", "PDF exported successfully.")
+
+    def on_export_excel_clicked(self) -> None:
+        if not self._last_rounds:
+            QMessageBox.information(self, "Export Excel", "No generated rounds to export yet.")
+            return
+        try:
+            from openpyxl import Workbook
+            from openpyxl.styles import Alignment, Font, PatternFill
+        except Exception:
+            QMessageBox.warning(
+                self,
+                "Export Excel",
+                "Excel export dependency is missing.\nInstall it with: pip install openpyxl",
+            )
+            return
+
+        default_name = f"flyer_generators_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        file_path, _ = QFileDialog.getSaveFileName(self, "Save Excel", default_name, "Excel Files (*.xlsx)")
+        if not file_path:
+            return
+        if not file_path.lower().endswith(".xlsx"):
+            file_path += ".xlsx"
+
+        try:
+            workbook = Workbook()
+            sheet = workbook.active
+            sheet.title = "Rounds"
+            captain_mode_active = self._captain_mode_enabled()
+            # Structure: each round uses two columns [team_no, participant].
+            # No merged cells. Team number is repeated for each participant row.
+            max_rows = 0
+            per_round_rows: list[list[tuple[int, str, bool]]] = []
+            for round_item in self._last_rounds:
+                flat_rows: list[tuple[int, str, bool]] = []
+                for team_idx, team in enumerate(round_item.teams, start=1):
+                    for participant in team:
+                        flat_rows.append((team_idx, format_participant(participant), participant.is_captain))
+                per_round_rows.append(flat_rows)
+                max_rows = max(max_rows, len(flat_rows))
+
+            yellow_fill = PatternFill(fill_type="solid", fgColor="FFFF00")
+            red_fill = PatternFill(fill_type="solid", fgColor="FF6666")
+            header_font = Font(bold=True)
+            center = Alignment(horizontal="center", vertical="center")
+            left = Alignment(horizontal="left", vertical="center")
+
+            for round_idx, rows in enumerate(per_round_rows, start=1):
+                team_col = (round_idx - 1) * 2 + 1
+                participant_col = team_col + 1
+
+                sheet.cell(row=1, column=team_col, value="")
+                header_cell = sheet.cell(row=1, column=participant_col, value=f"Round {round_idx}")
+                header_cell.font = header_font
+                header_cell.alignment = center
+
+                for row_idx in range(max_rows):
+                    excel_row = row_idx + 2
+                    if row_idx < len(rows):
+                        team_no, participant_text, is_captain = rows[row_idx]
+                        team_cell = sheet.cell(row=excel_row, column=team_col, value=team_no)
+                        participant_cell = sheet.cell(row=excel_row, column=participant_col, value=participant_text)
+                        highlight_captain = captain_mode_active and is_captain
+                        fill = red_fill if highlight_captain else yellow_fill
+                        team_cell.fill = fill
+                        if highlight_captain:
+                            participant_cell.fill = red_fill
+                        team_cell.alignment = center
+                        participant_cell.alignment = left
+                    else:
+                        team_cell = sheet.cell(row=excel_row, column=team_col, value="")
+                        participant_cell = sheet.cell(row=excel_row, column=participant_col, value="")
+                        team_cell.fill = yellow_fill
+                        team_cell.alignment = center
+                        participant_cell.alignment = left
+
+                sheet.column_dimensions[sheet.cell(row=1, column=team_col).column_letter].width = 6
+                sheet.column_dimensions[sheet.cell(row=1, column=participant_col).column_letter].width = 38
+
+            workbook.save(file_path)
+        except Exception as exc:  # pragma: no cover
+            QMessageBox.warning(self, "Export Excel", f"Failed to export Excel:\n{exc}")
+            return
+
+        QMessageBox.information(self, "Export Excel", "Excel exported successfully.")
 
     def _build_pdf_html(self) -> str:
         generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
