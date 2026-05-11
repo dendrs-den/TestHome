@@ -312,6 +312,7 @@ class MainWindow(QMainWindow):
         top_bar.setSpacing(0)
 
         self.right_controls = QWidget()
+        self.right_controls.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         right_layout = QHBoxLayout()
         right_layout.setContentsMargins(0, 0, 0, 0)
         right_layout.setSpacing(10)
@@ -320,6 +321,9 @@ class MainWindow(QMainWindow):
         right_layout.addWidget(self.settings_toggle)
         self.right_controls.setLayout(right_layout)
 
+        self.left_title_spacer = QWidget()
+        self.left_title_spacer.setFixedWidth(self.right_controls.sizeHint().width())
+        top_bar.addWidget(self.left_title_spacer)
         top_bar.addStretch(1)
         top_bar.addWidget(self.title_label)
         top_bar.addStretch(1)
@@ -345,6 +349,12 @@ class MainWindow(QMainWindow):
         root.setLayout(outer)
         self.setCentralWidget(root)
         self._build_settings_popup()
+        self._sync_title_balance_width()
+
+    def _sync_title_balance_width(self) -> None:
+        """Keep title strictly centered by mirroring right controls width on the left."""
+        if hasattr(self, "left_title_spacer") and hasattr(self, "right_controls"):
+            self.left_title_spacer.setFixedWidth(self.right_controls.sizeHint().width())
 
     def _build_settings_popup(self) -> None:
         self.settings_popup = QWidget(self)
@@ -1079,6 +1089,7 @@ class MainWindow(QMainWindow):
 
     def resizeEvent(self, event) -> None:  # noqa: N802
         super().resizeEvent(event)
+        self._sync_title_balance_width()
         if self._last_rounds:
             self._render_rounds(self._last_rounds)
         elif hasattr(self, "round_count"):
