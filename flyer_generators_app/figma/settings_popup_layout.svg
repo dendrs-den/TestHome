@@ -1,0 +1,84 @@
+﻿<svg width="1400" height="980" viewBox="0 0 1400 980" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="980" fill="#0A0A0A"/>
+
+  <!-- Popup -->
+  <rect x="80" y="40" width="1240" height="900" rx="14" fill="#121212" stroke="#2F2F2F"/>
+
+  <!-- Header Row (updated to match provided mockup style) -->
+  <rect x="120" y="66" width="20" height="20" fill="#E8F3F9"/>
+  <text x="151" y="83" fill="#F1F4F7" font-family="Segoe UI, Arial, sans-serif" font-size="38" font-weight="800">D2W &amp; D4W</text>
+
+  <rect x="648" y="66" width="32" height="21" fill="#DFDFE2"/>
+  <text x="663" y="84" text-anchor="middle" fill="#000000" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">5</text>
+
+  <rect x="720" y="66" width="20" height="20" fill="#E8F3F9"/>
+  <text x="751" y="83" fill="#F1F4F7" font-family="Segoe UI, Arial, sans-serif" font-size="38" font-weight="800">DS</text>
+
+  <rect x="1248" y="66" width="32" height="21" fill="#DFDFE2"/>
+  <text x="1263" y="84" text-anchor="middle" fill="#000000" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">5</text>
+
+  <rect x="1180" y="66" width="56" height="21" fill="#DFDFE2"/>
+  <text x="1208" y="83" text-anchor="middle" fill="#000000" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">CLEAR</text>
+
+  <!-- Left column groups -->
+  <rect x="120" y="130" width="560" height="190" fill="#000" stroke="#C2C9CE"/>
+  <rect x="132" y="117" width="74" height="18" fill="#121212"/>
+  <text x="136" y="131" fill="#F1F4F7" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Snakes</text>
+
+  <rect x="120" y="344" width="560" height="230" fill="#000" stroke="#C2C9CE"/>
+  <rect x="132" y="331" width="88" height="18" fill="#121212"/>
+  <text x="136" y="345" fill="#F1F4F7" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Verticals</text>
+
+  <rect x="120" y="598" width="560" height="230" fill="#000" stroke="#C2C9CE"/>
+  <rect x="132" y="585" width="72" height="18" fill="#121212"/>
+  <text x="136" y="599" fill="#F1F4F7" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Mixers</text>
+
+  <!-- Right column groups -->
+  <rect x="720" y="130" width="560" height="220" fill="#000" stroke="#C2C9CE"/>
+  <rect x="732" y="117" width="74" height="18" fill="#121212"/>
+  <text x="736" y="131" fill="#F1F4F7" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Snakes</text>
+
+  <rect x="720" y="374" width="560" height="200" fill="#000" stroke="#C2C9CE"/>
+  <rect x="732" y="361" width="88" height="18" fill="#121212"/>
+  <text x="736" y="375" fill="#F1F4F7" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Verticals</text>
+
+  <rect x="720" y="598" width="560" height="230" fill="#000" stroke="#C2C9CE"/>
+  <rect x="732" y="585" width="72" height="18" fill="#121212"/>
+  <text x="736" y="599" fill="#F1F4F7" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Mixers</text>
+
+  <!-- Sample rows left -->
+  <g fill="#E8F3F9" font-family="Segoe UI, Arial, sans-serif" font-size="15">
+    <text x="138" y="160">☑ S1 - Head-down Inface Snake</text>
+    <text x="138" y="188">☑ S2 - Head-down Switching Snake</text>
+    <text x="138" y="216">☑ S3 - Head-up Inface Snake</text>
+    <text x="138" y="244">☑ S4 - Head-up Switching Snake</text>
+    <text x="138" y="272">☑ S5 - Head-down Mixed Snake</text>
+    <text x="138" y="300">☑ S6 - Head-up Mixed Snake</text>
+  </g>
+
+  <g fill="#E8F3F9" font-family="Segoe UI, Arial, sans-serif" font-size="15">
+    <text x="738" y="160">☑ S-1 - Head-down Inface Snake</text>
+    <text x="738" y="188">☑ S-2 - Head-down Switching Snake</text>
+    <text x="738" y="216">☑ S-3 - Head-up Inface Snake</text>
+    <text x="738" y="244">☑ S-4 - Head-up Switching Snake</text>
+    <text x="738" y="272">☑ S-5 - Head-down Mixed Snake</text>
+    <text x="738" y="300">☑ S-6 - Head-up Mixed Snake</text>
+    <text x="738" y="328">☑ S-7 - Head-down Inface 360 Snake</text>
+  </g>
+
+  <!-- Bottom controls -->
+  <text x="120" y="872" fill="#F1F4F7" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">Competition:</text>
+  <rect x="292" y="848" width="122" height="34" rx="4" fill="#0D0D0D" stroke="#C2C9CE"/>
+  <text x="324" y="870" fill="#E8F3F9" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">☑ D2W</text>
+  <rect x="428" y="848" width="102" height="34" rx="4" fill="#0D0D0D" stroke="#C2C9CE"/>
+  <text x="458" y="870" fill="#E8F3F9" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">☑ DS</text>
+
+  <text x="580" y="872" fill="#F1F4F7" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">Rounds:</text>
+  <text x="692" y="872" fill="#E4EDF3" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">D2W</text>
+  <rect x="752" y="848" width="58" height="34" fill="#DFDFE2"/>
+  <text x="776" y="872" text-anchor="middle" fill="#000" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">5</text>
+
+  <text x="838" y="872" fill="#E4EDF3" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">DS</text>
+  <rect x="878" y="848" width="58" height="34" fill="#DFDFE2"/>
+  <text x="902" y="872" text-anchor="middle" fill="#000" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">5</text>
+</svg>
