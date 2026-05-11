@@ -41,7 +41,7 @@ ORDER_WIDTH = 28
 ROW_SPACING = 10
 NAME_WIDTH = 500
 NUMBER_WIDTH = 84
-ACTIONS_CAPTAIN_WIDTH = 78
+ACTIONS_CAPTAIN_WIDTH = NUMBER_WIDTH
 ACTIONS_WIDTH = 156
 PARTICIPANT_CARD_HEIGHT = 56
 
@@ -91,8 +91,19 @@ class ParticipantRowWidget(QWidget):
         self.captain_checkbox = QCheckBox("")
         self.captain_checkbox.setObjectName("participantCaptainCheckbox")
         self.captain_checkbox.setChecked(participant.is_captain)
-        self.captain_checkbox.setFixedWidth(ACTIONS_CAPTAIN_WIDTH)
         self.captain_checkbox.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        self.captain_checkbox.setFixedSize(18, 18)
+
+        self.captain_cell = QWidget()
+        self.captain_cell.setObjectName("participantCaptainCell")
+        self.captain_cell.setFixedWidth(ACTIONS_CAPTAIN_WIDTH)
+        captain_layout = QHBoxLayout()
+        captain_layout.setContentsMargins(0, 0, 0, 0)
+        captain_layout.setSpacing(0)
+        captain_layout.addStretch(1)
+        captain_layout.addWidget(self.captain_checkbox)
+        captain_layout.addStretch(1)
+        self.captain_cell.setLayout(captain_layout)
 
         self.delete_button = QPushButton("Del")
         self.delete_button.setObjectName("rowActionButton")
@@ -125,12 +136,16 @@ class ParticipantRowWidget(QWidget):
         layout.addWidget(self.order_label)
         layout.addWidget(self.name_field)
         layout.addWidget(self.number_field)
-        layout.addWidget(self.captain_checkbox, 0, Qt.AlignmentFlag.AlignHCenter)
+        layout.addWidget(self.captain_cell)
         layout.addWidget(self.actions_container)
         self.setLayout(layout)
 
         for widget in (self, self.order_label, self.name_field, self.number_field, self.captain_checkbox):
             widget.installEventFilter(self)
+
+    def set_captain_column_visible(self, visible: bool) -> None:
+        self.captain_cell.setVisible(True)
+        self.captain_checkbox.setVisible(visible)
 
     def set_selected(self, selected: bool) -> None:
         self._selected = selected
@@ -366,13 +381,13 @@ class MainWindow(QMainWindow):
         rounds_row.addWidget(self.add_button)
         layout.addLayout(rounds_row)
 
-        layout.addWidget(self._build_participants_header())
-
         self.participants_list_container = QWidget()
         self.participants_list_container.setObjectName("participantsListContainer")
         self.participants_list_layout = QVBoxLayout()
         self.participants_list_layout.setContentsMargins(0, 0, 14, 0)
         self.participants_list_layout.setSpacing(2)
+        self.participants_header_row = self._build_participants_header()
+        self.participants_list_layout.addWidget(self.participants_header_row)
         self.participants_list_layout.addStretch(1)
         self.participants_list_container.setLayout(self.participants_list_layout)
 
@@ -389,37 +404,65 @@ class MainWindow(QMainWindow):
     def _build_participants_header(self) -> QWidget:
         """Build participants table header aligned to row grid."""
         header = QWidget()
-        self.participants_header_widget = header
         row = QHBoxLayout()
         row.setContentsMargins(0, 0, 0, 0)
         row.setSpacing(ROW_SPACING)
 
-        order_spacer = QWidget()
-        order_spacer.setFixedWidth(ORDER_WIDTH)
+        order_cell = QWidget()
+        order_cell.setObjectName("participantsHeaderCell")
+        order_cell.setFixedWidth(ORDER_WIDTH)
 
+        name_cell = QWidget()
+        name_cell.setObjectName("participantsHeaderCell")
+        name_cell.setFixedWidth(NAME_WIDTH)
+        name_cell_layout = QHBoxLayout()
+        name_cell_layout.setContentsMargins(0, 0, 0, 0)
+        name_cell_layout.setSpacing(0)
         name_col = QLabel("Name")
         name_col.setObjectName("participantsHeader")
-        name_col.setFixedWidth(NAME_WIDTH)
-        name_col.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        name_col.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+        name_cell_layout.addStretch(1)
+        name_cell_layout.addWidget(name_col)
+        name_cell_layout.addStretch(1)
+        name_cell.setLayout(name_cell_layout)
 
+        num_cell = QWidget()
+        num_cell.setObjectName("participantsHeaderCell")
+        num_cell.setFixedWidth(NUMBER_WIDTH)
+        num_cell_layout = QHBoxLayout()
+        num_cell_layout.setContentsMargins(0, 0, 0, 0)
+        num_cell_layout.setSpacing(0)
         num_col = QLabel("№")
         num_col.setObjectName("participantsHeader")
-        num_col.setFixedWidth(NUMBER_WIDTH)
-        num_col.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        num_col.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+        num_cell_layout.addStretch(1)
+        num_cell_layout.addWidget(num_col)
+        num_cell_layout.addStretch(1)
+        num_cell.setLayout(num_cell_layout)
 
+        self.captain_header_cell = QWidget()
+        self.captain_header_cell.setObjectName("participantsHeaderCell")
+        self.captain_header_cell.setFixedWidth(ACTIONS_CAPTAIN_WIDTH)
+        captain_header_layout = QHBoxLayout()
+        captain_header_layout.setContentsMargins(0, 0, 0, 0)
+        captain_header_layout.setSpacing(0)
         self.captain_col = QLabel("Captain")
         self.captain_col.setObjectName("participantsHeader")
-        self.captain_col.setFixedWidth(ACTIONS_CAPTAIN_WIDTH)
         self.captain_col.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+        captain_header_layout.addStretch(1)
+        captain_header_layout.addWidget(self.captain_col)
+        captain_header_layout.addStretch(1)
+        self.captain_header_cell.setLayout(captain_header_layout)
 
-        actions_spacer = QWidget()
-        actions_spacer.setFixedWidth(ACTIONS_WIDTH)
+        actions_cell = QWidget()
+        actions_cell.setObjectName("participantsHeaderCell")
+        actions_cell.setFixedWidth(ACTIONS_WIDTH)
 
-        row.addWidget(order_spacer)
-        row.addWidget(name_col)
-        row.addWidget(num_col)
-        row.addWidget(self.captain_col)
-        row.addWidget(actions_spacer)
+        row.addWidget(order_cell)
+        row.addWidget(name_cell)
+        row.addWidget(num_cell)
+        row.addWidget(self.captain_header_cell)
+        row.addWidget(actions_cell)
         header.setLayout(row)
         return header
 
@@ -493,15 +536,15 @@ class MainWindow(QMainWindow):
         self._save_current_settings()
 
     def _sync_participants_table(self, select_index: int | None = None) -> None:
-        while self.participants_list_layout.count() > 1:
-            item = self.participants_list_layout.takeAt(0)
+        while self.participants_list_layout.count() > 2:
+            item = self.participants_list_layout.takeAt(1)
             widget = item.widget()
             if widget is not None:
                 widget.deleteLater()
 
         for idx, participant in enumerate(self.participants):
             row = ParticipantRowWidget(idx, participant)
-            row.captain_checkbox.setVisible(self._captain_mode_enabled())
+            row.set_captain_column_visible(self._captain_mode_enabled())
             row.captain_checkbox.setProperty("captainModeActive", self._captain_mode_enabled())
             row.captain_checkbox.style().unpolish(row.captain_checkbox)
             row.captain_checkbox.style().polish(row.captain_checkbox)
@@ -1073,7 +1116,7 @@ class MainWindow(QMainWindow):
     def _apply_captain_column_visibility(self) -> None:
         visible = self._captain_mode_enabled()
         if hasattr(self, "captain_col"):
-            self.captain_col.setVisible(visible)
+            self.captain_col.setText("Captain" if visible else "")
 
     def _show_validation_error(self, message: str) -> None:
         """Show localized validation error dialog with dark text."""

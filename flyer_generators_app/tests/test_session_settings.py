@@ -33,7 +33,6 @@ def test_load_settings_returns_empty_on_invalid_json(tmp_path: Path, monkeypatch
     target.write_text("session_settings_json = '''\n{broken\n'''\n", encoding="utf-8")
     monkeypatch.setattr(session_settings, "get_settings_path", lambda: target)
     monkeypatch.setattr(session_settings, "_legacy_local_settings_path", lambda: tmp_path / "missing_local.cfg")
-    monkeypatch.setattr(session_settings, "_legacy_settings_path", lambda: tmp_path / "missing_legacy.json")
 
     assert session_settings.load_settings() == {}
 

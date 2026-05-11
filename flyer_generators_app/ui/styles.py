@@ -47,6 +47,18 @@ QFrame#topSeparator {
     min-height: 1px;
     max-height: 1px;
 }
+QMessageBox {
+    background: #f2f2f2;
+}
+QMessageBox QLabel {
+    color: #101010;
+    font-size: 16px;
+}
+QMessageBox QPushButton {
+    min-width: 88px;
+    min-height: 30px;
+    color: #101010;
+}
 QWidget#resultsPanel { background: #030e21; }
 QScrollArea { border: none; background: #030e21; }
 QLabel#resultTitle {
