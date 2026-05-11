@@ -4,11 +4,15 @@ from __future__ import annotations
 
 from core.models import Participant
 
+MAX_ALLOWED_ROUNDS = 10
+
 
 def validate_round_count(round_count: int) -> None:
-    """Ensure rounds count is positive."""
+    """Ensure rounds count is in supported range."""
     if round_count < 1:
         raise ValueError("Количество раундов должно быть не меньше 1.")
+    if round_count > MAX_ALLOWED_ROUNDS:
+        raise ValueError(f"Количество раундов должно быть не больше {MAX_ALLOWED_ROUNDS}.")
 
 
 def validate_participants(participants: list[Participant]) -> None:

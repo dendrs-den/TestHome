@@ -13,6 +13,11 @@ def test_validate_round_count_error() -> None:
         validate_round_count(0)
 
 
+def test_validate_round_count_too_large_error() -> None:
+    with pytest.raises(ValueError, match="не больше 10"):
+        validate_round_count(11)
+
+
 def test_validate_participants_error() -> None:
     with pytest.raises(ValueError):
         validate_participants([Participant("001", "Only One")])

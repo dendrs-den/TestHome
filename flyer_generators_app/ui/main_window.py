@@ -44,6 +44,7 @@ NUMBER_WIDTH = 84
 ACTIONS_CAPTAIN_WIDTH = NUMBER_WIDTH
 ACTIONS_WIDTH = 156
 PARTICIPANT_CARD_HEIGHT = 56
+MAX_UI_ROUND_COUNT = 10
 
 
 class ParticipantRowWidget(QWidget):
@@ -361,9 +362,10 @@ class MainWindow(QMainWindow):
         self.round_count = QComboBox()
         self.round_count.setObjectName("roundCountBox")
         self.round_count.setCursor(Qt.CursorShape.PointingHandCursor)
-        for value in range(1, config.MAX_ROUND_COUNT + 1):
+        effective_max_rounds = min(config.MAX_ROUND_COUNT, MAX_UI_ROUND_COUNT)
+        for value in range(1, effective_max_rounds + 1):
             self.round_count.addItem(str(value), value)
-        default_index = max(0, min(config.MAX_ROUND_COUNT - 1, config.DEFAULT_ROUND_COUNT - 1))
+        default_index = max(0, min(effective_max_rounds - 1, config.DEFAULT_ROUND_COUNT - 1))
         self.round_count.setCurrentIndex(default_index)
         self.round_count.currentIndexChanged.connect(self._on_rounds_changed)
 
@@ -813,7 +815,13 @@ class MainWindow(QMainWindow):
                     participant_card.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
                     participant_card.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     participant_card.setWordWrap(False)
-                    self._fit_result_card_text(participant_card, participant_text)
+                    if self._pulse_timer.isActive():
+                        # During pulse animation keep deterministic readable font.
+                        font = QFont(participant_card.font())
+                        font.setPointSize(16)
+                        participant_card.setFont(font)
+                    else:
+                        self._fit_result_card_text(participant_card, participant_text)
                     team_layout.addWidget(participant_card, 0, Qt.AlignmentFlag.AlignHCenter)
 
             team_layout.addStretch(1)
@@ -830,13 +838,13 @@ class MainWindow(QMainWindow):
             if not isValid(label):
                 return
             # Account for left/right inner padding from stylesheet.
-            available_width = max(20, label.contentsRect().width() - 24)
-            available_height = max(14, label.contentsRect().height() - 10)
+            available_width = max(20, label.contentsRect().width() - 20)
+            available_height = max(14, label.contentsRect().height() - 8)
             if available_width <= 20:
                 return
 
             min_size = 8
-            max_size = 48
+            max_size = 52
             chosen = min_size
             for size in range(max_size, min_size - 1, -1):
                 font = QFont(label.font())
@@ -962,7 +970,7 @@ class MainWindow(QMainWindow):
 
         round_count = settings.get("round_count")
         if isinstance(round_count, int):
-            idx = self.round_count.findData(max(1, min(config.MAX_ROUND_COUNT, round_count)))
+            idx = self.round_count.findData(max(1, min(MAX_UI_ROUND_COUNT, round_count)))
             if idx >= 0:
                 self.round_count.setCurrentIndex(idx)
 
@@ -1171,7 +1179,9 @@ class MainWindow(QMainWindow):
 
             document = QTextDocument()
             document.setDocumentMargin(0)
-            document.setDefaultStyleSheet("body { font-family: Arial; margin: 0; padding: 0; }")
+            document.setDefaultStyleSheet(
+                "body { font-family: Segoe UI, Arial, sans-serif; margin: 0; padding: 0; }"
+            )
             document.setHtml(self._build_pdf_html())
             document.setPageSize(printer.pageRect(QPrinter.Unit.Point).size())
             document.print_(printer)
@@ -1268,44 +1278,54 @@ class MainWindow(QMainWindow):
     def _build_pdf_html(self) -> str:
         generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         return (
-            f"<h1 style='font-size:24pt;margin:0 0 6px 0;'>{escape(config.APP_TITLE_TEXT)}</h1>"
-            f"<p style='font-size:10pt;margin:0 0 8px 0;'>Generated: {generated_at}</p>"
-            f"{self._build_rounds_table_html(self._last_rounds)}"
+            f"{self._build_round_pages_html(self._last_rounds, generated_at)}"
         )
 
-    def _build_rounds_table_html(self, rounds: list[TeamRound]) -> str:
-        round_count = max(1, len(rounds))
-        max_teams = max((len(round_item.teams) for round_item in rounds), default=1)
-        header_cells = "".join(
-            f"<th style='border:1px solid #555;padding:5px;background:#efefef;'>Round {escape(str(item.number))}</th>"
-            for item in rounds
-        )
-        rows = []
-        for team_idx in range(max_teams):
-            round_cells = []
-            for round_item in rounds:
-                team = round_item.teams[team_idx] if team_idx < len(round_item.teams) else []
-                participants_text = "<br/>".join(escape(format_participant(p)) for p in team)
-                round_cells.append(f"<td style='border:1px solid #555;padding:5px;'>{participants_text}</td>")
-            rows.append(
-                "<tr>"
-                f"<td style='border:1px solid #555;padding:5px;background:#efefef;font-weight:700;'>Team {team_idx + 1}</td>"
-                f"{''.join(round_cells)}"
-                "</tr>"
+    def _build_round_pages_html(self, rounds: list[TeamRound], generated_at: str) -> str:
+        """Render PDF as one round per page in portrait orientation."""
+        if not rounds:
+            return ""
+
+        pages: list[str] = []
+        for page_idx, round_item in enumerate(rounds):
+            teams_count = max(1, len(round_item.teams))
+            max_team_size = max((len(team) for team in round_item.teams), default=1)
+            # Adaptive font so a full round fits page without text wrapping.
+            font_size = 11
+            if teams_count >= 7 or max_team_size >= 5:
+                font_size = 10
+            if teams_count >= 9 or max_team_size >= 6:
+                font_size = 9
+
+            rows_html: list[str] = []
+            for team_idx, team in enumerate(round_item.teams, start=1):
+                participants_text = "".join(
+                    f"<div style='white-space:nowrap;margin:0 0 2px 0;'>{escape(format_participant(p))}</div>"
+                    for p in team
+                )
+                rows_html.append(
+                    "<tr style='page-break-inside:avoid;break-inside:avoid-page;'>"
+                    f"<td style='border:1px solid #555;padding:5px;background:#efefef;font-weight:700;white-space:nowrap;width:18%;'>Team {team_idx}</td>"
+                    f"<td style='border:1px solid #555;padding:5px;vertical-align:top;width:82%;'>{participants_text}</td>"
+                    "</tr>"
+                )
+
+            page_html = (
+                f"<div style='font-size:{font_size}pt;'>"
+                f"<h1 style='font-size:24pt;margin:0 0 6px 0;'>{escape(config.APP_TITLE_TEXT)}</h1>"
+                f"<p style='font-size:10pt;margin:0 0 8px 0;'>Generated: {generated_at}</p>"
+                f"<h2 style='margin:0 0 8px 0;font-size:18pt;'>Round {round_item.number}</h2>"
+                "<table style='width:100%;border-collapse:collapse;table-layout:fixed;'>"
+                "<thead><tr>"
+                "<th style='border:1px solid #555;padding:5px;background:#efefef;'>Team</th>"
+                "<th style='border:1px solid #555;padding:5px;background:#efefef;'>Participants</th>"
+                "</tr></thead>"
+                f"<tbody>{''.join(rows_html)}</tbody>"
+                "</table>"
+                "</div>"
             )
-        round_col_width = int(82 / round_count)
-        extra = 82 - (round_col_width * round_count)
-        colgroup = "<col style='width:18%;'/>" + "".join(
-            f"<col style='width:{round_col_width + (1 if idx < extra else 0)}%;'/>"
-            for idx in range(round_count)
-        )
-        return (
-            "<table style='width:100%;border-collapse:collapse;table-layout:fixed;'>"
-            f"<colgroup>{colgroup}</colgroup>"
-            "<thead><tr>"
-            "<th style='border:1px solid #555;padding:5px;background:#efefef;'>Team</th>"
-            f"{header_cells}"
-            "</tr></thead>"
-            f"<tbody>{''.join(rows)}</tbody>"
-            "</table>"
-        )
+            if page_idx > 0:
+                page_html = "<div style='page-break-before:always;break-before:page;'></div>" + page_html
+            pages.append(page_html)
+
+        return "".join(pages)
