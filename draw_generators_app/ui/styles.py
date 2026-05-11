@@ -171,14 +171,14 @@ QWidget#settingsPopup QGroupBox::title {
 QLabel#resultCard {
     background: #12a9e1;
     color: #ffffff;
-    border-radius: 0px;
+    border-radius: 9px;
     font-weight: 700;
     padding: 8px 8px;
 }
 QLabel#dualResultCard {
     background: #12a9e1;
     color: #ffffff;
-    border-radius: 0px;
+    border-radius: 9px;
     font-weight: 700;
     font-size: 18px;
     padding: 8px 8px;

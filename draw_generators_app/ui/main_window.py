@@ -110,6 +110,7 @@ class MainWindow(QMainWindow):
         top_bar.setSpacing(0)
 
         self.right_controls = QWidget()
+        self.right_controls.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         right_layout = QHBoxLayout()
         right_layout.setContentsMargins(0, 0, 0, 0)
         right_layout.setSpacing(10)
@@ -117,6 +118,9 @@ class MainWindow(QMainWindow):
         right_layout.addWidget(self.settings_toggle)
         self.right_controls.setLayout(right_layout)
 
+        self.left_title_spacer = QWidget()
+        self.left_title_spacer.setFixedWidth(self.right_controls.sizeHint().width())
+        top_bar.addWidget(self.left_title_spacer)
         top_bar.addStretch(1)
         top_bar.addWidget(self.title_label)
         top_bar.addStretch(1)
@@ -144,6 +148,12 @@ class MainWindow(QMainWindow):
         self._build_settings_popup()
         self._update_mode_controls()
         self.title_label.setText(self._current_title_text())
+        self._sync_title_balance_width()
+
+    def _sync_title_balance_width(self) -> None:
+        """Keep title strictly centered by mirroring right controls width on the left."""
+        if hasattr(self, "left_title_spacer") and hasattr(self, "right_controls"):
+            self.left_title_spacer.setFixedWidth(self.right_controls.sizeHint().width())
 
     def on_generate_clicked(self) -> None:
         """Generate rounds and render or show validation error."""
@@ -233,6 +243,7 @@ class MainWindow(QMainWindow):
     def resizeEvent(self, event) -> None:  # noqa: N802
         """Re-render generated rounds so sizes adapt to new window dimensions."""
         super().resizeEvent(event)
+        self._sync_title_balance_width()
         if self._last_rounds:
             self._render_rounds(self._last_rounds)
         if self.settings_popup.isVisible():
