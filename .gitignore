@@ -6,3 +6,5 @@ backup_ui_before_shuffle_pulse/
 build/
 dist/
 *.spec
+flyer_generators_app/flyer_generators_*.pdf
+flyer_generators_app/draw_generators_*.pdf
