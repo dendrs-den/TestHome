@@ -20,6 +20,7 @@ DEFAULT_COMPETITION = "D2W_D4W"
 # Shuffle animation configuration.
 ANIMATION_STEP_DELAY_MS = 70
 ANIMATION_STEP_COUNT = 50
+ANIMATION_PREVIEW_ROUNDS = 5
 
 
 COMPETITIONS = {
@@ -143,8 +144,28 @@ def _build_default_external_config() -> str:
         f"DEFAULT_COMPETITION = {DEFAULT_COMPETITION!r}\n\n"
         f"ANIMATION_STEP_DELAY_MS = {ANIMATION_STEP_DELAY_MS!r}\n"
         f"ANIMATION_STEP_COUNT = {ANIMATION_STEP_COUNT!r}\n\n"
+        f"ANIMATION_PREVIEW_ROUNDS = {ANIMATION_PREVIEW_ROUNDS!r}\n\n"
         f"COMPETITIONS = {pformat(COMPETITIONS, width=100)}\n"
     )
+
+
+def save_competition_title(competition_key: str, title: str) -> bool:
+    """Persist one competition title to external config file."""
+    if competition_key not in COMPETITIONS:
+        return False
+
+    normalized = title.strip()
+
+    COMPETITIONS[competition_key]["title"] = normalized
+    globals()["APP_TITLE_TEXT"] = get_competition_title()
+
+    external_path = _resolve_external_config_path()
+    _ensure_external_config_exists(external_path)
+    try:
+        external_path.write_text(_build_default_external_config(), encoding="utf-8")
+    except OSError:
+        return False
+    return True
 
 
 def _ensure_external_config_exists(path: Path) -> None:

@@ -142,6 +142,16 @@ QWidget#settingsPopup QLabel#settingsRoundsLabel {
     font-size: 20px;
     font-weight: 700;
 }
+QWidget#settingsPopup QLineEdit#settingsTitleInput {
+    color: #f1f4f7;
+    background: transparent;
+    border: 1px solid #2f2f2f;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 20px;
+    font-weight: 700;
+    min-height: 26px;
+}
 QWidget#settingsPopup QCheckBox {
     min-width: 20px;
     min-height: 20px;

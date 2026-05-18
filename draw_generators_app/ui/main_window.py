@@ -5,10 +5,11 @@ from __future__ import annotations
 import random
 from datetime import datetime
 from html import escape
+from pathlib import Path
 
-from PySide6.QtCore import QSignalBlocker, QTimer, Qt
+from PySide6.QtCore import QEvent, QSignalBlocker, QTimer, Qt
 from PySide6.QtCore import QMarginsF
-from PySide6.QtGui import QPageLayout, QTextDocument
+from PySide6.QtGui import QDesktopServices, QPageLayout, QTextDocument
 from PySide6.QtPrintSupport import QPrinter
 from PySide6.QtWidgets import (
     QComboBox,
@@ -18,6 +19,7 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QHBoxLayout,
     QLabel,
+    QLineEdit,
     QMainWindow,
     QMessageBox,
     QScrollArea,
@@ -26,6 +28,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+from PySide6.QtCore import QUrl
 
 import config
 from core.generator import generate_rounds
@@ -38,6 +41,7 @@ from utils.session_settings import load_settings, save_settings
 
 class MainWindow(QMainWindow):
     """Main app window with settings and generated result."""
+    _DEFAULT_PULSE_PREVIEW_ROUNDS = 5
 
     def __init__(self) -> None:
         super().__init__()
@@ -53,10 +57,12 @@ class MainWindow(QMainWindow):
         self.settings_toggle.setObjectName("settingsToggle")
         self.settings_toggle.setText("⚙")
         self.settings_toggle.setToolTip("Show or hide settings panel")
+        self.settings_toggle.setCursor(Qt.CursorShape.PointingHandCursor)
         self.export_pdf_button = QToolButton()
         self.export_pdf_button.setObjectName("exportPdfButton")
         self.export_pdf_button.setText("PDF")
         self.export_pdf_button.setToolTip("Export current generation result to PDF")
+        self.export_pdf_button.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self.result_container = QWidget()
         self.result_container.setObjectName("resultsPanel")
@@ -71,6 +77,8 @@ class MainWindow(QMainWindow):
         self.result_scroll.setWidget(self.result_container)
         self.result_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.result_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self._suppress_result_scroll = False
+        self.result_scroll.viewport().installEventFilter(self)
         self._last_rounds: list[Round] = []
         self._pulse_timer = QTimer(self)
         self._pulse_timer.timeout.connect(self._on_pulse_tick)
@@ -341,7 +349,8 @@ class MainWindow(QMainWindow):
         self._target_rounds = list(rounds)
         self._target_rounds_secondary = list(rounds_secondary)
         self._pulse_ticks = 0
-        self.right_controls.setVisible(False)
+        self.right_controls.setEnabled(False)
+        self._suppress_result_scroll = True
         self.title_label.setText("Generating...")
         self.title_label.setStyleSheet("color: #ffffff;")
         self._blink_visible = True
@@ -355,7 +364,8 @@ class MainWindow(QMainWindow):
             self._blink_timer.stop()
             self.title_label.setText(self._current_title_text())
             self.title_label.setStyleSheet(self._default_title_style)
-            self.right_controls.setVisible(True)
+            self.right_controls.setEnabled(True)
+            self._suppress_result_scroll = False
             self._last_secondary_rounds = list(self._target_rounds_secondary)
             self._render_rounds(self._target_rounds)
             return
@@ -364,8 +374,15 @@ class MainWindow(QMainWindow):
         self._render_pulse_frame(len(self._target_rounds), len(self._target_rounds_secondary))
 
     def _render_pulse_frame(self, rounds_count: int, rounds_count_secondary: int) -> None:
-        """Render one pulse frame with temporary shuffled cards."""
+        """Render one pulse frame with temporary shuffled cards.
+
+        To keep animation responsive on low-end machines, show only a compact
+        preview subset during pulse and render full data only at the end.
+        """
         self._clear_results()
+        preview_limit = self._pulse_preview_rounds_limit()
+        preview_rounds = min(rounds_count, preview_limit)
+        preview_secondary = min(rounds_count_secondary, preview_limit)
         if self._is_dual_mode():
             ds_groups = self.groups_by_competition["DS"]
             d2w_groups = self.groups_by_competition["D2W_D4W"]
@@ -382,7 +399,7 @@ class MainWindow(QMainWindow):
 
             fake_ds: list[Round] = []
             fake_d2w: list[Round] = []
-            for idx in range(rounds_count):
+            for idx in range(preview_rounds):
                 fake_ds.append(
                     Round(
                         number=idx + 1,
@@ -391,7 +408,7 @@ class MainWindow(QMainWindow):
                         mixer=random.choice(ds_mixers),
                     )
                 )
-            for idx in range(rounds_count_secondary):
+            for idx in range(preview_secondary):
                 fake_d2w.append(
                     Round(
                         number=idx + 1,
@@ -413,7 +430,7 @@ class MainWindow(QMainWindow):
         if not snakes or not verticals or not mixers:
             return
 
-        for idx in range(rounds_count):
+        for idx in range(preview_rounds):
             fake_round = Round(
                 number=idx + 1,
                 snake=random.choice(snakes),
@@ -421,6 +438,15 @@ class MainWindow(QMainWindow):
                 mixer=random.choice(mixers),
             )
             self._append_round_widget(fake_round)
+
+    def _pulse_preview_rounds_limit(self) -> int:
+        """Return configured preview rounds count for pulse animation."""
+        value = getattr(config, "ANIMATION_PREVIEW_ROUNDS", self._DEFAULT_PULSE_PREVIEW_ROUNDS)
+        try:
+            parsed = int(value)
+        except (TypeError, ValueError):
+            return self._DEFAULT_PULSE_PREVIEW_ROUNDS
+        return max(1, parsed)
 
     def _append_round_widget(self, round_item: Round) -> None:
         """Append one round block into results container."""
@@ -510,14 +536,15 @@ class MainWindow(QMainWindow):
         self.ds_checkbox.setObjectName("popupHeaderCheckbox")
         self.ds_checkbox.setChecked(False)
         self.ds_checkbox.toggled.connect(self._on_ds_toggled)
-        left_title = QLabel("DS")
-        left_title.setObjectName("settingsColumnTitle")
+        self.ds_title_input = QLineEdit(self.competition_labels.get("DS", "DS"))
+        self.ds_title_input.setObjectName("settingsTitleInput")
+        self.ds_title_input.editingFinished.connect(lambda: self._on_competition_title_edited("DS", self.ds_title_input))
         left_rounds_label = QLabel("Rounds")
         left_rounds_label.setObjectName("settingsRoundsLabel")
         self.ds_round_count = self._build_rounds_combobox()
         self.ds_round_count.currentIndexChanged.connect(self._on_rounds_changed)
         left_header_box.addWidget(self.ds_checkbox)
-        left_header_box.addWidget(left_title)
+        left_header_box.addWidget(self.ds_title_input)
         left_header_box.addStretch(1)
         left_header_box.addWidget(left_rounds_label)
         left_header_box.addWidget(self.ds_round_count)
@@ -529,14 +556,15 @@ class MainWindow(QMainWindow):
         self.d2w_checkbox.setObjectName("popupHeaderCheckbox")
         self.d2w_checkbox.setChecked(True)
         self.d2w_checkbox.toggled.connect(self._on_d2w_toggled)
-        right_title = QLabel("D2W & D4W")
-        right_title.setObjectName("settingsColumnTitle")
+        self.d2w_title_input = QLineEdit(self.competition_labels.get("D2W_D4W", "D2W & D4W"))
+        self.d2w_title_input.setObjectName("settingsTitleInput")
+        self.d2w_title_input.editingFinished.connect(lambda: self._on_competition_title_edited("D2W_D4W", self.d2w_title_input))
         right_rounds_label = QLabel("Rounds")
         right_rounds_label.setObjectName("settingsRoundsLabel")
         self.d2w_round_count = self._build_rounds_combobox()
         self.d2w_round_count.currentIndexChanged.connect(self._on_rounds_changed)
         right_header_box.addWidget(self.d2w_checkbox)
-        right_header_box.addWidget(right_title)
+        right_header_box.addWidget(self.d2w_title_input)
         right_header_box.addStretch(1)
         right_header_box.addWidget(right_rounds_label)
         right_header_box.addWidget(self.d2w_round_count)
@@ -551,6 +579,23 @@ class MainWindow(QMainWindow):
         header_grid.setColumnStretch(0, 1)
         header_grid.setColumnStretch(1, 1)
         layout.addLayout(header_grid)
+
+        columns_header_grid = QGridLayout()
+        columns_header_grid.setContentsMargins(0, 2, 0, 0)
+        columns_header_grid.setHorizontalSpacing(14)
+
+        left_column_title = QLabel("DS")
+        left_column_title.setObjectName("settingsColumnTitle")
+        left_column_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        right_column_title = QLabel("D2W & D4W")
+        right_column_title.setObjectName("settingsColumnTitle")
+        right_column_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        columns_header_grid.addWidget(left_column_title, 0, 0)
+        columns_header_grid.addWidget(right_column_title, 0, 1)
+        columns_header_grid.setColumnStretch(0, 1)
+        columns_header_grid.setColumnStretch(1, 1)
+        layout.addLayout(columns_header_grid)
 
         grid = QGridLayout()
         grid.setHorizontalSpacing(14)
@@ -674,7 +719,24 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Export PDF", f"Failed to export PDF:\n{exc}")
             return
 
-        QMessageBox.information(self, "Export PDF", "PDF exported successfully.")
+        self._show_export_success_dialog(file_path)
+
+    def _show_export_success_dialog(self, file_path: str) -> None:
+        """Show export success dialog with optional quick folder open action."""
+        message = QMessageBox(self)
+        message.setIcon(QMessageBox.Icon.Information)
+        message.setWindowTitle("Export PDF")
+        message.setText("PDF exported successfully.")
+        message.setStyleSheet(
+            "QLabel { color: #000000; }"
+            "QPushButton { min-width: 110px; }"
+        )
+        open_folder_button = message.addButton("Open Folder", QMessageBox.ButtonRole.ActionRole)
+        message.addButton("Close", QMessageBox.ButtonRole.RejectRole)
+        message.exec()
+        if message.clickedButton() == open_folder_button:
+            target_dir = Path(file_path).resolve().parent
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(target_dir)))
 
     def _build_pdf_html(self) -> str:
         """Build printable HTML representation of current generation result."""
@@ -744,12 +806,30 @@ class MainWindow(QMainWindow):
 
     def _current_title_text(self) -> str:
         """Return top title for currently selected generation mode."""
-        if self._is_dual_mode():
-            return "DS + D2W"
-        selected = self._single_selected_competition_key()
-        if selected is None:
+        selected = self._selected_competitions()
+        if not selected:
             return "Select Competition"
-        return "D2W & D4W" if selected == "D2W_D4W" else "DS"
+        titles = [self.competition_labels.get(key, key).strip() for key in selected]
+        visible_titles = [title for title in titles if title]
+        if not visible_titles:
+            return "Start"
+        return " ".join(visible_titles)
+
+    def _on_competition_title_edited(self, competition_key: str, field: QLineEdit) -> None:
+        """Apply and persist custom competition title from settings popup."""
+        new_title = field.text().strip()
+        self.competition_labels[competition_key] = new_title
+        field.setText(new_title)
+        self.title_label.setText(self._current_title_text())
+        if not config.save_competition_title(competition_key, new_title):
+            # Keep UI text but notify about persistence issue.
+            QMessageBox.warning(self, "Settings", "Failed to save competition title to DrawGenerators.cfg.")
+
+    def eventFilter(self, watched, event):  # noqa: N802
+        """Block results scrolling while generation pulse animation is active."""
+        if watched == self.result_scroll.viewport() and self._suppress_result_scroll and event.type() == QEvent.Type.Wheel:
+            return True
+        return super().eventFilter(watched, event)
 
     def _selected_competitions(self) -> list[str]:
         """Return selected competition keys in fixed order."""
@@ -818,6 +898,7 @@ class MainWindow(QMainWindow):
         """Build fixed rounds selector with values 1..10."""
         box = QComboBox()
         box.setObjectName("roundCountBox")
+        box.setCursor(Qt.CursorShape.PointingHandCursor)
         for value in range(1, 11):
             box.addItem(str(value), value)
         box.setCurrentIndex(4)
