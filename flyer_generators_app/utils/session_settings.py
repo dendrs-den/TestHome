@@ -35,10 +35,13 @@ def load_settings() -> dict:
 
     from_cfg = _load_settings_from_cfg(path)
     if from_cfg:
-        return from_cfg
+        return _normalize_settings_text(from_cfg)
 
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(loaded, dict):
+            return _normalize_settings_text(loaded)
+        return {}
     except (json.JSONDecodeError, OSError):
         return {}
 
@@ -87,6 +90,51 @@ def _load_settings_from_cfg(path: Path) -> dict:
     except json.JSONDecodeError:
         return {}
     return parsed if isinstance(parsed, dict) else {}
+
+
+_MOJIBAKE_MARKERS_RE = re.compile(r"[РС][\u0400-\u04FF]")
+
+
+def _repair_mojibake_text(value: str) -> str:
+    """Best-effort fix for UTF-8 text decoded as CP1251."""
+    if not value or not _MOJIBAKE_MARKERS_RE.search(value):
+        return value
+
+    def _score(text: str) -> int:
+        cyr = sum(1 for ch in text if "\u0400" <= ch <= "\u04FF")
+        garbled = text.count("Р") + text.count("С") + text.count("Ð") + text.count("Ñ")
+        return cyr - garbled
+
+    best = value
+    best_score = _score(value)
+    for enc in ("cp1251", "latin1"):
+        for encode_err, decode_err in (
+            ("strict", "strict"),
+            ("ignore", "strict"),
+            ("replace", "strict"),
+            ("ignore", "ignore"),
+            ("replace", "ignore"),
+        ):
+            try:
+                candidate = value.encode(enc, errors=encode_err).decode("utf-8", errors=decode_err)
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                continue
+            score = _score(candidate)
+            if score > best_score:
+                best = candidate
+                best_score = score
+    return best
+
+
+def _normalize_settings_text(value):
+    """Recursively normalize possible mojibake strings in settings payload."""
+    if isinstance(value, str):
+        return _repair_mojibake_text(value)
+    if isinstance(value, list):
+        return [_normalize_settings_text(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _normalize_settings_text(item) for key, item in value.items()}
+    return value
 
 
 def _migrate_legacy_settings(path: Path) -> None:

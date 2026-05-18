@@ -12,10 +12,12 @@ from __future__ import annotations
 import runpy
 from pathlib import Path
 from pprint import pformat
+import re
 
 APP_TITLE_TEXT = "Flyer Generators"
 ANIMATION_STEP_DELAY_MS = 70
 ANIMATION_STEP_COUNT = 50
+ANIMATION_PREVIEW_ROUNDS = 5
 DEFAULT_ROUND_COUNT = 5
 MAX_ROUND_COUNT = 10
 DEFAULT_TEAM_SIZE = 2
@@ -37,12 +39,26 @@ def _build_default_external_config() -> str:
         f"APP_TITLE_TEXT = {APP_TITLE_TEXT!r}\n"
         f"ANIMATION_STEP_DELAY_MS = {ANIMATION_STEP_DELAY_MS!r}\n"
         f"ANIMATION_STEP_COUNT = {ANIMATION_STEP_COUNT!r}\n"
+        f"ANIMATION_PREVIEW_ROUNDS = {ANIMATION_PREVIEW_ROUNDS!r}\n"
         f"DEFAULT_ROUND_COUNT = {DEFAULT_ROUND_COUNT!r}\n"
         f"MAX_ROUND_COUNT = {MAX_ROUND_COUNT!r}\n"
         f"DEFAULT_TEAM_SIZE = {DEFAULT_TEAM_SIZE!r}\n"
         f"MIN_TEAM_SIZE = {MIN_TEAM_SIZE!r}\n"
         f"MAX_TEAM_SIZE = {MAX_TEAM_SIZE!r}\n"
     )
+
+
+def save_app_title(title: str) -> bool:
+    """Persist APP_TITLE_TEXT to external config file."""
+    normalized = title.strip()
+    globals()["APP_TITLE_TEXT"] = normalized
+    external_path = _resolve_external_config_path()
+    _ensure_external_config_exists(external_path)
+    try:
+        external_path.write_text(_build_default_external_config(), encoding="utf-8")
+    except OSError:
+        return False
+    return True
 
 
 def _ensure_external_config_exists(path: Path) -> None:
@@ -70,3 +86,41 @@ def _apply_external_overrides() -> None:
 
 
 _apply_external_overrides()
+
+
+_MOJIBAKE_MARKERS_RE = re.compile(r"[РС][\u0400-\u04FF]")
+
+
+def _repair_mojibake_text(value: str) -> str:
+    """Best-effort fix for UTF-8 text that was decoded as CP1251."""
+    if not value or not _MOJIBAKE_MARKERS_RE.search(value):
+        return value
+
+    def _score(text: str) -> int:
+        cyr = sum(1 for ch in text if "\u0400" <= ch <= "\u04FF")
+        garbled = text.count("Р") + text.count("С") + text.count("Ð") + text.count("Ñ")
+        return cyr - garbled
+
+    best = value
+    best_score = _score(value)
+    for enc in ("cp1251", "latin1"):
+        for encode_err, decode_err in (
+            ("strict", "strict"),
+            ("ignore", "strict"),
+            ("replace", "strict"),
+            ("ignore", "ignore"),
+            ("replace", "ignore"),
+        ):
+            try:
+                candidate = value.encode(enc, errors=encode_err).decode("utf-8", errors=decode_err)
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                continue
+            score = _score(candidate)
+            if score > best_score:
+                best = candidate
+                best_score = score
+    return best
+
+
+if isinstance(APP_TITLE_TEXT, str):
+    APP_TITLE_TEXT = _repair_mojibake_text(APP_TITLE_TEXT)

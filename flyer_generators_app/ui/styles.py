@@ -93,6 +93,21 @@ QLabel#settingsRoundsLabel {
     font-size: 20px;
     font-weight: 700;
 }
+QLabel#settingsNameLabel {
+    color: #f1f4f7;
+    font-size: 14px;
+    font-weight: 600;
+}
+QLineEdit#settingsNameField {
+    background: #0e1218;
+    color: #f1f4f7;
+    border: 1px solid #374754;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 14px;
+    min-height: 22px;
+    max-height: 22px;
+}
 QComboBox#roundCountBox {
     background: #dfdfe2;
     color: #000000;

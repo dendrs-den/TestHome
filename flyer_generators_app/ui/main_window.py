@@ -5,9 +5,10 @@ from __future__ import annotations
 import random
 from datetime import datetime
 from html import escape
+from pathlib import Path
 
-from PySide6.QtCore import QEvent, QMarginsF, QTimer, Qt, Signal
-from PySide6.QtGui import QFont, QFontMetrics, QPageLayout, QTextDocument
+from PySide6.QtCore import QEvent, QMarginsF, QTimer, Qt, Signal, QUrl
+from PySide6.QtGui import QDesktopServices, QFont, QFontMetrics, QPageLayout, QTextDocument
 from PySide6.QtPrintSupport import QPrinter
 from PySide6.QtWidgets import (
     QComboBox,
@@ -275,11 +276,13 @@ class MainWindow(QMainWindow):
         self.participants: list[Participant] = []
         self._last_rounds: list[TeamRound] = []
         self._target_rounds: list[TeamRound] = []
+        self._app_title_text = config.APP_TITLE_TEXT
 
         self._pulse_timer = QTimer(self)
         self._pulse_timer.timeout.connect(self._on_pulse_tick)
         self._pulse_ticks = 0
         self._pulse_total_ticks = config.ANIMATION_STEP_COUNT
+        self._pulse_preview_rounds = self._resolve_pulse_preview_rounds()
         self._animation_step_delay_ms = config.ANIMATION_STEP_DELAY_MS
 
         self._blink_timer = QTimer(self)
@@ -301,7 +304,7 @@ class MainWindow(QMainWindow):
         self.settings_popup.hide()
 
     def _build_ui(self) -> None:
-        self.title_label = QLabel(config.APP_TITLE_TEXT)
+        self.title_label = QLabel(self._current_title_text())
         self.title_label.setObjectName("resultTitle")
         self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.title_label.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -356,6 +359,10 @@ class MainWindow(QMainWindow):
         if hasattr(self, "left_title_spacer") and hasattr(self, "right_controls"):
             self.left_title_spacer.setFixedWidth(self.right_controls.sizeHint().width())
 
+    def _current_title_text(self) -> str:
+        """Return app title with fallback when custom name is empty."""
+        return self._app_title_text if self._app_title_text else "Start"
+
     def _build_settings_popup(self) -> None:
         self.settings_popup = QWidget(self)
         self.settings_popup.setObjectName("settingsPopup")
@@ -394,6 +401,13 @@ class MainWindow(QMainWindow):
         self.captain_mode_checkbox.setChecked(False)
         self.captain_mode_checkbox.setCursor(Qt.CursorShape.PointingHandCursor)
         self.captain_mode_checkbox.toggled.connect(self._on_captain_mode_changed)
+        title_label = QLabel("Name")
+        title_label.setObjectName("settingsNameLabel")
+        self.competition_title_input = QLineEdit(self._app_title_text)
+        self.competition_title_input.setObjectName("settingsNameField")
+        self.competition_title_input.setMaxLength(40)
+        self.competition_title_input.setFixedWidth(220)
+        self.competition_title_input.editingFinished.connect(self._on_competition_title_edited)
 
         self.add_button = QPushButton("Add +")
         self.add_button.setObjectName("actionButton")
@@ -407,6 +421,9 @@ class MainWindow(QMainWindow):
         rounds_row.addWidget(self.team_size)
         rounds_row.addSpacing(10)
         rounds_row.addWidget(self.captain_mode_checkbox)
+        rounds_row.addSpacing(10)
+        rounds_row.addWidget(title_label)
+        rounds_row.addWidget(self.competition_title_input)
         rounds_row.addStretch(1)
         rounds_row.addWidget(self.add_button)
         layout.addLayout(rounds_row)
@@ -768,9 +785,14 @@ class MainWindow(QMainWindow):
                 widget.deleteLater()
 
     def _render_rounds(self, rounds: list[TeamRound]) -> None:
-        self._clear_results()
-        for round_item in rounds:
-            self._append_round_widget(round_item)
+        self.result_container.setUpdatesEnabled(False)
+        try:
+            self._clear_results()
+            for round_item in rounds:
+                self._append_round_widget(round_item)
+        finally:
+            self.result_container.setUpdatesEnabled(True)
+            self.result_container.update()
 
     def _append_round_widget(self, round_item: TeamRound) -> None:
         round_label = QLabel(f"Round {round_item.number}")
@@ -872,15 +894,20 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(16, _apply)
 
     def _render_empty_scheme(self) -> None:
-        self._clear_results()
-        for number in range(1, self._round_value() + 1):
-            round_item = TeamRound(number=number, teams=[[]])
-            self._append_round_widget(round_item)
+        self.result_container.setUpdatesEnabled(False)
+        try:
+            self._clear_results()
+            for number in range(1, self._round_value() + 1):
+                round_item = TeamRound(number=number, teams=[[]])
+                self._append_round_widget(round_item)
+        finally:
+            self.result_container.setUpdatesEnabled(True)
+            self.result_container.update()
 
     def _start_shuffle_pulse(self) -> None:
         self._clear_results()
         self._pulse_ticks = 0
-        self.right_controls.setVisible(False)
+        self.right_controls.setEnabled(False)
         self.title_label.setText("Generating...")
         self._blink_visible = True
         self._blink_timer.start(300)
@@ -890,9 +917,9 @@ class MainWindow(QMainWindow):
         if self._pulse_ticks >= self._pulse_total_ticks:
             self._pulse_timer.stop()
             self._blink_timer.stop()
-            self.title_label.setText(config.APP_TITLE_TEXT)
+            self.title_label.setText(self._current_title_text())
             self.title_label.setStyleSheet("color: #ffffff;")
-            self.right_controls.setVisible(True)
+            self.right_controls.setEnabled(True)
             self._render_rounds(self._target_rounds)
             return
 
@@ -900,19 +927,26 @@ class MainWindow(QMainWindow):
         self._render_pulse_frame()
 
     def _render_pulse_frame(self) -> None:
-        self._clear_results()
-        if len(self.participants) < 2:
-            return
-        if not self._validate_captains_for_mode(show_message=False):
-            return
-        fake_rounds = generate_team_rounds(
-            self._round_value(),
-            self.participants,
-            self._team_size_value(),
-            captain_mode=self._captain_mode_enabled(),
-            rng=random.Random(),
-        )
-        self._render_rounds(fake_rounds)
+        self.result_container.setUpdatesEnabled(False)
+        try:
+            self._clear_results()
+            if len(self.participants) < 2:
+                return
+            if not self._validate_captains_for_mode(show_message=False):
+                return
+            preview_rounds = min(self._round_value(), self._pulse_preview_rounds)
+            fake_rounds = generate_team_rounds(
+                preview_rounds,
+                self.participants,
+                self._team_size_value(),
+                captain_mode=self._captain_mode_enabled(),
+                rng=random.Random(),
+            )
+            for round_item in fake_rounds:
+                self._append_round_widget(round_item)
+        finally:
+            self.result_container.setUpdatesEnabled(True)
+            self.result_container.update()
 
     def _toggle_generating_blink(self) -> None:
         self._blink_visible = not self._blink_visible
@@ -921,6 +955,14 @@ class MainWindow(QMainWindow):
     def _round_value(self) -> int:
         value = self.round_count.currentData()
         return int(value) if value is not None else 1
+
+    def _resolve_pulse_preview_rounds(self) -> int:
+        """Return safe preview rounds count for pulse animation."""
+        raw = getattr(config, "ANIMATION_PREVIEW_ROUNDS", 5)
+        try:
+            return max(1, int(raw))
+        except (TypeError, ValueError):
+            return 5
 
     def _team_size_value(self) -> int:
         value = self.team_size.currentData()
@@ -1200,7 +1242,7 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Export PDF", f"Failed to export PDF:\n{exc}")
             return
 
-        QMessageBox.information(self, "Export PDF", "PDF exported successfully.")
+        self._show_export_success_dialog("Export PDF", "PDF exported successfully.", file_path)
 
     def on_export_excel_clicked(self) -> None:
         if not self._last_rounds:
@@ -1284,7 +1326,33 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Export Excel", f"Failed to export Excel:\n{exc}")
             return
 
-        QMessageBox.information(self, "Export Excel", "Excel exported successfully.")
+        self._show_export_success_dialog("Export Excel", "Excel exported successfully.", file_path)
+
+    def _show_export_success_dialog(self, title: str, message_text: str, file_path: str) -> None:
+        """Show export success dialog and offer quick access to output folder."""
+        message = QMessageBox(self)
+        message.setIcon(QMessageBox.Icon.Information)
+        message.setWindowTitle(title)
+        message.setText(message_text)
+        message.setStyleSheet(
+            "QLabel { color: #000000; }"
+            "QPushButton { min-width: 110px; }"
+        )
+        open_folder_button = message.addButton("Open Folder", QMessageBox.ButtonRole.ActionRole)
+        message.addButton("Close", QMessageBox.ButtonRole.RejectRole)
+        message.exec()
+        if message.clickedButton() == open_folder_button:
+            target_dir = Path(file_path).resolve().parent
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(target_dir)))
+
+    def _on_competition_title_edited(self) -> None:
+        """Apply and persist competition title edited in settings popup."""
+        new_title = self.competition_title_input.text().strip()
+        self._app_title_text = new_title
+        self.competition_title_input.setText(new_title)
+        self.title_label.setText(self._current_title_text())
+        if not config.save_app_title(new_title):
+            QMessageBox.warning(self, "Settings", "Failed to save competition title to FlyerGenerators.cfg.")
 
     def _build_pdf_html(self) -> str:
         generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -1323,7 +1391,7 @@ class MainWindow(QMainWindow):
 
             page_html = (
                 f"<div style='font-size:{font_size}pt;'>"
-                f"<h1 style='font-size:24pt;margin:0 0 6px 0;'>{escape(config.APP_TITLE_TEXT)}</h1>"
+                f"<h1 style='font-size:24pt;margin:0 0 6px 0;'>{escape(self._current_title_text())}</h1>"
                 f"<p style='font-size:10pt;margin:0 0 8px 0;'>Generated: {generated_at}</p>"
                 f"<h2 style='margin:0 0 8px 0;font-size:18pt;'>Round {round_item.number}</h2>"
                 "<table style='width:100%;border-collapse:collapse;table-layout:fixed;'>"
