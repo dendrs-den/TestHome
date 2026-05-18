@@ -9,7 +9,7 @@ from pathlib import Path
 
 from PySide6.QtCore import QEvent, QSignalBlocker, QTimer, Qt
 from PySide6.QtCore import QMarginsF
-from PySide6.QtGui import QDesktopServices, QPageLayout, QTextDocument
+from PySide6.QtGui import QDesktopServices, QFont, QPageLayout, QTextDocument
 from PySide6.QtPrintSupport import QPrinter
 from PySide6.QtWidgets import (
     QComboBox,
@@ -42,6 +42,7 @@ from utils.session_settings import load_settings, save_settings
 class MainWindow(QMainWindow):
     """Main app window with settings and generated result."""
     _DEFAULT_PULSE_PREVIEW_ROUNDS = 5
+    _MONO_CARD_FONT_PX = 30
 
     def __init__(self) -> None:
         super().__init__()
@@ -84,8 +85,14 @@ class MainWindow(QMainWindow):
         self._pulse_timer.timeout.connect(self._on_pulse_tick)
         self._target_rounds: list[Round] = []
         self._target_rounds_secondary: list[Round] = []
+        self._pulse_single_pool: dict[str, list[Element]] = {}
+        self._pulse_dual_pools: dict[str, dict[str, list[Element]]] = {}
         self._pulse_ticks = 0
         self._pulse_total_ticks = config.ANIMATION_STEP_COUNT
+        self._cached_round_font_size = -1
+        self._cached_card_font_size = -1
+        self._cached_round_label_font = QFont()
+        self._cached_card_label_font = QFont()
         self._blink_timer = QTimer(self)
         self._blink_timer.timeout.connect(self._toggle_generating_blink)
         self._blink_visible = True
@@ -237,12 +244,21 @@ class MainWindow(QMainWindow):
 
     def _render_rounds(self, rounds: list[Round]) -> None:
         """Render rounds as large cards similar to the reference screenshot."""
-        self._clear_results()
-        if self._is_dual_mode() and self._last_secondary_rounds:
-            self._render_dual_rounds(rounds, self._last_secondary_rounds)
-            return
-        for round_item in rounds:
-            self._append_round_widget(round_item)
+        self.result_container.setUpdatesEnabled(False)
+        try:
+            self._clear_results()
+            if self._is_dual_mode() and self._last_secondary_rounds:
+                self._render_dual_rounds(rounds, self._last_secondary_rounds)
+                return
+            if self._should_use_two_column_mono(len(rounds)):
+                self._render_mono_two_columns(rounds)
+                return
+            mono_card_font = self._mono_fixed_card_font()
+            for round_item in rounds:
+                self._append_round_widget(round_item, card_font_override=mono_card_font, wrap_cards=True)
+        finally:
+            self.result_container.setUpdatesEnabled(True)
+            self.result_container.update()
 
     def _calculate_result_sizes(self) -> tuple[int, int, int]:
         """Return fixed sizes; scrolling handles larger round counts."""
@@ -348,6 +364,9 @@ class MainWindow(QMainWindow):
         self._clear_results()
         self._target_rounds = list(rounds)
         self._target_rounds_secondary = list(rounds_secondary)
+        self._pulse_single_pool = {}
+        self._pulse_dual_pools = {}
+        self._prepare_pulse_pools()
         self._pulse_ticks = 0
         self.right_controls.setEnabled(False)
         self._suppress_result_scroll = True
@@ -366,6 +385,8 @@ class MainWindow(QMainWindow):
             self.title_label.setStyleSheet(self._default_title_style)
             self.right_controls.setEnabled(True)
             self._suppress_result_scroll = False
+            self._pulse_single_pool = {}
+            self._pulse_dual_pools = {}
             self._last_secondary_rounds = list(self._target_rounds_secondary)
             self._render_rounds(self._target_rounds)
             return
@@ -379,65 +400,107 @@ class MainWindow(QMainWindow):
         To keep animation responsive on low-end machines, show only a compact
         preview subset during pulse and render full data only at the end.
         """
-        self._clear_results()
-        preview_limit = self._pulse_preview_rounds_limit()
-        preview_rounds = min(rounds_count, preview_limit)
-        preview_secondary = min(rounds_count_secondary, preview_limit)
+        self.result_container.setUpdatesEnabled(False)
+        try:
+            self._clear_results()
+            preview_limit = self._pulse_preview_rounds_limit()
+            preview_rounds = rounds_count
+            preview_secondary = min(rounds_count_secondary, preview_limit)
+            if self._is_dual_mode():
+                preview_rounds = min(rounds_count, preview_limit)
+                ds_pool = self._pulse_dual_pools.get("DS", {})
+                d2w_pool = self._pulse_dual_pools.get("D2W_D4W", {})
+                ds_snakes = ds_pool.get("snakes", [])
+                ds_verticals = ds_pool.get("verticals", [])
+                ds_mixers = ds_pool.get("mixers", [])
+                d2w_snakes = d2w_pool.get("snakes", [])
+                d2w_verticals = d2w_pool.get("verticals", [])
+                d2w_mixers = d2w_pool.get("mixers", [])
+                if not ds_snakes or not ds_verticals or not ds_mixers:
+                    return
+                if not d2w_snakes or not d2w_verticals or not d2w_mixers:
+                    return
+
+                fake_ds: list[Round] = []
+                fake_d2w: list[Round] = []
+                for idx in range(preview_rounds):
+                    fake_ds.append(
+                        Round(
+                            number=idx + 1,
+                            snake=random.choice(ds_snakes),
+                            vertical=random.choice(ds_verticals),
+                            mixer=random.choice(ds_mixers),
+                        )
+                    )
+                for idx in range(preview_secondary):
+                    fake_d2w.append(
+                        Round(
+                            number=idx + 1,
+                            snake=random.choice(d2w_snakes),
+                            vertical=random.choice(d2w_verticals),
+                            mixer=random.choice(d2w_mixers),
+                        )
+                    )
+                self._render_dual_rounds(fake_ds, fake_d2w)
+                return
+
+            selected = self._single_selected_competition_key()
+            if selected is None:
+                return
+            snakes = self._pulse_single_pool.get("snakes", [])
+            verticals = self._pulse_single_pool.get("verticals", [])
+            mixers = self._pulse_single_pool.get("mixers", [])
+            if not snakes or not verticals or not mixers:
+                return
+
+            use_two_columns = self._should_use_two_column_mono(rounds_count)
+            pulse_rounds: list[Round] = []
+            for idx in range(preview_rounds):
+                fake_round = Round(
+                    number=idx + 1,
+                    snake=random.choice(snakes),
+                    vertical=random.choice(verticals),
+                    mixer=random.choice(mixers),
+                )
+                pulse_rounds.append(fake_round)
+            if use_two_columns:
+                self._render_mono_two_columns(pulse_rounds, rounds_count=rounds_count)
+                return
+            mono_card_font = self._mono_fixed_card_font()
+            for fake_round in pulse_rounds:
+                self._append_round_widget(fake_round, card_font_override=mono_card_font, wrap_cards=True)
+        finally:
+            self.result_container.setUpdatesEnabled(True)
+            self.result_container.update()
+
+    def _prepare_pulse_pools(self) -> None:
+        """Cache selected pools once before animation ticks to reduce UI overhead."""
         if self._is_dual_mode():
             ds_groups = self.groups_by_competition["DS"]
             d2w_groups = self.groups_by_competition["D2W_D4W"]
-            ds_snakes = ds_groups["snakes"].selected_elements()
-            ds_verticals = ds_groups["verticals"].selected_elements()
-            ds_mixers = ds_groups["mixers"].selected_elements()
-            d2w_snakes = d2w_groups["snakes"].selected_elements()
-            d2w_verticals = d2w_groups["verticals"].selected_elements()
-            d2w_mixers = d2w_groups["mixers"].selected_elements()
-            if not ds_snakes or not ds_verticals or not ds_mixers:
-                return
-            if not d2w_snakes or not d2w_verticals or not d2w_mixers:
-                return
-
-            fake_ds: list[Round] = []
-            fake_d2w: list[Round] = []
-            for idx in range(preview_rounds):
-                fake_ds.append(
-                    Round(
-                        number=idx + 1,
-                        snake=random.choice(ds_snakes),
-                        vertical=random.choice(ds_verticals),
-                        mixer=random.choice(ds_mixers),
-                    )
-                )
-            for idx in range(preview_secondary):
-                fake_d2w.append(
-                    Round(
-                        number=idx + 1,
-                        snake=random.choice(d2w_snakes),
-                        vertical=random.choice(d2w_verticals),
-                        mixer=random.choice(d2w_mixers),
-                    )
-                )
-            self._render_dual_rounds(fake_ds, fake_d2w)
+            self._pulse_dual_pools = {
+                "DS": {
+                    "snakes": ds_groups["snakes"].selected_elements(),
+                    "verticals": ds_groups["verticals"].selected_elements(),
+                    "mixers": ds_groups["mixers"].selected_elements(),
+                },
+                "D2W_D4W": {
+                    "snakes": d2w_groups["snakes"].selected_elements(),
+                    "verticals": d2w_groups["verticals"].selected_elements(),
+                    "mixers": d2w_groups["mixers"].selected_elements(),
+                },
+            }
             return
 
         selected = self._single_selected_competition_key()
         if selected is None:
             return
-        active_groups = self.groups_by_competition[selected]
-        snakes = active_groups["snakes"].selected_elements()
-        verticals = active_groups["verticals"].selected_elements()
-        mixers = active_groups["mixers"].selected_elements()
-        if not snakes or not verticals or not mixers:
-            return
-
-        for idx in range(preview_rounds):
-            fake_round = Round(
-                number=idx + 1,
-                snake=random.choice(snakes),
-                vertical=random.choice(verticals),
-                mixer=random.choice(mixers),
-            )
-            self._append_round_widget(fake_round)
+        groups = self.groups_by_competition[selected]
+        self._pulse_single_pool = {
+            "snakes": groups["snakes"].selected_elements(),
+            "verticals": groups["verticals"].selected_elements(),
+            "mixers": groups["mixers"].selected_elements(),
+        }
 
     def _pulse_preview_rounds_limit(self) -> int:
         """Return configured preview rounds count for pulse animation."""
@@ -448,12 +511,15 @@ class MainWindow(QMainWindow):
             return self._DEFAULT_PULSE_PREVIEW_ROUNDS
         return max(1, parsed)
 
-    def _append_round_widget(self, round_item: Round) -> None:
+    def _append_round_widget(self, round_item: Round, card_font_override: QFont | None = None, wrap_cards: bool = True) -> None:
         """Append one round block into results container."""
-        round_font_size, card_font_size, card_height = self._calculate_result_sizes()
+        round_font_size, card_font_size, _card_height_probe = self._calculate_result_sizes()
+        round_font, card_font, card_height = self._result_metrics()
+        effective_card_font = card_font_override or card_font
         round_label = QLabel(f"Round {round_item.number}")
         round_label.setObjectName("roundLabel")
         round_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        round_label.setFont(round_font)
         round_label.setStyleSheet(f"font-size: {round_font_size}px;")
         self.result_layout.insertWidget(self.result_layout.count() - 1, round_label)
 
@@ -478,12 +544,21 @@ class MainWindow(QMainWindow):
             card.setMinimumWidth(0)
             card.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
             card.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            card.setWordWrap(True)
-            card.setStyleSheet(f"font-size: {card_font_size}px;")
+            card.setWordWrap(wrap_cards)
+            card.setFont(effective_card_font)
+            effective_size = effective_card_font.pixelSize() if effective_card_font.pixelSize() > 0 else card_font_size
+            card.setStyleSheet(f"font-size: {effective_size}px;")
             row_layout.addWidget(card, 0, idx)
 
         row.setLayout(row_layout)
         self.result_layout.insertWidget(self.result_layout.count() - 1, row)
+
+    def _mono_fixed_card_font(self) -> QFont:
+        """Return fixed mono-mode card font size."""
+        _round_font, base_card_font, _card_height = self._result_metrics()
+        fixed = QFont(base_card_font)
+        fixed.setPixelSize(self._MONO_CARD_FONT_PX)
+        return fixed
 
     def _toggle_generating_blink(self) -> None:
         """Blink generating label while shuffle animation is active."""
@@ -976,38 +1051,48 @@ class MainWindow(QMainWindow):
 
     def _render_empty_scheme(self) -> None:
         """Render empty card scheme for current mode and rounds selection."""
-        self._clear_results()
-        if self._is_dual_mode():
-            container = QWidget()
-            layout = QHBoxLayout()
-            layout.setContentsMargins(0, 0, 0, 0)
-            layout.setSpacing(16)
-            left_col = self._build_dual_column("DS", [], self._round_value(self.ds_round_count))
-            right_col = self._build_dual_column("D2W", [], self._round_value(self.d2w_round_count))
-            divider = QFrame()
-            divider.setObjectName("dualDivider")
-            divider.setFrameShape(QFrame.Shape.VLine)
-            divider.setLineWidth(1)
-            layout.addWidget(left_col, 1)
-            layout.addWidget(divider)
-            layout.addWidget(right_col, 1)
-            container.setLayout(layout)
-            self.result_layout.insertWidget(self.result_layout.count() - 1, container)
-            return
+        self.result_container.setUpdatesEnabled(False)
+        try:
+            self._clear_results()
+            if self._is_dual_mode():
+                container = QWidget()
+                layout = QHBoxLayout()
+                layout.setContentsMargins(0, 0, 0, 0)
+                layout.setSpacing(16)
+                left_col = self._build_dual_column("DS", [], self._round_value(self.ds_round_count))
+                right_col = self._build_dual_column("D2W", [], self._round_value(self.d2w_round_count))
+                divider = QFrame()
+                divider.setObjectName("dualDivider")
+                divider.setFrameShape(QFrame.Shape.VLine)
+                divider.setLineWidth(1)
+                layout.addWidget(left_col, 1)
+                layout.addWidget(divider)
+                layout.addWidget(right_col, 1)
+                container.setLayout(layout)
+                self.result_layout.insertWidget(self.result_layout.count() - 1, container)
+                return
 
-        selected = self._single_selected_competition_key()
-        if selected is None:
-            return
-        rounds_count = self._round_value(self.d2w_round_count) if selected == "D2W_D4W" else self._round_value(self.ds_round_count)
-        for number in range(1, rounds_count + 1):
-            self._append_empty_round_widget(number)
+            selected = self._single_selected_competition_key()
+            if selected is None:
+                return
+            rounds_count = self._round_value(self.d2w_round_count) if selected == "D2W_D4W" else self._round_value(self.ds_round_count)
+            if self._should_use_two_column_mono(rounds_count):
+                self._render_mono_two_columns([], rounds_count=rounds_count)
+                return
+            for number in range(1, rounds_count + 1):
+                self._append_empty_round_widget(number)
+        finally:
+            self.result_container.setUpdatesEnabled(True)
+            self.result_container.update()
 
     def _append_empty_round_widget(self, number: int) -> None:
         """Append one empty round block with three blank cards."""
-        round_font_size, card_font_size, card_height = self._calculate_result_sizes()
+        round_font_size, card_font_size, _card_height_probe = self._calculate_result_sizes()
+        round_font, card_font, card_height = self._result_metrics()
         round_label = QLabel(f"Round {number}")
         round_label.setObjectName("roundLabel")
         round_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        round_label.setFont(round_font)
         round_label.setStyleSheet(f"font-size: {round_font_size}px;")
         self.result_layout.insertWidget(self.result_layout.count() - 1, round_label)
 
@@ -1027,6 +1112,7 @@ class MainWindow(QMainWindow):
             card.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
             card.setAlignment(Qt.AlignmentFlag.AlignCenter)
             card.setWordWrap(False)
+            card.setFont(card_font)
             card.setStyleSheet(f"font-size: {card_font_size}px;")
             row_layout.addWidget(card, 0, idx)
         row.setLayout(row_layout)
@@ -1044,7 +1130,8 @@ class MainWindow(QMainWindow):
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         col_layout.addWidget(title_label)
 
-        round_font_size, card_font_size, card_height = self._calculate_result_sizes()
+        round_font_size, _card_font_size, _card_height_probe = self._calculate_result_sizes()
+        round_font, _card_font, card_height = self._result_metrics()
         if rounds_count is None:
             rounds_count = len(rounds)
 
@@ -1054,6 +1141,7 @@ class MainWindow(QMainWindow):
             round_label = QLabel(f"Round {round_number}")
             round_label.setObjectName("roundLabel")
             round_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            round_label.setFont(round_font)
             round_label.setStyleSheet(f"font-size: {round_font_size}px;")
             col_layout.addWidget(round_label)
 
@@ -1088,3 +1176,98 @@ class MainWindow(QMainWindow):
         col_layout.addStretch(1)
         column.setLayout(col_layout)
         return column
+
+    def _should_use_two_column_mono(self, rounds_count: int) -> bool:
+        """Return True when mono-mode layout should switch to two columns."""
+        return rounds_count > 5
+
+    def _render_mono_two_columns(self, rounds: list[Round], rounds_count: int | None = None) -> None:
+        """Render mono mode in two columns for better readability with many rounds."""
+        total = rounds_count if rounds_count is not None else len(rounds)
+        left_count = (total + 1) // 2
+        right_count = total - left_count
+        left_rounds = rounds[:left_count]
+        right_rounds = rounds[left_count:]
+
+        container = QWidget()
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(16)
+
+        left_col = self._build_mono_column(left_rounds, start_number=1, rounds_count=left_count)
+        right_col = self._build_mono_column(right_rounds, start_number=left_count + 1, rounds_count=right_count)
+        divider = QFrame()
+        divider.setObjectName("dualDivider")
+        divider.setFrameShape(QFrame.Shape.VLine)
+        divider.setLineWidth(1)
+
+        layout.addWidget(left_col, 1)
+        layout.addWidget(divider)
+        layout.addWidget(right_col, 1)
+        container.setLayout(layout)
+        self.result_layout.insertWidget(self.result_layout.count() - 1, container)
+
+    def _build_mono_column(self, rounds: list[Round], start_number: int, rounds_count: int) -> QWidget:
+        """Build one column for mono-mode two-column layout."""
+        column = QWidget()
+        col_layout = QVBoxLayout()
+        col_layout.setContentsMargins(0, 0, 0, 0)
+        col_layout.setSpacing(10)
+
+        round_font_size, _card_font_size, card_height = self._calculate_result_sizes()
+
+        for idx in range(rounds_count):
+            round_item = rounds[idx] if idx < len(rounds) else None
+            round_number = round_item.number if round_item is not None else start_number + idx
+            round_label = QLabel(f"Round {round_number}")
+            round_label.setObjectName("roundLabel")
+            round_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            round_label.setStyleSheet(f"font-size: {round_font_size}px;")
+            col_layout.addWidget(round_label)
+
+            row = QWidget()
+            row_layout = QGridLayout()
+            row_layout.setHorizontalSpacing(22)
+            row_layout.setVerticalSpacing(0)
+            row_layout.setContentsMargins(0, 0, 0, 0)
+            row_layout.setColumnStretch(0, 1)
+            row_layout.setColumnStretch(1, 1)
+            row_layout.setColumnStretch(2, 1)
+
+            if round_item is None:
+                cards = ["", "", ""]
+            else:
+                cards = [
+                    f"{round_item.snake.code} {round_item.snake.name}",
+                    f"{round_item.vertical.code} {round_item.vertical.name}",
+                    f"{round_item.mixer.code} {round_item.mixer.name}",
+                ]
+            for card_idx, text in enumerate(cards):
+                card = QLabel(text)
+                # Use dual-mode card style/typography when mono mode is split into two columns.
+                card.setObjectName("dualResultCard")
+                card.setMinimumHeight(card_height)
+                card.setMinimumWidth(0)
+                card.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
+                card.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                card.setWordWrap(True)
+                row_layout.addWidget(card, 0, card_idx)
+
+            row.setLayout(row_layout)
+            col_layout.addWidget(row)
+
+        col_layout.addStretch(1)
+        column.setLayout(col_layout)
+        return column
+    def _result_metrics(self) -> tuple[QFont, QFont, int]:
+        """Return cached fonts and card height for result rendering."""
+        round_font_size, card_font_size, card_height = self._calculate_result_sizes()
+        if self._cached_round_font_size != round_font_size:
+            self._cached_round_label_font = QFont()
+            self._cached_round_label_font.setPixelSize(round_font_size)
+            self._cached_round_font_size = round_font_size
+        if self._cached_card_font_size != card_font_size:
+            self._cached_card_label_font = QFont()
+            self._cached_card_label_font.setPixelSize(card_font_size)
+            self._cached_card_font_size = card_font_size
+        return (self._cached_round_label_font, self._cached_card_label_font, card_height)
