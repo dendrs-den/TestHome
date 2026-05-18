@@ -43,6 +43,7 @@ class MainWindow(QMainWindow):
     """Main app window with settings and generated result."""
     _DEFAULT_PULSE_PREVIEW_ROUNDS = 5
     _MONO_CARD_FONT_PX = 30
+    _SETTINGS_SAVE_DEBOUNCE_MS = 250
 
     def __init__(self) -> None:
         super().__init__()
@@ -100,6 +101,11 @@ class MainWindow(QMainWindow):
         self._last_secondary_rounds: list[Round] = []
         self._persisted_last_rounds: list[Round] = []
         self._persisted_last_secondary_rounds: list[Round] = []
+        self._settings_save_timer = QTimer(self)
+        self._settings_save_timer.setSingleShot(True)
+        self._settings_save_timer.timeout.connect(self._flush_settings_save)
+        self._pending_settings_payload: dict | None = None
+        self._last_saved_settings_payload: dict | None = None
 
         self.settings_toggle.clicked.connect(self.on_toggle_settings_clicked)
         self.export_pdf_button.clicked.connect(self.on_export_pdf_clicked)
@@ -281,7 +287,7 @@ class MainWindow(QMainWindow):
                     checkbox.stateChanged.connect(self._save_current_settings)
 
     def _save_current_settings(self) -> None:
-        """Save round count and element selections to session storage."""
+        """Queue settings save (debounced) to reduce frequent disk writes."""
         self._ensure_at_least_one_mode_selected()
         selections: dict[str, dict[str, list[str]]] = {}
         for key, group_set in self.groups_by_competition.items():
@@ -291,26 +297,37 @@ class MainWindow(QMainWindow):
                 "mixers": group_set["mixers"].selected_codes(),
             }
 
-        save_settings(
-            {
-                "selected_competitions": self._selected_competitions(),
-                "rounds_by_competition": {
-                    "D2W_D4W": self._round_value(self.d2w_round_count),
-                    "DS": self._round_value(self.ds_round_count),
-                },
-                "selections": selections,
-                "last_generated": {
-                    "primary": self._serialize_rounds(self._persisted_last_rounds),
-                    "secondary": self._serialize_rounds(self._persisted_last_secondary_rounds),
-                },
-            }
-        )
+        payload = {
+            "selected_competitions": self._selected_competitions(),
+            "rounds_by_competition": {
+                "D2W_D4W": self._round_value(self.d2w_round_count),
+                "DS": self._round_value(self.ds_round_count),
+            },
+            "selections": selections,
+            "last_generated": {
+                "primary": self._serialize_rounds(self._persisted_last_rounds),
+                "secondary": self._serialize_rounds(self._persisted_last_secondary_rounds),
+            },
+        }
+        self._pending_settings_payload = payload
+        self._settings_save_timer.start(self._SETTINGS_SAVE_DEBOUNCE_MS)
+
+    def _flush_settings_save(self) -> None:
+        """Persist queued settings when changed since previous write."""
+        if self._pending_settings_payload is None:
+            return
+        if self._pending_settings_payload == self._last_saved_settings_payload:
+            return
+        save_settings(self._pending_settings_payload)
+        self._last_saved_settings_payload = self._pending_settings_payload
+        self._pending_settings_payload = None
 
     def _load_session_settings(self) -> None:
         """Restore previously saved settings when available."""
         settings = load_settings()
         if not settings:
             return
+        self._last_saved_settings_payload = settings
 
         rounds_by_competition = settings.get("rounds_by_competition")
         if isinstance(rounds_by_competition, dict):
@@ -358,6 +375,13 @@ class MainWindow(QMainWindow):
 
         self._update_mode_controls()
         self.title_label.setText(self._current_title_text())
+
+    def closeEvent(self, event) -> None:  # noqa: N802
+        """Flush pending debounced settings before window closes."""
+        if self._settings_save_timer.isActive():
+            self._settings_save_timer.stop()
+        self._flush_settings_save()
+        super().closeEvent(event)
 
     def _start_shuffle_pulse(self, rounds: list[Round], rounds_secondary: list[Round]) -> None:
         """Start short shuffle pulse animation before final result render."""

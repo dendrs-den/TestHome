@@ -11,16 +11,20 @@ from core.validators import validate_group_selection, validate_round_count
 
 def _expand_to_round_count(items: Sequence[Element], round_count: int) -> list[Element]:
     """Repeat list until it reaches required rounds count, then cut extra."""
-    result: list[Element] = []
-    while len(result) < round_count:
-        result.extend(items)
-    return result[:round_count]
+    if round_count <= 0:
+        return []
+    source = list(items)
+    if not source:
+        return []
+    repeats = (round_count + len(source) - 1) // len(source)
+    return (source * repeats)[:round_count]
 
 
 def _shuffle_copy(items: Sequence[Element], rng: random.Random | None = None) -> list[Element]:
     """Create and shuffle a copy to keep original order untouched."""
     shuffled = list(items)
-    (rng or random).shuffle(shuffled)
+    rand = rng if rng is not None else random
+    rand.shuffle(shuffled)
     return shuffled
 
 
@@ -44,14 +48,12 @@ def generate_rounds(
     verticals_pool = _shuffle_copy(_expand_to_round_count(verticals, round_count), rng)
     mixers_pool = _shuffle_copy(_expand_to_round_count(mixers, round_count), rng)
 
-    rounds: list[Round] = []
-    for index in range(round_count):
-        rounds.append(
-            Round(
-                number=index + 1,
-                snake=snakes_pool[index],
-                vertical=verticals_pool[index],
-                mixer=mixers_pool[index],
-            )
+    return [
+        Round(
+            number=index + 1,
+            snake=snakes_pool[index],
+            vertical=verticals_pool[index],
+            mixer=mixers_pool[index],
         )
-    return rounds
+        for index in range(round_count)
+    ]

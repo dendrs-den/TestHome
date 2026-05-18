@@ -25,7 +25,7 @@ ANIMATION_PREVIEW_ROUNDS = 5
 
 COMPETITIONS = {
     "D2W_D4W": {
-        "title": "D2W & D4W",
+        "title": "",
         "snakes": [
             ("S1", "Head-down Inface Snake"),
             ("S2", "Head-down Switching Snake"),
@@ -57,7 +57,7 @@ COMPETITIONS = {
         ],
     },
     "DS": {
-        "title": "DS",
+        "title": "",
         "snakes": [
             ("S-1", "Head-down Inface Snake"),
             ("S-2", "Head-down Switching Snake"),
