@@ -8,15 +8,29 @@ type Props = {
 
 const PreviousRoundResult = ({ roundInfo }: Props) => {
   return (
-    <Box minWidth="240px" fontSize="1.4rem">
-      <Box mt="10px">
-        <Box display="flex" fontSize="130px" justifyContent="space-between">
-          <span style={{fontWeight: "bold"}}>
+    <Box
+      minWidth="240px"
+      width="100%"
+      maxWidth="640px"
+      textAlign="right"
+      fontSize="1.4rem"
+    >
+      <Box mt="6px">
+        <Box
+          display="flex"
+          justifyContent="flex-end"
+          sx={{
+            fontSize: "clamp(56px, 5vw, 96px)",
+            lineHeight: 1,
+            whiteSpace: "nowrap",
+          }}
+        >
+          <span style={{ fontWeight: "bold" }}>
             {formatTime(roundInfo?.time_result).fullTime()}
           </span>
         </Box>
       </Box>
-      <p style={{ textAlign: "center" }}>Previous result</p>
+      <p style={{ textAlign: "right", margin: "14px 0 0 0" }}>Previous result</p>
     </Box>
   );
 };

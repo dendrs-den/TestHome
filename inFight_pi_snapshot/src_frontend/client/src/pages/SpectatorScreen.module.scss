@@ -112,6 +112,14 @@
   line-height: 204px;
 }
 
+.previous-battle-result {
+  position: absolute;
+  right: 78px;
+  bottom: 42px;
+  width: min(640px, 38vw);
+  z-index: 1;
+}
+
 @media (max-width: 1650px) {
   .result-timer {
     font-size: 120px;
@@ -231,6 +239,12 @@
   .result-timer {
     font-size: 70px;
   }
+
+  .previous-battle-result {
+    right: 40px;
+    bottom: 32px;
+    width: min(500px, 44vw);
+  }
 }
 
 @media (max-width: 700px) {
@@ -315,5 +329,11 @@
     margin-top: 20px;
     margin-bottom: 20px;
     font-size: 50px;
+  }
+
+  .previous-battle-result {
+    position: static;
+    width: 100%;
+    margin-top: 12px;
   }
 }

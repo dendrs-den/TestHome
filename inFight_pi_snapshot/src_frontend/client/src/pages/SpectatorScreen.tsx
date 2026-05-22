@@ -1,6 +1,5 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import SpectatorSocket from "../Api_requests/SpectatorSocket";
-import getLastRound from "../Api_requests/getLastRound";
 import StopWatch from "../Components/SpectatorScreen/Timer/StopWatch";
 import classes from "./SpectatorScreen.module.scss";
 import formatTime from "../utils/formatTime";
@@ -17,6 +16,7 @@ import lp from "../Api_requests/longpoll/longpoll";
 import sendLongCross from "../Api_requests/longCross";
 import { useNavigate } from "react-router-dom";
 import getIp from "../Api_requests/rounds/getIp";
+import getCurrentTournament from "../Api_requests/tournaments/getCurrentTournament";
 
 const SpectatorsScreenPage = () => {
   const [lastRoundInfo, setLastRoundInfo] = useState<LastRound>(null);
@@ -36,8 +36,66 @@ const SpectatorsScreenPage = () => {
   const [firstCrossTime, setFirstCrossTime] = useState(0);
   const [showLongCrossNote, setLongCrossNote] = useState(false);
   const [ipList, setIpList] = useState([]);
+  const [showPreviousBattleResult, setShowPreviousBattleResult] = useState(false);
+  const currentStateRef = useRef("");
+  const stopWatchActiveRef = useRef(false);
   const navigate = useNavigate();
   const isTrainingMode = Boolean(currentTournament?.is_traning);
+
+  const updatePreviousBattleResult = useCallback(
+    async (targetRound?: Round) => {
+      try {
+      if (!targetRound?.stage?.battle) {
+        setShowPreviousBattleResult(false);
+        setLastRoundInfo(null);
+        return;
+      }
+
+      const currentTour = await getCurrentTournament();
+      const rounds = Array.isArray(currentTour?.round) ? currentTour.round : [];
+      const stageRounds = rounds.filter(
+        (round) => round?.stage?.id === targetRound?.stage?.id
+      );
+      const currentIndex = stageRounds.findIndex(
+        (round) => round?.team?.id === targetRound?.team?.id
+      );
+
+      // First participant in stage should not see previous result block.
+      if (currentIndex <= 0) {
+        setShowPreviousBattleResult(false);
+        setLastRoundInfo(null);
+        return;
+      }
+
+      const previousRound = stageRounds[currentIndex - 1];
+      const previousResultTime =
+        Number(previousRound?.time_result) > 0
+          ? Number(previousRound?.time_result)
+          : Number(previousRound?.time_real);
+      if (!Number.isFinite(previousResultTime) || previousResultTime < 0) {
+        setShowPreviousBattleResult(false);
+        setLastRoundInfo(null);
+        return;
+      }
+
+      setShowPreviousBattleResult(true);
+      setLastRoundInfo({
+        team: previousRound?.team || null,
+        time_result: previousResultTime,
+        crossings: previousRound?.crossings || [],
+        faults: previousRound?.faults || [],
+        round_start: previousRound?.round_start || 0,
+        stage_rank: previousRound?.stage_rank || 0,
+        time_real: previousRound?.time_real || 0,
+      });
+      } catch (error) {
+        console.log("Failed to calculate previous battle result", error);
+        setShowPreviousBattleResult(false);
+        setLastRoundInfo(null);
+      }
+    },
+    []
+  );
 
   const onFirstLoad = async () => {
     const fetchedData = await getInfo();
@@ -51,7 +109,10 @@ const SpectatorsScreenPage = () => {
     }
 
     if (fetchedData?.round?.stage?.battle) {
-      loadLastBattleRound();
+      await updatePreviousBattleResult(fetchedData?.round);
+    } else {
+      setShowPreviousBattleResult(false);
+      setLastRoundInfo(null);
     }
 
     if (["Expectation", "Performance", "Completion"].includes(fetchedData?.state)) {
@@ -128,17 +189,12 @@ const SpectatorsScreenPage = () => {
     setCurrentState(nextState);
 
     if (fetchedData?.round?.stage?.battle) {
-      await loadLastBattleRound();
+      await updatePreviousBattleResult(fetchedData?.round);
+    } else {
+      setShowPreviousBattleResult(false);
+      setLastRoundInfo(null);
     }
-  }, []);
-
-  const loadLastBattleRound = useCallback(async () => {
-    const lastRound = await getLastRound();
-
-    if (lastRound) {
-      setLastRoundInfo(lastRound);
-    }
-  }, []);
+  }, [updatePreviousBattleResult]);
 
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
@@ -163,38 +219,38 @@ const SpectatorsScreenPage = () => {
   useEffect(() => {
     const { socket } = SpectatorSocket.getInstance();
 
-    socket.on("current_tournament", (data) => {
+    const onCurrentTournament = (data) => {
       setCurrentTournament(data);
-    });
+    };
 
-    socket.on("bust", (info) => {
+    const onBust = () => {
       setBustCount((prev) => prev + 1);
       setFaultCount((prev) => prev + 1);
-    });
-    socket.on("skip", (info) => {
+    };
+    const onSkip = () => {
       setSkipCount((prev) => prev + 1);
       setFaultCount((prev) => prev + 1);
-    });
+    };
 
-    socket.on("stateAdministration", () => {
+    const onStateAdministration = () => {
       setStopWatchActive(false);
       setLongCrossNote(false);
 
       setCurrentState("Administration");
-    });
+    };
 
-    socket.on("set_training", () => {
+    const onSetTraining = () => {
       loadRelevantData();
-    });
+    };
 
-    socket.on("statePrepare", () => {
+    const onStatePrepare = () => {
       setIsPreparing(true);
       setLongCrossNote(false);
       setCurrentState("Preparation");
       setFirstCrossTime(0);
       loadRelevantData();
-    });
-    socket.on("stateStart", () => {
+    };
+    const onStateStart = () => {
       setIsPreparing(false);
       setCurrentState("Expectation");
       setFactTime(0);
@@ -202,16 +258,16 @@ const SpectatorsScreenPage = () => {
       setFaultCount(0);
       setBustCount(0);
       setSkipCount(0);
-    });
-    socket.on("stopWatch_start", () => {
+    };
+    const onStopwatchStart = () => {
       console.log("stopWatch started");
       setStopWatchActive(true);
       setStopWatchReset(false);
       const startTs = Date.now() - (timeDifference || 0);
       setFirstCrossTime((prev) => (prev && prev > 0 ? prev : startTs));
       localStorage.setItem("starting_time", String(startTs));
-    });
-    socket.on("stateStop", ({ result }: any) => {
+    };
+    const onStateStop = ({ result }: any) => {
       console.log("set state STOP, received results:", result);
       setStopWatchActive(false);
       setCurrentState("Completion");
@@ -220,9 +276,9 @@ const SpectatorsScreenPage = () => {
         setResultTime(result?.result_time);
       }
       loadRelevantData();
-    });
+    };
 
-    socket.on("stopWithError", () => {
+    const onStopWithError = () => {
       console.log("stop With Error");
       setStopWatchActive(false);
       setStopWatchReset(true);
@@ -234,9 +290,9 @@ const SpectatorsScreenPage = () => {
       setSkipCount(0);
       setFaultCount(0);
       setFirstCrossTime(0);
-    });
+    };
 
-    socket.on("nextRound", async () => {
+    const onNextRound = async () => {
       const info = await getInfo();
       setIsPreparing(true);
       setCurrentState(info.state);
@@ -260,20 +316,29 @@ const SpectatorsScreenPage = () => {
           setCurrentTournament(info.tournament);
         }
         if (info.round.stage.battle) {
-          getLastRound();
+          await updatePreviousBattleResult(info.round);
+        } else {
+          setShowPreviousBattleResult(false);
+          setLastRoundInfo(null);
         }
       }
-    });
+    };
 
-    socket.on("all_params_ok", () => {
+    const onAllParamsOk = () => {
       console.log("all_params_ok");
-    });
+    };
 
-    socket.on("getInfo", () => {
+    const onGetInfo = () => {
+      if (
+        currentStateRef.current === "Performance" &&
+        stopWatchActiveRef.current
+      ) {
+        return;
+      }
       loadRelevantData();
-    });
+    };
 
-    socket.on("bluetooth_fault", (fault) => {
+    const onBluetoothFault = (fault) => {
       if (fault.valid === true) {
         if (fault.type === "bust") {
           setBustCount((prevCount) => prevCount + 1);
@@ -285,13 +350,46 @@ const SpectatorsScreenPage = () => {
           }
         }
       }
-    });
+    };
 
-    socket.on("last_round", (round_data) => {
+    const onLastRound = (round_data) => {
       console.log(round_data);
-      setLastRoundInfo(round_data);
-    });
-  }, [loadRelevantData]);
+    };
+
+    socket.on("current_tournament", onCurrentTournament);
+    socket.on("bust", onBust);
+    socket.on("skip", onSkip);
+    socket.on("stateAdministration", onStateAdministration);
+    socket.on("set_training", onSetTraining);
+    socket.on("statePrepare", onStatePrepare);
+    socket.on("stateStart", onStateStart);
+    socket.on("stopWatch_start", onStopwatchStart);
+    socket.on("stateStop", onStateStop);
+    socket.on("stopWithError", onStopWithError);
+    socket.on("nextRound", onNextRound);
+    socket.on("all_params_ok", onAllParamsOk);
+    socket.on("getInfo", onGetInfo);
+    socket.on("bluetooth_fault", onBluetoothFault);
+    socket.on("last_round", onLastRound);
+
+    return () => {
+      socket.off("current_tournament", onCurrentTournament);
+      socket.off("bust", onBust);
+      socket.off("skip", onSkip);
+      socket.off("stateAdministration", onStateAdministration);
+      socket.off("set_training", onSetTraining);
+      socket.off("statePrepare", onStatePrepare);
+      socket.off("stateStart", onStateStart);
+      socket.off("stopWatch_start", onStopwatchStart);
+      socket.off("stateStop", onStateStop);
+      socket.off("stopWithError", onStopWithError);
+      socket.off("nextRound", onNextRound);
+      socket.off("all_params_ok", onAllParamsOk);
+      socket.off("getInfo", onGetInfo);
+      socket.off("bluetooth_fault", onBluetoothFault);
+      socket.off("last_round", onLastRound);
+    };
+  }, [loadRelevantData, timeDifference, updatePreviousBattleResult]);
 
   useEffect(() => {
     console.log("Subscribing");
@@ -323,7 +421,12 @@ const SpectatorsScreenPage = () => {
     if (currentState) {
       console.log(currentState);
     }
+    currentStateRef.current = currentState;
   }, [currentState]);
+
+  useEffect(() => {
+    stopWatchActiveRef.current = stopWatchActive;
+  }, [stopWatchActive]);
   return (
     <React.Fragment>
       <Helmet>
@@ -517,9 +620,10 @@ const SpectatorsScreenPage = () => {
                 {["Performance", "Expectation", "Completion"].includes(
                   currentState
                 ) &&
+                  showPreviousBattleResult &&
                   lastRoundInfo &&
                   roundInfo?.stage?.battle && (
-                    <Box position="absolute" bottom="42px" right="78px">
+                    <Box className={classes["previous-battle-result"]}>
                       <PreviousRoundResult roundInfo={lastRoundInfo} />
                     </Box>
                   )}

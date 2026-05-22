@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const path = require("path");
 const SocketServer = require("./models/SocketServer");
 const url = process.env.WEBSERVER_URL || "http://localhost";
@@ -24,6 +25,7 @@ const longpollRoutes = require("./routes/longpoll");
 const logger = Logger.getInstance();
 
 app.use(express.static(path.join(__dirname, "../client/build")));
+app.use(cors());
 app.use(
   express.urlencoded({
     extended: true,
