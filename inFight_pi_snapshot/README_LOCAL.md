@@ -1,4 +1,4 @@
-﻿# inFight Local Workspace
+﻿# inflight Local Workspace
 
 Локальный снимок проекта с Raspberry Pi хранится в этой папке.
 
@@ -42,6 +42,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\stop_all.ps1
 - Убедись, что backend поднят на 3001 до запуска клиента.
 
 ## Важно
-- Проект на Pi называется `inFight` (в путях часто используется `inflight`).
+- Проект на Pi называется `inflight`.
 - Для реального прод-развертывания смотри `configs/` и `configs/environment_snapshot.txt`.
 - В локальной среде используется `sass` вместо устаревшего `node-sass` для совместимости с современными версиями Node.js.
+
