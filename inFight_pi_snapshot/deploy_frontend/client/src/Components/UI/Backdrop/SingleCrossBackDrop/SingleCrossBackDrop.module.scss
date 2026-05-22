@@ -1,0 +1,55 @@
+.stopError__backDrop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px;
+  width: 100%;
+  max-width: 700px;
+  min-height: 400px;
+  background-color: #fff;
+  color: #000;
+  border-radius: 20px;
+}
+
+.backdrop_text {
+  margin-bottom: 40px;
+  font-size: 26px;
+  line-height: 2.5rem;
+  color: #000;
+}
+
+.text_alarm {
+  color: #fdbf14;
+  font-weight: bolder;
+}
+
+.backdrop_btn_row {
+  display: flex;
+  justify-content: center;
+}
+
+.ok_btn {
+  font-size: x-large;
+  font-weight: normal;
+  width: 100px;
+}
+
+@media (max-width: 680px) {
+  .stopError__backDrop {
+    padding: 30px;
+    max-width: 80%;
+    min-height: 250px;
+  }
+
+  .backdrop_text {
+    font-size: 20px;
+    line-height: 1.5rem;
+  }
+
+  .ok_btn {
+    font-size: medium;
+  }
+}

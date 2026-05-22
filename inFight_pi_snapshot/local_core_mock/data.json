@@ -1,0 +1,730 @@
+{
+  "state": "Administration",
+  "led": {
+    "enabled": true
+  },
+  "history": [
+    {
+      "tournament": "FlowCUP",
+      "team": "Иванов",
+      "discipline": "DS",
+      "stage": "Round 1",
+      "is_battle": false,
+      "bust_price": 5,
+      "skip_price": 20,
+      "bust_count": 2,
+      "skip_count": 0,
+      "actual_time": 20380,
+      "result_time": 26380,
+      "ended_at": 1779481020330
+    },
+    {
+      "type": "tournament.add",
+      "at": 1779480685925,
+      "payload": {
+        "id": "UBQHQRERGDLWMXMSMVIZZKQZHKUEFG",
+        "name": "FlowCUP"
+      }
+    },
+    {
+      "tournament": "Test",
+      "team": "Иванов",
+      "discipline": "DS",
+      "stage": "Round 1",
+      "is_battle": false,
+      "bust_price": 5,
+      "skip_price": 20,
+      "bust_count": 3,
+      "skip_count": 0,
+      "actual_time": 33306,
+      "result_time": 42306,
+      "ended_at": 1779480518872
+    },
+    {
+      "tournament": "Test",
+      "team": "Иванов",
+      "discipline": "DS",
+      "stage": "Round 1",
+      "is_battle": false,
+      "bust_price": 5,
+      "skip_price": 20,
+      "bust_count": 0,
+      "skip_count": 0,
+      "actual_time": 10321,
+      "result_time": 10321,
+      "ended_at": 1779480471901
+    },
+    {
+      "tournament": "Test",
+      "team": "Иванов",
+      "discipline": "DS",
+      "stage": "Round 1",
+      "is_battle": false,
+      "bust_price": 5,
+      "skip_price": 20,
+      "bust_count": 0,
+      "skip_count": 0,
+      "actual_time": 5214,
+      "result_time": 5214,
+      "ended_at": 1779479840757
+    },
+    {
+      "type": "tournament.add",
+      "at": 1779467049638,
+      "payload": {
+        "id": "FMRUZRMBDRVKDJKJQDWHWRITINAQBP",
+        "name": "Test"
+      }
+    },
+    {
+      "type": "tournament.add",
+      "at": 1779464432982,
+      "payload": {
+        "id": "RVROLDSSAMIJBMSWVRLBSKVCRODPQB",
+        "name": "offline_local_final"
+      }
+    },
+    {
+      "type": "tournament.add",
+      "at": 1779464419354,
+      "payload": {
+        "id": "ZPYVZIAMSOXQABFCVZSSXIBSKHJTIE",
+        "name": "offline_local_ok"
+      }
+    }
+  ],
+  "currentTournamentId": "UBQHQRERGDLWMXMSMVIZZKQZHKUEFG",
+  "currentRoundIndex": 0,
+  "rounds": [
+    {
+      "team": {
+        "id": "QWVIPIIOGLPZWXTFIZTYAHPWULWMNX",
+        "name": "Иванов",
+        "number": 101
+      },
+      "stage": {
+        "id": "ZTBJRQKVKOQKBPOKUFOYHCKTELPUIV",
+        "name": "Round 1",
+        "battle": false
+      },
+      "faults": [
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 9023,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 11968,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 16454,
+          "valid": true
+        }
+      ],
+      "crossings": [
+        {
+          "cross": 0
+        },
+        {
+          "cross": 25358
+        },
+        {
+          "cross": 25550
+        },
+        {
+          "cross": 25779
+        }
+      ],
+      "round_start": 1779481879858,
+      "time_real": 25779,
+      "time_result": 40779,
+      "stage_rank": 1,
+      "tournament_rank": null
+    },
+    {
+      "team": {
+        "id": "OCWNOIUUXBXSCUWFBOIIGMHAFPORFF",
+        "name": "Петров",
+        "number": 102
+      },
+      "stage": {
+        "id": "ZTBJRQKVKOQKBPOKUFOYHCKTELPUIV",
+        "name": "Round 1",
+        "battle": false
+      },
+      "faults": [],
+      "crossings": [],
+      "round_start": 0,
+      "time_real": null,
+      "time_result": null,
+      "stage_rank": null,
+      "tournament_rank": null
+    },
+    {
+      "team": {
+        "id": "LHCWELRFSHWXAHGHXLLESDKKASQXDY",
+        "name": "Сидоров",
+        "number": 103
+      },
+      "stage": {
+        "id": "ZTBJRQKVKOQKBPOKUFOYHCKTELPUIV",
+        "name": "Round 1",
+        "battle": false
+      },
+      "faults": [],
+      "crossings": [],
+      "round_start": 0,
+      "time_real": null,
+      "time_result": null,
+      "stage_rank": null,
+      "tournament_rank": null
+    },
+    {
+      "team": {
+        "id": "QWVIPIIOGLPZWXTFIZTYAHPWULWMNX",
+        "name": "Иванов",
+        "number": 101
+      },
+      "stage": {
+        "id": "TPAAWIYTGQMEKPYHFGKHRXCTVRUICF",
+        "name": "Round 2",
+        "battle": false
+      },
+      "faults": [],
+      "crossings": [],
+      "round_start": 0,
+      "time_real": null,
+      "time_result": null,
+      "stage_rank": null,
+      "tournament_rank": null
+    },
+    {
+      "team": {
+        "id": "OCWNOIUUXBXSCUWFBOIIGMHAFPORFF",
+        "name": "Петров",
+        "number": 102
+      },
+      "stage": {
+        "id": "TPAAWIYTGQMEKPYHFGKHRXCTVRUICF",
+        "name": "Round 2",
+        "battle": false
+      },
+      "faults": [],
+      "crossings": [],
+      "round_start": 0,
+      "time_real": null,
+      "time_result": null,
+      "stage_rank": null,
+      "tournament_rank": null
+    },
+    {
+      "team": {
+        "id": "LHCWELRFSHWXAHGHXLLESDKKASQXDY",
+        "name": "Сидоров",
+        "number": 103
+      },
+      "stage": {
+        "id": "TPAAWIYTGQMEKPYHFGKHRXCTVRUICF",
+        "name": "Round 2",
+        "battle": false
+      },
+      "faults": [],
+      "crossings": [],
+      "round_start": 0,
+      "time_real": null,
+      "time_result": null,
+      "stage_rank": null,
+      "tournament_rank": null
+    },
+    {
+      "team": {
+        "id": "QWVIPIIOGLPZWXTFIZTYAHPWULWMNX",
+        "name": "Иванов",
+        "number": 101
+      },
+      "stage": {
+        "id": "FWKMWBAZZTHFNLLPYPSMTRCVNWQUOG",
+        "name": "Round 3",
+        "battle": true
+      },
+      "faults": [],
+      "crossings": [],
+      "round_start": 0,
+      "time_real": null,
+      "time_result": null,
+      "stage_rank": null,
+      "tournament_rank": null
+    },
+    {
+      "team": {
+        "id": "OCWNOIUUXBXSCUWFBOIIGMHAFPORFF",
+        "name": "Петров",
+        "number": 102
+      },
+      "stage": {
+        "id": "FWKMWBAZZTHFNLLPYPSMTRCVNWQUOG",
+        "name": "Round 3",
+        "battle": true
+      },
+      "faults": [],
+      "crossings": [],
+      "round_start": 0,
+      "time_real": null,
+      "time_result": null,
+      "stage_rank": null,
+      "tournament_rank": null
+    },
+    {
+      "team": {
+        "id": "QWVIPIIOGLPZWXTFIZTYAHPWULWMNX",
+        "name": "Иванов",
+        "number": 101
+      },
+      "stage": {
+        "id": "KYXFLXCYNTTVIAPGHQCNOQRKDPHWKW",
+        "name": "Round 4",
+        "battle": true
+      },
+      "faults": [],
+      "crossings": [],
+      "round_start": 0,
+      "time_real": null,
+      "time_result": null,
+      "stage_rank": null,
+      "tournament_rank": null
+    },
+    {
+      "team": {
+        "id": "OCWNOIUUXBXSCUWFBOIIGMHAFPORFF",
+        "name": "Петров",
+        "number": 102
+      },
+      "stage": {
+        "id": "KYXFLXCYNTTVIAPGHQCNOQRKDPHWKW",
+        "name": "Round 4",
+        "battle": true
+      },
+      "faults": [],
+      "crossings": [],
+      "round_start": 0,
+      "time_real": null,
+      "time_result": null,
+      "stage_rank": null,
+      "tournament_rank": null
+    },
+    {
+      "team": {
+        "id": "LHCWELRFSHWXAHGHXLLESDKKASQXDY",
+        "name": "Сидоров",
+        "number": 103
+      },
+      "stage": {
+        "id": "KYXFLXCYNTTVIAPGHQCNOQRKDPHWKW",
+        "name": "Round 4",
+        "battle": true
+      },
+      "faults": [],
+      "crossings": [],
+      "round_start": 0,
+      "time_real": null,
+      "time_result": null,
+      "stage_rank": null,
+      "tournament_rank": null
+    }
+  ],
+  "faults": [
+    {
+      "device_id": 0,
+      "device_type": "terminal",
+      "type": "bust",
+      "time": 9023,
+      "valid": true
+    },
+    {
+      "device_id": 0,
+      "device_type": "terminal",
+      "type": "bust",
+      "time": 11968,
+      "valid": true
+    },
+    {
+      "device_id": 0,
+      "device_type": "terminal",
+      "type": "bust",
+      "time": 16454,
+      "valid": true
+    }
+  ],
+  "crosses": [
+    {
+      "cross": 0
+    },
+    {
+      "cross": 25358
+    },
+    {
+      "cross": 25550
+    },
+    {
+      "cross": 25779
+    }
+  ],
+  "devices": {
+    "bluetoothDevices": [],
+    "connectedDevices": [],
+    "maps": []
+  },
+  "teams": [
+    {
+      "id": "QWVIPIIOGLPZWXTFIZTYAHPWULWMNX",
+      "name": "Иванов",
+      "number": 101
+    },
+    {
+      "id": "OCWNOIUUXBXSCUWFBOIIGMHAFPORFF",
+      "name": "Петров",
+      "number": 102
+    },
+    {
+      "id": "LHCWELRFSHWXAHGHXLLESDKKASQXDY",
+      "name": "Сидоров",
+      "number": 103
+    }
+  ],
+  "disciplines": [
+    {
+      "id": "QOSWDHOVXLOTNFTYSDUKTONSKGGZDC",
+      "name": "DS"
+    }
+  ],
+  "stages": [
+    {
+      "id": "ZTBJRQKVKOQKBPOKUFOYHCKTELPUIV",
+      "name": "Round 1",
+      "battle": false
+    },
+    {
+      "id": "TPAAWIYTGQMEKPYHFGKHRXCTVRUICF",
+      "name": "Round 2",
+      "battle": false
+    },
+    {
+      "id": "FWKMWBAZZTHFNLLPYPSMTRCVNWQUOG",
+      "name": "Round 3",
+      "battle": false
+    },
+    {
+      "id": "KYXFLXCYNTTVIAPGHQCNOQRKDPHWKW",
+      "name": "Round 4",
+      "battle": false
+    }
+  ],
+  "tournaments": [
+    {
+      "id": "UBQHQRERGDLWMXMSMVIZZKQZHKUEFG",
+      "name": "FlowCUP",
+      "teams": [
+        {
+          "id": "QWVIPIIOGLPZWXTFIZTYAHPWULWMNX",
+          "name": "Иванов",
+          "number": 101
+        },
+        {
+          "id": "OCWNOIUUXBXSCUWFBOIIGMHAFPORFF",
+          "name": "Петров",
+          "number": 102
+        },
+        {
+          "id": "LHCWELRFSHWXAHGHXLLESDKKASQXDY",
+          "name": "Сидоров",
+          "number": 103
+        }
+      ],
+      "disciplines": [
+        {
+          "id": "QOSWDHOVXLOTNFTYSDUKTONSKGGZDC",
+          "name": "DS"
+        }
+      ],
+      "stages": [
+        {
+          "id": "ZTBJRQKVKOQKBPOKUFOYHCKTELPUIV",
+          "name": "Round 1",
+          "battle": false
+        },
+        {
+          "id": "TPAAWIYTGQMEKPYHFGKHRXCTVRUICF",
+          "name": "Round 2",
+          "battle": false
+        },
+        {
+          "id": "FWKMWBAZZTHFNLLPYPSMTRCVNWQUOG",
+          "name": "Round 3",
+          "battle": true
+        },
+        {
+          "id": "KYXFLXCYNTTVIAPGHQCNOQRKDPHWKW",
+          "name": "Round 4",
+          "battle": true
+        }
+      ],
+      "bust_value": 5,
+      "skip_value": 20,
+      "round": [
+        {
+          "team": {
+            "id": "QWVIPIIOGLPZWXTFIZTYAHPWULWMNX",
+            "name": "Иванов",
+            "number": 101
+          },
+          "stage": {
+            "id": "ZTBJRQKVKOQKBPOKUFOYHCKTELPUIV",
+            "name": "Round 1",
+            "battle": false
+          },
+          "faults": [
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 9023,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 11968,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 16454,
+              "valid": true
+            }
+          ],
+          "crossings": [
+            {
+              "cross": 0
+            },
+            {
+              "cross": 25358
+            },
+            {
+              "cross": 25550
+            },
+            {
+              "cross": 25779
+            }
+          ],
+          "round_start": 1779481879858,
+          "time_real": 25779,
+          "time_result": 40779,
+          "stage_rank": 1,
+          "tournament_rank": null
+        },
+        {
+          "team": {
+            "id": "OCWNOIUUXBXSCUWFBOIIGMHAFPORFF",
+            "name": "Петров",
+            "number": 102
+          },
+          "stage": {
+            "id": "ZTBJRQKVKOQKBPOKUFOYHCKTELPUIV",
+            "name": "Round 1",
+            "battle": false
+          },
+          "faults": [],
+          "crossings": [],
+          "round_start": 0,
+          "time_real": null,
+          "time_result": null,
+          "stage_rank": null,
+          "tournament_rank": null
+        },
+        {
+          "team": {
+            "id": "LHCWELRFSHWXAHGHXLLESDKKASQXDY",
+            "name": "Сидоров",
+            "number": 103
+          },
+          "stage": {
+            "id": "ZTBJRQKVKOQKBPOKUFOYHCKTELPUIV",
+            "name": "Round 1",
+            "battle": false
+          },
+          "faults": [],
+          "crossings": [],
+          "round_start": 0,
+          "time_real": null,
+          "time_result": null,
+          "stage_rank": null,
+          "tournament_rank": null
+        },
+        {
+          "team": {
+            "id": "QWVIPIIOGLPZWXTFIZTYAHPWULWMNX",
+            "name": "Иванов",
+            "number": 101
+          },
+          "stage": {
+            "id": "TPAAWIYTGQMEKPYHFGKHRXCTVRUICF",
+            "name": "Round 2",
+            "battle": false
+          },
+          "faults": [],
+          "crossings": [],
+          "round_start": 0,
+          "time_real": null,
+          "time_result": null,
+          "stage_rank": null,
+          "tournament_rank": null
+        },
+        {
+          "team": {
+            "id": "OCWNOIUUXBXSCUWFBOIIGMHAFPORFF",
+            "name": "Петров",
+            "number": 102
+          },
+          "stage": {
+            "id": "TPAAWIYTGQMEKPYHFGKHRXCTVRUICF",
+            "name": "Round 2",
+            "battle": false
+          },
+          "faults": [],
+          "crossings": [],
+          "round_start": 0,
+          "time_real": null,
+          "time_result": null,
+          "stage_rank": null,
+          "tournament_rank": null
+        },
+        {
+          "team": {
+            "id": "LHCWELRFSHWXAHGHXLLESDKKASQXDY",
+            "name": "Сидоров",
+            "number": 103
+          },
+          "stage": {
+            "id": "TPAAWIYTGQMEKPYHFGKHRXCTVRUICF",
+            "name": "Round 2",
+            "battle": false
+          },
+          "faults": [],
+          "crossings": [],
+          "round_start": 0,
+          "time_real": null,
+          "time_result": null,
+          "stage_rank": null,
+          "tournament_rank": null
+        },
+        {
+          "team": {
+            "id": "QWVIPIIOGLPZWXTFIZTYAHPWULWMNX",
+            "name": "Иванов",
+            "number": 101
+          },
+          "stage": {
+            "id": "FWKMWBAZZTHFNLLPYPSMTRCVNWQUOG",
+            "name": "Round 3",
+            "battle": true
+          },
+          "faults": [],
+          "crossings": [],
+          "round_start": 0,
+          "time_real": null,
+          "time_result": null,
+          "stage_rank": null,
+          "tournament_rank": null
+        },
+        {
+          "team": {
+            "id": "OCWNOIUUXBXSCUWFBOIIGMHAFPORFF",
+            "name": "Петров",
+            "number": 102
+          },
+          "stage": {
+            "id": "FWKMWBAZZTHFNLLPYPSMTRCVNWQUOG",
+            "name": "Round 3",
+            "battle": true
+          },
+          "faults": [],
+          "crossings": [],
+          "round_start": 0,
+          "time_real": null,
+          "time_result": null,
+          "stage_rank": null,
+          "tournament_rank": null
+        },
+        {
+          "team": {
+            "id": "QWVIPIIOGLPZWXTFIZTYAHPWULWMNX",
+            "name": "Иванов",
+            "number": 101
+          },
+          "stage": {
+            "id": "KYXFLXCYNTTVIAPGHQCNOQRKDPHWKW",
+            "name": "Round 4",
+            "battle": true
+          },
+          "faults": [],
+          "crossings": [],
+          "round_start": 0,
+          "time_real": null,
+          "time_result": null,
+          "stage_rank": null,
+          "tournament_rank": null
+        },
+        {
+          "team": {
+            "id": "OCWNOIUUXBXSCUWFBOIIGMHAFPORFF",
+            "name": "Петров",
+            "number": 102
+          },
+          "stage": {
+            "id": "KYXFLXCYNTTVIAPGHQCNOQRKDPHWKW",
+            "name": "Round 4",
+            "battle": true
+          },
+          "faults": [],
+          "crossings": [],
+          "round_start": 0,
+          "time_real": null,
+          "time_result": null,
+          "stage_rank": null,
+          "tournament_rank": null
+        },
+        {
+          "team": {
+            "id": "LHCWELRFSHWXAHGHXLLESDKKASQXDY",
+            "name": "Сидоров",
+            "number": 103
+          },
+          "stage": {
+            "id": "KYXFLXCYNTTVIAPGHQCNOQRKDPHWKW",
+            "name": "Round 4",
+            "battle": true
+          },
+          "faults": [],
+          "crossings": [],
+          "round_start": 0,
+          "time_real": null,
+          "time_result": null,
+          "stage_rank": null,
+          "tournament_rank": null
+        }
+      ]
+    }
+  ]
+}

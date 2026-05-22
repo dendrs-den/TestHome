@@ -1,0 +1,72 @@
+* {
+  font-family: "Rubik" !important;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style: none;
+}
+
+html {
+  height: 100vh;
+}
+@font-face {
+  font-family: "Rubik" !important;
+  src: local("Rubik"),
+    url("../public/assests/fonts/Rubik/Rubik-VariableFont_wght.ttf")
+      format("truetype");
+  font-weight: normal;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  font-family: "Rubik" !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+#root {
+  height: 100%;
+}
+
+.MuiPopover-root li {
+  display: flex;
+  vertical-align: middle;
+  justify-content: flex-start;
+  padding: 6px 16px;
+}
+
+.css-18lolh3-MuiDataGrid-root .MuiDataGrid-columnHeader:focus,
+.css-18lolh3-MuiDataGrid-root .MuiDataGrid-cell:focus {
+  outline: none;
+}
+
+.css-9ddj71-MuiInputBase-root-MuiOutlinedInput-root.Mui-focused
+  .MuiOutlinedInput-notchedOutline {
+  border-color: #562cff;
+  /* border-width: 1px; */
+}
+.css-18lolh3-MuiDataGrid-root .MuiDataGrid-columnHeader:focus-within,
+.css-18lolh3-MuiDataGrid-root .MuiDataGrid-cell:focus-within {
+  outline: none;
+}
+
+.MuiDataGrid-virtualScroller::-webkit-scrollbar {
+  width: 5px;
+}
+
+.MuiDataGrid-virtualScroller::-webkit-scrollbar-track {
+  width: 50px;
+  background: #d3d3d3;
+}
+
+.MuiDataGrid-virtualScroller::-webkit-scrollbar-thumb {
+  width: 20px;
+  background: #562cff;
+  border-radius: 15px;
+}

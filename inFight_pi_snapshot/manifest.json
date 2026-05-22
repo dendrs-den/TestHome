@@ -1,0 +1,48 @@
+{
+  "created": "2026-05-22 16:30:31",
+  "host": "192.168.0.177",
+  "project_name": "inFight",
+  "copied_dirs": [
+    [
+      "/home/pi/src/frontend",
+      "src_frontend"
+    ],
+    [
+      "/opt/inflight/frontend",
+      "deploy_frontend"
+    ],
+    [
+      "/opt/inflight/core",
+      "deploy_core"
+    ]
+  ],
+  "copied_files": [
+    [
+      "/etc/nginx/sites-available/default",
+      "configs/nginx_default.conf"
+    ],
+    [
+      "/etc/systemd/system/inflight-server.service",
+      "configs/inflight-server.service"
+    ],
+    [
+      "/etc/systemd/system/inflight-core.service",
+      "configs/inflight-core.service"
+    ],
+    [
+      "/etc/systemd/system/inflight-crossfront.service",
+      "configs/inflight-crossfront.service"
+    ],
+    [
+      "/etc/systemd/system/inflight-client.service",
+      "configs/inflight-client.service"
+    ]
+  ],
+  "excluded_dirs": [
+    ".cache",
+    ".git",
+    "build",
+    "dist",
+    "node_modules"
+  ]
+}

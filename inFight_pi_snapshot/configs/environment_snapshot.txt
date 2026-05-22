@@ -1,0 +1,85 @@
+in-flight-flow
+Linux in-flight-flow 5.15.32-v8+ #1538 SMP PREEMPT Thu Mar 31 19:40:39 BST 2022 aarch64 GNU/Linux
+PRETTY_NAME="Debian GNU/Linux 11 (bullseye)"
+NAME="Debian GNU/Linux"
+VERSION_ID="11"
+VERSION="11 (bullseye)"
+VERSION_CODENAME=bullseye
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+v16.19.1
+8.19.3
+Python 3.9.2
+git version 2.30.2
+● inflight-server.service - inFlight Client service
+     Loaded: loaded (/etc/systemd/system/inflight-server.service; enabled; vendor preset: enabled)
+     Active: active (running) since Thu 2026-05-21 17:24:54 MSK; 23h ago
+   Main PID: 493 (node)
+      Tasks: 11 (limit: 4164)
+        CPU: 1.230s
+     CGroup: /system.slice/inflight-server.service
+             └─493 /usr/bin/node /opt/inflight/frontend/server/server.js
+
+May 21 17:24:54 in-flight-flow systemd[1]: Started inFlight Client service.
+May 21 17:24:56 in-flight-flow node[493]: webserver address: http://localhost:3001
+May 21 17:24:56 in-flight-flow node[493]: core api address:  http://127.0.0.1:15000
+
+● inflight-core.service - inFlight Core service
+     Loaded: loaded (/etc/systemd/system/inflight-core.service; enabled; vendor preset: enabled)
+     Active: active (running) since Thu 2026-05-21 17:25:02 MSK; 23h ago
+   Main PID: 702 (main)
+      Tasks: 8 (limit: 4164)
+        CPU: 26.308s
+     CGroup: /system.slice/inflight-core.service
+             └─702 /opt/inflight/core/cmd/app/main
+
+May 22 16:23:33 in-flight-flow main[702]: TRACE: 2026/05/22 16:23:33 statistic.go:28: Gorutines: 9 | MemUsed: 227491840 | MemFree: 520814592
+May 22 16:24:33 in-flight-flow main[702]: TRACE: 2026/05/22 16:24:33 statistic.go:28: Gorutines: 9 | MemUsed: 227753984 | MemFree: 520327168
+May 22 16:25:33 in-flight-flow main[702]: TRACE: 2026/05/22 16:25:33 statistic.go:28: Gorutines: 9 | MemUsed: 227807232 | MemFree: 520069120
+May 22 16:26:19 in-flight-flow main[702]: TRACE: 2026/05/22 16:26:19 eventSystem.go:38: EventsSystem take event:  {removeDevice map[connected:false guid: mac:48:5C:2C:2F:5A:A2 name:DV9135 paired:false support:false]}
+May 22 16:26:33 in-flight-flow main[702]: TRACE: 2026/05/22 16:26:33 statistic.go:28: Gorutines: 9 | MemUsed: 227373056 | MemFree: 520327168
+May 22 16:27:20 in-flight-flow main[702]: TRACE: 2026/05/22 16:27:20 eventSystem.go:38: EventsSystem take event:  {addDevice map[connected:false guid: mac:48:5C:2C:2F:5A:A2 name:DV9135 paired:false support:false]}
+May 22 16:27:33 in-flight-flow main[702]: TRACE: 2026/05/22 16:27:33 statistic.go:28: Gorutines: 9 | MemUsed: 226799616 | MemFree: 520843264
+May 22 16:28:33 in-flight-flow main[702]: TRACE: 2026/05/22 16:28:33 statistic.go:28: Gorutines: 9 | MemUsed: 226942976 | MemFree: 520585216
+May 22 16:29:33 in-flight-flow main[702]: TRACE: 2026/05/22 16:29:33 statistic.go:28: Gorutines: 9 | MemUsed: 227053568 | MemFree: 520097792
+May 22 16:30:25 in-flight-flow main[702]: TRACE: 2026/05/22 16:30:25 eventSystem.go:38: EventsSystem take event:  {removeDevice map[connected:false guid: mac:48:5C:2C:2F:5A:A2 name:DV9135 paired:false support:false]}
+
+● inflight-crossfront.service - inFlight Crossing Frontend service
+     Loaded: loaded (/etc/systemd/system/inflight-crossfront.service; enabled; vendor preset: enabled)
+     Active: active (running) since Thu 2026-05-21 17:24:54 MSK; 23h ago
+   Main PID: 489 (jsm.crossing-de)
+      Tasks: 6 (limit: 4164)
+        CPU: 17.149s
+     CGroup: /system.slice/inflight-crossfront.service
+             └─489 /opt/inflight/bins/jsm.crossing-detector-front
+
+May 21 17:24:54 in-flight-flow systemd[1]: Started inFlight Crossing Frontend service.
+May 21 17:24:54 in-flight-flow jsm.crossing-detector-front[489]: 0
+May 21 17:24:54 in-flight-flow jsm.crossing-detector-front[489]: GMT-2026:05:21-14:24:54 (548068798528): START
+May 21 17:24:54 in-flight-flow jsm.crossing-detector-front[489]: GMT-2026:05:21-14:24:54 (548068798528): Config readed
+May 21 17:24:54 in-flight-flow jsm.crossing-detector-front[489]: GMT-2026:05:21-14:24:54 (548068798528): Success installed reader
+
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+     Active: active (running) since Thu 2026-05-21 17:24:55 MSK; 23h ago
+       Docs: man:nginx(8)
+    Process: 496 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+    Process: 562 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+    Process: 1042 ExecReload=/usr/sbin/nginx -g daemon on; master_process on; -s reload (code=exited, status=0/SUCCESS)
+   Main PID: 563 (nginx)
+      Tasks: 5 (limit: 4164)
+        CPU: 221ms
+     CGroup: /system.slice/nginx.service
+             ├─ 563 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
+             ├─1043 nginx: worker process
+             ├─1044 nginx: worker process
+             ├─1045 nginx: worker process
+             └─1046 nginx: worker process
+
+May 21 17:24:54 in-flight-flow systemd[1]: Starting A high performance web server and a reverse proxy server...
+May 21 17:24:55 in-flight-flow systemd[1]: Started A high performance web server and a reverse proxy server.
+May 22 07:51:16 in-flight-flow systemd[1]: Reloading A high performance web server and a reverse proxy server.
+May 22 07:51:16 in-flight-flow systemd[1]: Reloaded A high performance web server and a reverse proxy server.
+
