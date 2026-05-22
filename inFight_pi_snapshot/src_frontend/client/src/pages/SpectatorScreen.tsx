@@ -247,12 +247,22 @@ const SpectatorsScreenPage = () => {
       setIsPreparing(true);
       setLongCrossNote(false);
       setCurrentState("Preparation");
+      setStopWatchActive(false);
+      setStopWatchReset(true);
       setFirstCrossTime(0);
+      setFactTime(0);
+      setResultTime(0);
+      setBustCount(0);
+      setSkipCount(0);
+      setFaultCount(0);
       loadRelevantData();
     };
     const onStateStart = () => {
       setIsPreparing(false);
       setCurrentState("Expectation");
+      setStopWatchActive(false);
+      setStopWatchReset(true);
+      setFirstCrossTime(0);
       setFactTime(0);
       setResultTime(0);
       setFaultCount(0);

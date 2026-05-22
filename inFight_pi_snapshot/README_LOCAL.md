@@ -37,6 +37,29 @@ powershell -ExecutionPolicy Bypass -File .\scripts\start_all.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\stop_all.ps1
 ```
 
+## Автотесты Локальной Логики
+- Полный локальный прогон (поднимет mock core + backend, выполнит тесты и остановит процессы):
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run_tests_local.ps1
+```
+
+- Несколько прогонов подряд:
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run_tests_local.ps1 -Repeat 10
+```
+
+- Что запускается внутри:
+- `scripts/smoke-tests-local.js` — smoke-проверка ключевых API-сценариев.
+- `scripts/session-timer-consistency-test.js` — сессия с рандомными `cross/bust/skip` и сверкой системного времени с `fact_time`.
+
+- Настройка допуска по времени:
+- По умолчанию `tolerance_ms = 10`.
+- Переопределение:
+```powershell
+$env:SESSION_TEST_TOLERANCE_MS=20
+powershell -ExecutionPolicy Bypass -File .\scripts\run_tests_local.ps1
+```
+
 ## Проверка API
 - Frontend проксирует запросы на `http://127.0.0.1:3001`.
 - Убедись, что backend поднят на 3001 до запуска клиента.

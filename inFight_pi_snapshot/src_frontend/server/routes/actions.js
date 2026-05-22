@@ -18,10 +18,21 @@ let serviceRoundStartTs = null;
 let serviceCrosses = [];
 let serviceFaults = [];
 let serviceLastFactTime = 0;
+let servicePrepared = false;
 
 const isServiceRoundActive = () => serviceRoundStartTs !== null;
 const isServiceModeEnabled = () => SERVICE_MODE_ENABLED;
 const isServiceFlowActive = () => isServiceModeEnabled() && isServiceRoundActive();
+const SAVE_ERROR_STATUS = "Round data was not saved due to system error";
+const FINALIZATION_IN_PROGRESS_STATUS = "Round finalization is already in progress";
+
+const serviceStopGuard = {
+  inProgress: false,
+  lastCompletedAt: 0,
+  lastResponse: null,
+};
+
+const SERVICE_STOP_DEDUP_WINDOW_MS = 5000;
 const getServiceElapsedMs = () => {
   if (!isServiceRoundActive()) return 0;
   return Math.max(0, Date.now() - serviceRoundStartTs);
@@ -238,33 +249,51 @@ router.get("/getinfo", (req, res) => {
       .then((response) => {
         const coreInfo = response.data || {};
         const shouldMergeService =
+          (isServiceModeEnabled() && servicePrepared) ||
           (isServiceModeEnabled() && isServiceRoundActive()) ||
           serviceLastFactTime > 0 ||
           serviceFaults.length > 0 ||
           serviceCrosses.length > 0;
 
         const mergedInfo = shouldMergeService
-          ? {
-              ...coreInfo,
-              faults: serviceFaults.length > 0 ? serviceFaults : coreInfo.faults || [],
-              crossed:
-                serviceCrosses.length > 0 ? serviceCrosses : coreInfo.crossed || [],
-              round: {
-                ...(coreInfo.round || {}),
-                faults:
-                  serviceFaults.length > 0
-                    ? serviceFaults
-                    : coreInfo?.round?.faults || coreInfo.faults || [],
-                crossings:
-                  serviceCrosses.length > 0
-                    ? serviceCrosses
-                    : coreInfo?.round?.crossings || coreInfo.crossed || [],
-                time_real:
-                  Number(coreInfo?.round?.time_real) > 0
-                    ? coreInfo.round.time_real
-                    : serviceLastFactTime,
-              },
-            }
+          ? servicePrepared
+            ? {
+                ...coreInfo,
+                faults: [],
+                crossed: [],
+                round: {
+                  ...(coreInfo.round || {}),
+                  faults: [],
+                  crossings: [],
+                  time_real: 0,
+                  time_result: 0,
+                },
+              }
+            : {
+                ...coreInfo,
+                faults: serviceFaults.length > 0 ? serviceFaults : coreInfo.faults || [],
+                crossed:
+                  serviceCrosses.length > 0 ? serviceCrosses : coreInfo.crossed || [],
+                round: {
+                  ...(coreInfo.round || {}),
+                  faults:
+                    serviceFaults.length > 0
+                      ? serviceFaults
+                      : coreInfo?.round?.faults || coreInfo.faults || [],
+                  crossings:
+                    serviceCrosses.length > 0
+                      ? serviceCrosses
+                      : coreInfo?.round?.crossings || coreInfo.crossed || [],
+                  time_real:
+                    Number(coreInfo?.round?.time_real) > 0
+                      ? coreInfo.round.time_real
+                      : serviceLastFactTime,
+                  time_result:
+                    Number(coreInfo?.round?.time_result) > 0
+                      ? coreInfo.round.time_result
+                      : serviceLastFactTime,
+                },
+              }
           : coreInfo;
 
         res.json(mergedInfo);
@@ -766,6 +795,10 @@ router.post("/service/activate", async (req, res) => {
     serviceLastFactTime = 0;
     serviceCrosses = [];
     serviceFaults = [];
+    servicePrepared = true;
+    serviceStopGuard.inProgress = false;
+    serviceStopGuard.lastCompletedAt = 0;
+    serviceStopGuard.lastResponse = null;
     try {
       await axios.request({
         method: "POST",
@@ -788,6 +821,7 @@ router.post("/service/activate", async (req, res) => {
 
     SocketServer.getSockets().forEach((socket) => {
       socket.emit("stateStart", "");
+      socket.emit("getInfo", null);
     });
     res.json({ ok: true });
   } catch (error) {
@@ -806,6 +840,7 @@ router.post("/service/cross", async (req, res) => {
       serviceRoundStartTs = Date.now();
       serviceCrosses = [];
       serviceFaults = [];
+      servicePrepared = false;
     }
     const newCross = { cross: getServiceElapsedMs() };
     serviceCrosses.push(newCross);
@@ -834,40 +869,60 @@ router.post("/service/stop", async (req, res) => {
     return res.status(404).json({ error: "Service mode is disabled" });
   }
   try {
+    if (
+      Date.now() - serviceStopGuard.lastCompletedAt <= SERVICE_STOP_DEDUP_WINDOW_MS &&
+      serviceStopGuard.lastResponse
+    ) {
+      return res.json(serviceStopGuard.lastResponse);
+    }
+    if (serviceStopGuard.inProgress) {
+      return res.status(409).send({ text: { status: FINALIZATION_IN_PROGRESS_STATUS } });
+    }
+    serviceStopGuard.inProgress = true;
+
     const factTime = getServiceElapsedMs();
     const fakeResult = {
       result: true,
       fact_time: factTime,
       result_time: factTime,
     };
-    try {
-      await axios.request({
-        method: "POST",
-        url: `${API_URL}/round/fault/edit`,
-        headers: { "Content-Type": "application/json" },
-        data: serviceFaults,
-      });
-      await axios.request({
-        method: "POST",
-        url: `${API_URL}/round/crossed/edit`,
-        headers: { "Content-Type": "application/json" },
-        data: serviceCrosses,
-      });
-      await axios.request({
-        method: "POST",
-        url: `${API_URL}/round/end`,
-        headers: { "Content-Type": "application/json" },
-      });
-    } catch (e) {}
+    await axios.request({
+      method: "POST",
+      url: `${API_URL}/round/fault/edit`,
+      headers: { "Content-Type": "application/json" },
+      data: serviceFaults,
+    });
+    await axios.request({
+      method: "POST",
+      url: `${API_URL}/round/crossed/edit`,
+      headers: { "Content-Type": "application/json" },
+      data: serviceCrosses,
+    });
+    await axios.request({
+      method: "POST",
+      url: `${API_URL}/round/end`,
+      headers: { "Content-Type": "application/json" },
+    });
+    await axios.request({
+      method: "GET",
+      url: `${API_URL}/round/save`,
+      headers: { "Content-Type": "application/json" },
+    });
 
     serviceLastFactTime = factTime;
     serviceRoundStartTs = null;
+    servicePrepared = false;
     SocketServer.getSockets().forEach((socket) => {
       socket.emit("stateStop", { result: fakeResult });
     });
+    serviceStopGuard.lastCompletedAt = Date.now();
+    serviceStopGuard.lastResponse = fakeResult;
     res.json(fakeResult);
   } catch (error) {
-    res.status(500).send();
+    console.log("service stop/save failed:", error?.response?.data || error);
+    res.status(500).send({ text: { status: SAVE_ERROR_STATUS } });
+  } finally {
+    serviceStopGuard.inProgress = false;
   }
 });
 

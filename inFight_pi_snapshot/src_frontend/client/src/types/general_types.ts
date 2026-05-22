@@ -67,4 +67,5 @@ export enum CrossErrors {
   wrongState = "Can't move state from Expectation to Completion",
   wrongState2 = "Can't move state from Completion to Completion",
   singleCross = "Can't end round, only have 1 crossing",
+  saveFailed = "Round data was not saved due to system error",
 }
