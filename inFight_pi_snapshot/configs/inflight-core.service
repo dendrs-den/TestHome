@@ -1,7 +1,6 @@
 [Unit]
 Description=inFlight Core service
-After=mongod.service
-Requires=mongod.service
+After=network.target
 
 [Service]
 Type=simple

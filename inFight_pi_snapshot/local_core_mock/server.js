@@ -5,6 +5,8 @@ const cors = require("cors");
 
 const PORT = Number(process.env.CORE_MOCK_PORT || 15000);
 const DATA_PATH = path.join(__dirname, "data.json");
+const AUTO_REMOTE_CROSS = process.env.MOCK_AUTO_REMOTE_CROSS === "1";
+const AUTO_REMOTE_FAULT = process.env.MOCK_AUTO_REMOTE_FAULT === "1";
 
 const mkId = () => {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -332,10 +334,14 @@ app.post("/round/fault/edit", (req, res) => {
   saveDb();
   res.json(db.faults);
 });
-app.get("/round/fault/remote", (_req, res) => res.json({ valid: true, remote: true }));
+app.get("/round/fault/remote", (_req, res) =>
+  res.json(AUTO_REMOTE_FAULT ? { valid: true, remote: true } : { valid: false, remote: false })
+);
 
 app.get("/round/crossed", (_req, res) => res.json(db.crosses));
-app.get("/round/crossed/remote", (_req, res) => res.json({ cross: 1, timestamp: Date.now() }));
+app.get("/round/crossed/remote", (_req, res) =>
+  res.json(AUTO_REMOTE_CROSS ? { cross: 1, timestamp: Date.now() } : { cross: 0, timestamp: Date.now() })
+);
 app.post("/round/crossed/edit", (req, res) => {
   db.crosses = Array.isArray(req.body) ? req.body : db.crosses;
   recalcCurrentRoundMetrics();
@@ -349,7 +355,9 @@ app.post("/round/start", (_req, res) => {
   res.json({ ok: true });
 });
 app.get("/round/start/bluetooth/remote", (_req, res) => res.json({ ok: true }));
-app.get("/round/start/crossing/remote", (_req, res) => res.json({ cross: 1 }));
+app.get("/round/start/crossing/remote", (_req, res) =>
+  res.json(AUTO_REMOTE_CROSS ? { cross: 1 } : { cross: 0 })
+);
 app.post("/round/end", (_req, res) => {
   recalcCurrentRoundMetrics();
   db.state = "Completion";
