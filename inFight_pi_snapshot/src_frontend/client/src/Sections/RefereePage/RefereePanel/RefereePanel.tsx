@@ -133,7 +133,6 @@ const RefereePanel = (props: Props) => {
       return;
     }
 
-    waitForRemoteStop();
     const timeStamp = await roundStart();
 
     if (timeStamp) {
@@ -195,6 +194,9 @@ const RefereePanel = (props: Props) => {
 
     // if (stopResponse?.text?.status && !roundIsPreparing) {
     if (stopResponse?.text?.status) {
+      if (stopResponse.text.status === "Round finalization is already in progress") {
+        return;
+      }
       setErrorText(stopResponse.text.status);
       toggleBackDrop(true);
       setIsPreparing(true);

@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const os = require("os");
 const SocketServer = require("./models/SocketServer");
 const url = process.env.WEBSERVER_URL || "http://localhost";
 const port = process.env.WEBSERVER_PORT || 3001;
@@ -32,6 +33,29 @@ app.use(
   })
 );
 app.use(express.json());
+
+app.get("/utils/getIp", (req, res) => {
+  try {
+    const nets = os.networkInterfaces();
+    const results = [];
+
+    Object.keys(nets).forEach((name) => {
+      (nets[name] || []).forEach((net) => {
+        if (net && net.family === "IPv4" && !net.internal) {
+          results.push({
+            interface: name,
+            address: net.address,
+            cidr: net.cidr || "",
+          });
+        }
+      });
+    });
+
+    res.json({ results });
+  } catch (error) {
+    res.status(500).json({ results: [], error: "Failed to detect network interfaces" });
+  }
+});
 
 // API routes
 app.use("/tournaments", tournamentRoutes);

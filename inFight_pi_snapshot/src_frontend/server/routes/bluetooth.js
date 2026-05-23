@@ -1,11 +1,16 @@
-﻿const express = require("express");
+const express = require("express");
 const router = express.Router();
 const axios = require("axios").default;
 const SocketServer = require("../models/SocketServer");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "./.env") });
 
-const API_URL = "http://127.0.0.1:15010";
+const API_URL = process.env.CORE_API_URL || "http://127.0.0.1:15000";
+const EMPTY_BT_PAYLOAD = {
+  bluetoothDevices: [],
+  connectedDevices: [],
+  maps: [],
+};
 
 const handleApiError = (res, error, context) => {
   const status = error?.response?.status || 502;
@@ -31,10 +36,15 @@ router.get("/getall", (req, res) => {
         res.json(response.data);
       })
       .catch((error) => {
-        return handleApiError(res, error, "Error trying to get device list");
+        console.log(
+          "Bluetooth service unavailable, returning empty list",
+          error?.response?.data || error?.message || error
+        );
+        return res.status(200).json(EMPTY_BT_PAYLOAD);
       });
   } catch (error) {
-    return handleApiError(res, error, "Error trying to get device list");
+    console.log("Error trying to get device list", error?.message || error);
+    return res.status(200).json(EMPTY_BT_PAYLOAD);
   }
 });
 

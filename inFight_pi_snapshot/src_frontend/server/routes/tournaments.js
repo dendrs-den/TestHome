@@ -1,4 +1,4 @@
-﻿const express = require("express");
+const express = require("express");
 const Logger = require("../models/Logger");
 const router = express.Router();
 const axios = require("axios").default;
@@ -6,7 +6,7 @@ const SocketServer = require("../models/SocketServer");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "./.env") });
 
-const API_URL = "http://127.0.0.1:15010";
+const API_URL = process.env.CORE_API_URL || "http://127.0.0.1:15000";
 
 const handleApiError = (res, error, context) => {
   const status = error?.response?.status || 502;

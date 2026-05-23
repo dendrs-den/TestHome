@@ -12,7 +12,7 @@ need=(
 missing=0
 echo "== check real-hardware artifacts =="
 for f in "${need[@]}"; do
-  if [[ -f "$f" ]]; then
+  if [[ -x "$f" ]]; then
     echo "[OK] $f"
   else
     echo "[MISS] $f"
@@ -20,7 +20,7 @@ for f in "${need[@]}"; do
   fi
 done
 
-if [[ -f "$ARTIFACTS_DIR/bins/jsm.bluetooth" ]]; then
+if [[ -x "$ARTIFACTS_DIR/bins/jsm.bluetooth" ]]; then
   echo "[OK] optional $ARTIFACTS_DIR/bins/jsm.bluetooth"
 else
   echo "[WARN] optional $ARTIFACTS_DIR/bins/jsm.bluetooth not found"
@@ -40,7 +40,7 @@ fi
 
 echo "== ldd checks =="
 for b in "$ARTIFACTS_DIR/bins/jsm.crossing-detector-front" "$ARTIFACTS_DIR/bins/jsm.bluetooth" "$ARTIFACTS_DIR/core/main"; do
-  if [[ -f "$b" ]]; then
+  if [[ -x "$b" ]]; then
     echo "-- $b --"
     ldd "$b" 2>/dev/null | grep -E "not found|libjsoncpp|libssl|libcrypto|libSDL2" || true
   fi

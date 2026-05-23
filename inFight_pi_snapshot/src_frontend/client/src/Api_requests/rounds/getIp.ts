@@ -6,12 +6,21 @@ const getIp = async () => {
         "Content-Type": "application/json",
       },
     });
-
-    const data = await response.json();
-    return data;
+    const bodyText = await response.text();
+    let data = null;
+    try {
+      data = bodyText ? JSON.parse(bodyText) : null;
+    } catch (_) {
+      // Ignore parse errors; handled below with safe fallback.
+    }
+    if (!response.ok) {
+      console.log("getIp request failed:", response.status, data || bodyText);
+      return { results: [] };
+    }
+    return data || { results: [] };
   } catch (err) {
-    console.log("Log error roundNext request failed", err);
-    console.log("Error trying to set next round");
+    console.log("getIp request error", err);
+    return { results: [] };
   }
 };
 

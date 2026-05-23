@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import SpectatorSocket from "../Api_requests/SpectatorSocket";
 import StopWatch from "../Components/SpectatorScreen/Timer/StopWatch";
 import classes from "./SpectatorScreen.module.scss";
@@ -37,8 +37,6 @@ const SpectatorsScreenPage = () => {
   const [showLongCrossNote, setLongCrossNote] = useState(false);
   const [ipList, setIpList] = useState([]);
   const [showPreviousBattleResult, setShowPreviousBattleResult] = useState(false);
-  const currentStateRef = useRef("");
-  const stopWatchActiveRef = useRef(false);
   const navigate = useNavigate();
   const isTrainingMode = Boolean(currentTournament?.is_traning);
 
@@ -339,12 +337,8 @@ const SpectatorsScreenPage = () => {
     };
 
     const onGetInfo = () => {
-      if (
-        currentStateRef.current === "Performance" &&
-        stopWatchActiveRef.current
-      ) {
-        return;
-      }
+      // Always resync from backend on getInfo.
+      // If a stop socket event is missed, this prevents stopwatch from running forever.
       loadRelevantData();
     };
 
@@ -431,12 +425,7 @@ const SpectatorsScreenPage = () => {
     if (currentState) {
       console.log(currentState);
     }
-    currentStateRef.current = currentState;
   }, [currentState]);
-
-  useEffect(() => {
-    stopWatchActiveRef.current = stopWatchActive;
-  }, [stopWatchActive]);
   return (
     <React.Fragment>
       <Helmet>

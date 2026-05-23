@@ -17,7 +17,6 @@ import swapTeamPositions from "../../Api_requests/rounds/roundSwapCommands";
 import setCurrentRound from "../../Api_requests/rounds/setCurrentRound";
 import formatTime from "../../utils/formatTime";
 import EditResultsBackDrop from "../RefereePage/RoundUtilitiesBlock/EditResultsBackDrop/EditResultsBackDrop";
-import updateCurrentTournament from "../../Api_requests/tournaments/updateCurrentTournament";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import setAdministrationState from "../../Api_requests/coreStateManagement/setAdministrationState";
@@ -32,6 +31,12 @@ const defaultTeam = {
   stage_rank: 0,
   tournament_rank: 0,
 };
+
+const MIN_BATTLE_SLOTS = 2;
+const BATTLE_SLOTS_KEY_PREFIX = "infight_battle_slots_";
+
+const getBattleSlotsStorageKey = (tourId) =>
+  `${BATTLE_SLOTS_KEY_PREFIX}${tourId || "unknown"}`;
 
 const buildRoundsFromTournament = (tour) => {
   const teams = Array.isArray(tour?.teams) ? tour.teams : [];
@@ -52,31 +57,15 @@ const buildRoundsFromTournament = (tour) => {
 };
 
 function EditToolbar(props) {
-  const { currentTour, stageId, fetchCurrentTournament } = props;
+  const { onAddSlot, canAddSlot } = props;
 
   const addNewRound = async () => {
-    const tourTemp = { ...currentTour };
-    const rounds = Array.isArray(currentTour?.round) ? currentTour.round : [];
-    const stages = Array.isArray(currentTour?.stages) ? currentTour.stages : [];
-
-    const foundStage = stages.find((stage) => stage.id === stageId) || null;
-    const lastIndex = rounds
-      .map((round) => round?.stage?.id)
-      .findLastIndex((id) => id === stageId);
-
-    // inserting new round with empty team an array of all rounds, assign stage to it
-    tourTemp.round = [...rounds];
-    tourTemp.round.splice(lastIndex + 1, 0, {
-      ...defaultTeam,
-      stage: foundStage,
-    });
-    // send updated tour info (rounds array specifically) and refetch tourData to display changes
-    await updateCurrentTournament(tourTemp);
-    fetchCurrentTournament();
+    await onAddSlot();
   };
   return (
     <GridToolbarContainer sx={{ justifyContent: "end", paddingTop: "15px" }}>
       <Button
+        disabled={!canAddSlot}
         sx={{
           paddingLeft: "20px",
           paddingRight: "20px",
@@ -101,6 +90,7 @@ const TournamentsRounds = (props) => {
   const [rowData, setRowData] = useState([]);
   const [selectedRow, setSelectedRow] = useState(0);
   const [open, setOpen] = useState(false);
+  const [battleVisibleSlots, setBattleVisibleSlots] = useState({});
 
   const startRound = useCallback(
     async (roundId) => {
@@ -111,12 +101,12 @@ const TournamentsRounds = (props) => {
   );
 
   const handleRowModelChange = async (params) => {
-    // params.defaultMuiPrevented = true;
-    const roundIndex = Object.keys(params)[0];
-    const teamId = params[roundIndex]?.name?.value;
+    const rowKey = Object.keys(params)[0];
+    const teamId = params[rowKey]?.name?.value;
+    const roundIndex = Number(rowKey);
 
-    // check if we received team's id, not team's name - id's length is always 30
-    if (roundIndex && teamId && teamId.length > 20) {
+    // Accept index 0 as valid and ensure we send numeric index.
+    if (Number.isInteger(roundIndex) && roundIndex >= 0 && teamId && teamId.length > 20) {
       await roundUpdateTeam(roundIndex, teamId);
       await fetchCurrentTournament();
     }
@@ -136,6 +126,39 @@ const TournamentsRounds = (props) => {
     };
     setCurrentTour(normalizedTour);
     setRowData(normalizedTour.round);
+    let storedSlots = {};
+    try {
+      const raw = localStorage.getItem(getBattleSlotsStorageKey(normalizedTour.id));
+      storedSlots = raw ? JSON.parse(raw) : {};
+    } catch (_) {
+      storedSlots = {};
+    }
+    const nextBattleVisible = {};
+    (normalizedTour?.stages || [])
+      .filter((stage) => stage?.battle)
+      .forEach((stage) => {
+        const stageRows = (normalizedTour?.round || []).filter(
+          (round) => round?.stage?.id === stage.id
+        );
+        const rowsWithData = stageRows.filter(
+          (round) =>
+            round?.team ||
+            (Array.isArray(round?.crossings) && round.crossings.length > 0) ||
+            (Array.isArray(round?.faults) && round.faults.length > 0) ||
+            [null, undefined].includes(round?.time_real) === false ||
+            [null, undefined].includes(round?.time_result) === false
+        ).length;
+        const fallbackVisible = Math.max(
+          MIN_BATTLE_SLOTS,
+          Math.min(stageRows.length, rowsWithData)
+        );
+        const storedVisible = Number(storedSlots?.[stage.id]);
+        nextBattleVisible[stage.id] =
+          Number.isInteger(storedVisible) && storedVisible >= MIN_BATTLE_SLOTS
+            ? Math.min(stageRows.length, storedVisible)
+            : fallbackVisible;
+      });
+    setBattleVisibleSlots(nextBattleVisible);
     changeBlockTitle(normalizedTour?.name || "Tournaments");
   }, [changeBlockTitle]);
 
@@ -149,23 +172,50 @@ const TournamentsRounds = (props) => {
 
   const deleteSelectedRound = useCallback(
     async (row) => {
-      const tourTemp = { ...currentTour };
-      tourTemp.round = (tourTemp.round || []).filter(
-        (round, i) => i !== row.roundsArrId
-      );
+      const hasResults =
+        (Array.isArray(row.crossings) && row.crossings.length > 0) ||
+        (Array.isArray(row.faults) && row.faults.length > 0) ||
+        [null, undefined].includes(row.time_real) === false ||
+        [null, undefined].includes(row.time_result) === false;
+      if (hasResults) return;
+      const stageRows = rowData
+        .map((item, i) => ({ ...item, roundsArrId: i }))
+        .filter((item) => item?.stage?.id === row.stageId);
+      const visible = battleVisibleSlots[row.stageId] || MIN_BATTLE_SLOTS;
+      if (visible <= MIN_BATTLE_SLOTS) return;
 
-      await updateCurrentTournament(tourTemp);
+      const rowPos = stageRows.findIndex((r) => r.roundsArrId === row.roundsArrId);
+      const lastVisiblePos = visible - 1;
+      if (rowPos < 0 || rowPos >= visible) return;
 
-      const tour = await getCurrentTournament();
-      setCurrentTour({
-        teams: tour?.teams || [],
-        stages: tour?.stages || [],
-        round: tour?.round || [],
-        ...tour,
-      });
-      setRowData(tour?.round || []);
+      // Move selected row to the end of visible segment, then hide that segment tail.
+      for (let i = rowPos; i < lastVisiblePos; i += 1) {
+        const from = stageRows[i]?.roundsArrId;
+        const to = stageRows[i + 1]?.roundsArrId;
+        if ([from, to].every((v) => Number.isInteger(v))) {
+          await swapTeamPositions(from, to);
+        }
+      }
+
+      setBattleVisibleSlots((prev) => ({
+        ...prev,
+        [row.stageId]: Math.max(MIN_BATTLE_SLOTS, visible - 1),
+      }));
+
+      await fetchCurrentTournament();
     },
-    [currentTour]
+    [battleVisibleSlots, fetchCurrentTournament, rowData]
+  );
+
+  const addBattleSlot = useCallback(
+    async (stageId, stageTotal) => {
+      setBattleVisibleSlots((prev) => {
+        const current = prev[stageId] || MIN_BATTLE_SLOTS;
+        const next = Math.min(stageTotal, current + 1);
+        return { ...prev, [stageId]: next };
+      });
+    },
+    []
   );
 
   const columns = [
@@ -176,28 +226,40 @@ const TournamentsRounds = (props) => {
       flex: 1,
     },
     {
-      field: "name",
-      headerName: "name",
-      maxWidth: 250,
-      flex: 2,
-    },
-    {
-      field: "time",
-      headerName: "time",
-      maxWidth: 100,
-      flex: 1,
-    },
-    {
       field: "number",
       headerName: "number",
       maxWidth: 100,
       flex: 1,
     },
     {
+      field: "name",
+      headerName: "name",
+      maxWidth: 250,
+      flex: 2,
+    },
+    {
       field: "rank",
       headerName: "rank",
       maxWidth: 100,
-      flex: 2,
+      flex: 1,
+    },
+    {
+      field: "time",
+      headerName: "time",
+      maxWidth: 120,
+      flex: 1.3,
+    },
+    {
+      field: "bust",
+      headerName: "Bust",
+      maxWidth: 90,
+      flex: 0.8,
+    },
+    {
+      field: "skip",
+      headerName: "Skip",
+      maxWidth: 90,
+      flex: 0.8,
     },
     {
       field: "actions",
@@ -310,10 +372,17 @@ const TournamentsRounds = (props) => {
       align: "right",
       flex: 0.7,
       renderCell: ({ row }) => {
+        const hasResults =
+          (Array.isArray(row.crossings) && row.crossings.length > 0) ||
+          (Array.isArray(row.faults) && row.faults.length > 0) ||
+          [null, undefined].includes(row.time_real) === false ||
+          [null, undefined].includes(row.time_result) === false;
         return (
           row.id === selectedRow.teamId &&
           row.stageId === selectedRow.stageId &&
-          row.stage.battle && (
+          row.stage.battle &&
+          (battleVisibleSlots[row.stageId] || MIN_BATTLE_SLOTS) > MIN_BATTLE_SLOTS &&
+          !hasResults && (
             <GridActionsCellItem
               icon={
                 <DeleteIcon
@@ -367,6 +436,18 @@ const TournamentsRounds = (props) => {
     }
   }, [open, fetchCurrentTournament]);
 
+  useEffect(() => {
+    if (!currentTour?.id) return;
+    try {
+      localStorage.setItem(
+        getBattleSlotsStorageKey(currentTour.id),
+        JSON.stringify(battleVisibleSlots)
+      );
+    } catch (_) {
+      // Ignore storage write errors (private mode / quota).
+    }
+  }, [battleVisibleSlots, currentTour?.id]);
+
   const rowClickHandler = ({ row }) => {
     setSelectedRow({ teamId: row.id, stageId: row.stageId });
   };
@@ -401,23 +482,32 @@ const TournamentsRounds = (props) => {
                 .filter((item) => item.stage.id === stageId);
 
               const countedRows = filteredRows.map(
-                ({ team, time_result, stage_rank, ...rest }, j) => ({
-                  ...rest,
-                  index: j,
-                  counter: j + 1,
-                  totalCount: filteredRows?.length,
-                  name: team?.name,
-                  number: [null, undefined].includes(team?.number)
-                    ? "-"
-                    : team?.number,
-                  time: [null, undefined].includes(time_result)
-                    ? "-"
-                    : formatTime(time_result).fullTime(),
-                  rank: [null, undefined].includes(stage_rank)
-                    ? "-"
-                    : stage_rank,
-                  stageId,
-                })
+                ({ team, time_result, stage_rank, faults, ...rest }, j) => {
+                  const validFaults = Array.isArray(faults)
+                    ? faults.filter((fault) => fault?.valid !== false)
+                    : [];
+                  return {
+                    ...rest,
+                    index: j,
+                    counter: j + 1,
+                    totalCount: filteredRows?.length,
+                    name: team?.name,
+                    number: [null, undefined].includes(team?.number)
+                      ? "-"
+                      : team?.number,
+                    time: [null, undefined].includes(time_result)
+                      ? "-"
+                      : formatTime(time_result).fullTime(),
+                    rank: [null, undefined].includes(stage_rank)
+                      ? "-"
+                      : stage_rank,
+                    bust: validFaults.filter((fault) => fault?.type === "bust")
+                      .length,
+                    skip: validFaults.filter((fault) => fault?.type === "skip")
+                      .length,
+                    stageId,
+                  };
+                }
               );
               return (
                 <Box
@@ -454,6 +544,17 @@ const TournamentsRounds = (props) => {
                     />
                   )}
                   {battle === true && (
+                    <>
+                    <Box
+                      sx={{
+                        color: "#6d6d6d",
+                        fontSize: "12px",
+                        px: 2,
+                        pb: 1,
+                      }}
+                    >
+                      Battle stage: minimum 2 slots. Delete is available only for rows without results.
+                    </Box>
                     <BaseDataGrid
                       sx={{
                         height: "320px",
@@ -467,7 +568,10 @@ const TournamentsRounds = (props) => {
                       }}
                       editMode="cell"
                       columns={battleDataGridColumns}
-                      rows={countedRows}
+                      rows={countedRows.filter((row) => {
+                        const maxVisible = battleVisibleSlots[stageId] || MIN_BATTLE_SLOTS;
+                        return row.index < maxVisible;
+                      })}
                       onRowClick={rowClickHandler}
                       disableColumnFilter={true}
                       disableColumnMenu={true}
@@ -483,9 +587,8 @@ const TournamentsRounds = (props) => {
                       }}
                       componentsProps={{
                         footer: {
-                          stageId,
-                          currentTour,
-                          fetchCurrentTournament,
+                          canAddSlot: (battleVisibleSlots[stageId] || MIN_BATTLE_SLOTS) < countedRows.length,
+                          onAddSlot: () => addBattleSlot(stageId, countedRows.length),
                         },
                       }}
                       getRowClassName={({ row }) => {
@@ -495,6 +598,7 @@ const TournamentsRounds = (props) => {
                         }`;
                       }}
                     />
+                    </>
                   )}
                 </Box>
               );

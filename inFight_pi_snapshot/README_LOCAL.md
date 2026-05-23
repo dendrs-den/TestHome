@@ -95,7 +95,6 @@ chmod +x /home/pi/inFight/scripts/bootstrap_fresh_pi.sh
 - `MODE=REAL`:
 - отключает mock-контур,
 - пытается включить боевые сервисы (`inflight-core`, `inflight-server`, `inflight-crossfront`, `nginx`) если они есть в системе.
-- `infight-web` в REAL-режиме может быть `inactive` и это нормально: UI обслуживает `inflight-server` (порт `3001`) и/или `nginx`, а не mock-web контур.
 
 Переключить режим:
 ```bash
@@ -181,15 +180,4 @@ powershell -ExecutionPolicy Bypass -File .\scripts\one_click_clean_pi.ps1 -Insta
 - В `src_frontend/server/routes/*` не должно оставаться ссылок на `127.0.0.1:15010`.
 - Рабочий бинарник датчика сохранен в локальных артефактах:
 `artifacts/bins/jsm.crossing-detector-front`
-
-## Проверенный Быстрый Прогон После Установки
-```bash
-/home/pi/inFight/scripts/mode_status.sh
-curl -sS -m 5 -i http://127.0.0.1:3001/tournaments/getall | head -n 12
-```
-
-Ожидание в `MODE=REAL`:
-- `inflight-core`/`inflight-server`/`inflight-crossfront` = `active`
-- `infight-web` может быть `inactive`
-- API отвечает `HTTP/1.1 200 OK`
 

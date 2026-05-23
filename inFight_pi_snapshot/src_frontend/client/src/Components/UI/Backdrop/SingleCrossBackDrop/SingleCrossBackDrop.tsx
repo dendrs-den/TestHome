@@ -39,6 +39,18 @@ const SingleCrossBackDrop = ({ open, onClick, errorText }: PropTypes) => {
               repeat the round save operation.
             </p>
           )}
+          {errorText !== CrossErrors.zeroCross &&
+            errorText !== CrossErrors.wrongState &&
+            errorText !== CrossErrors.wrongState2 &&
+            errorText !== CrossErrors.singleCross &&
+            errorText !== CrossErrors.saveFailed && (
+              <p>
+                Round stop returned status:{" "}
+                <span className={classes.text_alarm}>
+                  {errorText || "unknown error"}
+                </span>
+              </p>
+            )}
         </div>
         <div className={classes.backdrop_btn_row}>
           <Button

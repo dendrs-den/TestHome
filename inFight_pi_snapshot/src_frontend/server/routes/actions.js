@@ -5,12 +5,8 @@ const SocketServer = require("../models/SocketServer");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "./.env") });
 
-const API_URL = "http://127.0.0.1:15010";
-const CORE_API_URL = process.env.CORE_API_URL || "";
-const SERVICE_MODE_ENABLED =
-  process.env.SERVICE_MODE === "1" ||
-  CORE_API_URL.includes("127.0.0.1:15010") ||
-  CORE_API_URL.includes("localhost:15010");
+const API_URL = process.env.CORE_API_URL || "http://127.0.0.1:15000";
+const SERVICE_MODE_ENABLED = process.env.SERVICE_MODE === "1";
 
 // In local service mode we keep round telemetry in-memory so UI can work
 // without hardware/core events.

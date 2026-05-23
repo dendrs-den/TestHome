@@ -143,7 +143,7 @@ Response:
 - Add defensive fetch wrappers and socket subscription cleanup (already started).
 - Lock service mode behavior to first-cross start.
 
-### Phase 1: Core facade (3-5 days)
+### Phase 1: Core façade (3-5 days)
 - Introduce `core-gateway` API layer with stable contracts (`/api/v1/...`).
 - Existing Node routes call gateway instead of mixed direct flows.
 
@@ -199,12 +199,3 @@ inflight/
 - UI never mutates state directly.
 - Every critical action is event-logged.
 - Service mode and production mode share the same state machine.
-
-## 14. Deployment Baseline (May 2026)
-- Clean Pi deployment is standardized via `scripts/one_click_clean_pi.ps1`.
-- Runtime mode is controlled by `/etc/default/infight-mode` (`MODE=MOCK|REAL`).
-- REAL mode expected services: `inflight-core`, `inflight-server`, `inflight-crossfront`.
-- `infight-web` belongs to mock contour and may remain inactive in REAL mode.
-- Real hardware requires artifacts:
-- `artifacts/bins/jsm.crossing-detector-front`
-- `artifacts/core/main`

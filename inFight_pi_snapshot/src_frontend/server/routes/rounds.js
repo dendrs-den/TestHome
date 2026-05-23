@@ -6,9 +6,14 @@ const SocketServer = require("../models/SocketServer");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "./.env") });
 
-const API_URL = "http://127.0.0.1:15010";
-const SAVE_ERROR_STATUS = "Round data was not saved due to system error";
+const API_URL = process.env.CORE_API_URL || "http://127.0.0.1:15000";
 const FINALIZATION_IN_PROGRESS_STATUS = "Round finalization is already in progress";
+const handleApiError = (res, error, context) => {
+  const status = error?.response?.status || 502;
+  const details = error?.response?.data || error?.message || "Unknown error";
+  console.log(`${context}:`, details);
+  return res.status(status).json({ error: context, details });
+};
 
 // Local process-level guard against duplicate/parallel stop-save flows.
 // This prevents a shorter duplicate finalize from overwriting a fuller one.
@@ -19,7 +24,6 @@ const finalizationGuard = {
 };
 
 const FINALIZATION_DEDUP_WINDOW_MS = 5000;
-
 const shouldReturnLastFinalize = () =>
   Date.now() - finalizationGuard.lastCompletedAt <= FINALIZATION_DEDUP_WINDOW_MS &&
   finalizationGuard.lastResponse;
@@ -142,30 +146,14 @@ router.post("/end", (req, res) => {
   };
   axios
     .request(options)
-    .then(async (response) => {
-      try {
-        await axios.request({
-          method: "GET",
-          url: `${API_URL}/round/save`,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        finalizationGuard.lastCompletedAt = Date.now();
-        finalizationGuard.lastResponse = response.data;
-        res.json(response.data);
-        SocketServer.getSockets().forEach((socket) => {
-          socket.emit("stateStop", response.data);
-        });
-      } catch (saveError) {
-        console.log("save round failed after stop:", saveError?.response?.data || saveError);
-        SocketServer.getSockets().forEach((socket) => {
-          socket.emit("stopWithError", "");
-        });
-        res.status(500).send({ text: { status: SAVE_ERROR_STATUS } });
-      } finally {
-        endFinalization();
-      }
+    .then((response) => {
+      finalizationGuard.lastCompletedAt = Date.now();
+      finalizationGuard.lastResponse = response.data;
+      res.json(response.data);
+      SocketServer.getSockets().forEach((socket) => {
+        socket.emit("stateStop", response.data);
+      });
+      endFinalization();
     })
     .catch((error) => {
       if (error.response) {
@@ -175,36 +163,23 @@ router.post("/end", (req, res) => {
         console.log(error.response.data);
         res.send({ text: error.response.data }); // => the response payload
       } else {
-        res.status(500).send({ text: { status: SAVE_ERROR_STATUS } });
+        SocketServer.getSockets().forEach((socket) => {
+          socket.emit("stopWithError", "");
+        });
+        res.status(500).send({ text: { status: "Round stop failed due to system error" } });
       }
       endFinalization();
     });
 });
 
 const finalizeRemoteStop = async (res, responseData) => {
-  try {
-    await axios.request({
-      method: "GET",
-      url: `${API_URL}/round/save`,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    finalizationGuard.lastCompletedAt = Date.now();
-    finalizationGuard.lastResponse = responseData;
-    res.status(200).json(responseData);
-    SocketServer.getSockets().forEach((socket) => {
-      socket.emit("stateStop", responseData);
-    });
-  } catch (saveError) {
-    console.log("remote save round failed after stop:", saveError?.response?.data || saveError);
-    SocketServer.getSockets().forEach((socket) => {
-      socket.emit("stopWithError", "");
-    });
-    res.status(500).send({ status: SAVE_ERROR_STATUS });
-  } finally {
-    endFinalization();
-  }
+  finalizationGuard.lastCompletedAt = Date.now();
+  finalizationGuard.lastResponse = responseData;
+  res.status(200).json(responseData);
+  SocketServer.getSockets().forEach((socket) => {
+    socket.emit("stateStop", responseData);
+  });
+  endFinalization();
 };
 
 // END ROUND REMOTE
@@ -242,7 +217,7 @@ router.get("/stop_remotely", (req, res) => {
           endFinalization();
           return;
         }
-        res.status(500).send({ status: SAVE_ERROR_STATUS });
+        res.status(500).send({ status: "Round stop failed due to system error" });
         endFinalization();
       });
   } catch (error) {
@@ -342,7 +317,7 @@ router.post("/swap", (req, res) => {
       console.log("swap commands request success");
     })
     .catch((error) => {
-      console.log("swap commands error");
+      return handleApiError(res, error, "Swap commands error");
     });
 });
 
@@ -364,10 +339,10 @@ router.post("/updateTeam", (req, res) => {
     .request(options)
     .then((response) => {
       res.json(response.data);
-      console.log("swap commands request success");
+      console.log("update team request success");
     })
     .catch((error) => {
-      console.log("swap commands error");
+      return handleApiError(res, error, "Update team in round error");
     });
 });
 

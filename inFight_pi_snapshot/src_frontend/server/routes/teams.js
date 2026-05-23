@@ -1,10 +1,16 @@
-﻿const express = require("express");
+const express = require("express");
 const router = express.Router();
 const axios = require("axios").default;
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "./.env") });
 
-const API_URL = "http://127.0.0.1:15010";
+const API_URL = process.env.CORE_API_URL || "http://127.0.0.1:15000";
+const handleApiError = (res, error, context) => {
+  const status = error?.response?.status || 502;
+  const details = error?.response?.data || error?.message || "Unknown error";
+  console.log(`${context}:`, details);
+  return res.status(status).json({ error: context, details });
+};
 
 // GET TEAM BY ID
 router.get("/getbyid/:id", (req, res) => {
@@ -26,7 +32,7 @@ router.get("/getbyid/:id", (req, res) => {
       res.json(response.data);
     })
     .catch((error) => {
-      console.log(error);
+      return handleApiError(res, error, "Get team by id failed");
     });
 });
 
@@ -51,7 +57,7 @@ router.post("/add", (req, res) => {
       res.json(response.data);
     })
     .catch((error) => {
-      console.log(error);
+      return handleApiError(res, error, "Create team failed");
     });
 });
 
@@ -74,7 +80,7 @@ router.post("/delete", (req, res) => {
       res.json(response.data);
     })
     .catch((error) => {
-      console.log(error);
+      return handleApiError(res, error, "Delete team failed");
     });
 });
 
@@ -101,7 +107,7 @@ router.post("/update", (req, res) => {
       res.json(response.data);
     })
     .catch((error) => {
-      console.log(error);
+      return handleApiError(res, error, "Update team failed");
     });
 });
 
