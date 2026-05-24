@@ -127,10 +127,27 @@ func Run() error {
 			TournamentID string `json:"tournamentId"`
 			RoundID      string `json:"roundId"`
 			KeyPrefix    string `json:"keyPrefix"`
+			Profile      string `json:"profile"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_json"})
 			return
+		}
+		if body.Profile != "" {
+			profile, err := engine.ResolveProfile(body.Profile)
+			if err != nil {
+				writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+				return
+			}
+			if body.TournamentID == "" {
+				body.TournamentID = profile.TournamentID
+			}
+			if body.RoundID == "" {
+				body.RoundID = fmt.Sprintf("%s-%s", profile.RoundIDPrefix, time.Now().UTC().Format("150405"))
+			}
+			if body.KeyPrefix == "" {
+				body.KeyPrefix = fmt.Sprintf("%s:%s", profile.IdempotencyPrefix, body.RoundID)
+			}
 		}
 		if body.TournamentID == "" || body.RoundID == "" {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "tournamentId and roundId are required"})
@@ -149,6 +166,13 @@ func Run() error {
 			"state":  state,
 			"events": events,
 		})
+	}))
+	mux.HandleFunc("/v1/domain/bootstrap/profiles", passwordGate(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{"profiles": engine.DefaultProfiles()})
 	}))
 
 	// Live sensor debug endpoints for real hardware bring-up and noise analysis.
