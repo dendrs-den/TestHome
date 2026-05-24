@@ -46,7 +46,17 @@ curl http://<pi-ip>:18080/v1/instructor/sensor-health
 ```
 Behavior:
 - returns `OK | WARNING | CRITICAL` with reasons
+- returns `action` for instructor panel:
+  - `NONE`
+  - `CHECK_WIRING`
+  - `RESTART_SENSOR`
+  - `HOLD_START`
 - when health is `CRITICAL`, `start_round` is blocked by core with `sensor_health_critical`
+
+Instructor quick procedure:
+- `WARNING + RESTART_SENSOR`: restart sensor service/process and re-check health.
+- `WARNING + CHECK_WIRING`: inspect sensor power/signal/GND, verify `GPIO27` power line.
+- `CRITICAL + HOLD_START`: do not start new round until health returns to `OK` or accepted `WARNING`.
 
 ## Core integration model
 - Hardware adapters are part of `apps/core`

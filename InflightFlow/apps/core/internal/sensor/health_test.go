@@ -13,6 +13,9 @@ func TestEvaluateHealthCriticalWhenReaderDown(t *testing.T) {
 	if h.Level != HealthCritical {
 		t.Fatalf("expected CRITICAL, got %s", h.Level)
 	}
+	if h.Action != ActionHoldStart {
+		t.Fatalf("expected HOLD_START, got %s", h.Action)
+	}
 }
 
 func TestEvaluateHealthWarningOnRecentRestart(t *testing.T) {
@@ -27,6 +30,9 @@ func TestEvaluateHealthWarningOnRecentRestart(t *testing.T) {
 	if h.Level != HealthWarning {
 		t.Fatalf("expected WARNING, got %s", h.Level)
 	}
+	if h.Action != ActionRestartSensor {
+		t.Fatalf("expected RESTART_SENSOR, got %s", h.Action)
+	}
 }
 
 func TestEvaluateHealthCriticalNoEvents(t *testing.T) {
@@ -39,5 +45,8 @@ func TestEvaluateHealthCriticalNoEvents(t *testing.T) {
 	h := EvaluateHealth(now, w, p, "real", "gpio")
 	if h.Level != HealthCritical {
 		t.Fatalf("expected CRITICAL, got %s", h.Level)
+	}
+	if h.Action != ActionCheckWiring {
+		t.Fatalf("expected CHECK_WIRING, got %s", h.Action)
 	}
 }

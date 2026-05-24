@@ -3,15 +3,22 @@ package sensor
 import "time"
 
 type HealthLevel string
+type HealthAction string
 
 const (
 	HealthOK       HealthLevel = "OK"
 	HealthWarning  HealthLevel = "WARNING"
 	HealthCritical HealthLevel = "CRITICAL"
+
+	ActionNone          HealthAction = "NONE"
+	ActionCheckWiring   HealthAction = "CHECK_WIRING"
+	ActionRestartSensor HealthAction = "RESTART_SENSOR"
+	ActionHoldStart     HealthAction = "HOLD_START"
 )
 
 type HealthStatus struct {
 	Level       HealthLevel          `json:"level"`
+	Action      HealthAction         `json:"action"`
 	Reasons     []string             `json:"reasons"`
 	Watchdog    GPIOWatchdogSnapshot `json:"watchdog"`
 	CheckedAt   time.Time            `json:"checkedAt"`
@@ -37,6 +44,7 @@ func DefaultHealthPolicy() HealthPolicy {
 func EvaluateHealth(now time.Time, watchdog GPIOWatchdogSnapshot, policy HealthPolicy, hardwareMode, sensorSource string) HealthStatus {
 	st := HealthStatus{
 		Level:       HealthOK,
+		Action:      ActionNone,
 		Reasons:     []string{},
 		Watchdog:    watchdog,
 		CheckedAt:   now.UTC(),
@@ -52,12 +60,14 @@ func EvaluateHealth(now time.Time, watchdog GPIOWatchdogSnapshot, policy HealthP
 
 	if !watchdog.Running {
 		st.Level = HealthCritical
+		st.Action = ActionHoldStart
 		st.Reasons = append(st.Reasons, "gpio reader is not running")
 	}
 
 	if watchdog.RestartCount > 0 && !watchdog.LastStartAt.IsZero() && now.Sub(watchdog.LastStartAt) <= policy.RecentRestartWindow {
 		if st.Level != HealthCritical {
 			st.Level = HealthWarning
+			st.Action = ActionRestartSensor
 		}
 		st.Reasons = append(st.Reasons, "gpio reader was recently restarted")
 	}
@@ -66,15 +76,18 @@ func EvaluateHealth(now time.Time, watchdog GPIOWatchdogSnapshot, policy HealthP
 		idle := now.Sub(watchdog.LastEventAt)
 		if idle >= policy.NoEventCriticalAfter {
 			st.Level = HealthCritical
+			st.Action = ActionCheckWiring
 			st.Reasons = append(st.Reasons, "no gpio events for too long")
 		} else if idle >= policy.NoEventWarningAfter && st.Level == HealthOK {
 			st.Level = HealthWarning
+			st.Action = ActionCheckWiring
 			st.Reasons = append(st.Reasons, "no recent gpio events")
 		}
 	}
 
 	if watchdog.LastError != "" && st.Level == HealthOK {
 		st.Level = HealthWarning
+		st.Action = ActionRestartSensor
 		st.Reasons = append(st.Reasons, "last reader error is present")
 	}
 
