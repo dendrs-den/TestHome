@@ -161,12 +161,9 @@ func (e *Engine) finishRound(_ commands.Command) ([]events.Event, error) {
 	if e.state.RoundState != RoundRunning {
 		return nil, fmt.Errorf("round must be running, got=%s", e.state.RoundState)
 	}
-	if e.state.Crossings < 2 {
-		return nil, errors.New("cannot finish round with less than 2 crossings")
-	}
-	result := e.state.LastCrossAt - e.state.FirstCrossAt
-	if result < 0 {
-		result = 0
+	result, err := ComputeRoundResultMs(e.state)
+	if err != nil {
+		return nil, err
 	}
 	return e.newEvents(events.TypeRoundFinished, map[string]any{
 		"crossings":  e.state.Crossings,

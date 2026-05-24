@@ -17,28 +17,37 @@
 - API endpoints:
   - `GET /v1/domain/state`
   - `POST /v1/domain/command`
+  - `POST /v1/domain/bootstrap`
+  - `GET /v1/domain/bootstrap/profiles`
 - Sensor integration:
   - every accepted sensor crossing is forwarded to domain command `accept_crossing`
 - Idempotency for API commands:
   - `idempotencyKey` supported in `POST /v1/domain/command`
   - duplicate key returns cached result without re-applying command
-- Startup bootstrap flow added:
-  - `POST /v1/domain/bootstrap` performs idempotent `create -> prepare -> start`
-  - intended for fast event-day initialization
 
 ## Tests added
 - Engine happy-path lifecycle test
 - Engine invalid finish (<2 crossings) test
 - Journal append/replay integrity test
+- Restore-after-restart replay test (journal -> state)
+- Bootstrap idempotency test
+- Bootstrap profile resolver tests
+
+## Completed in this step (2026-05-24)
+1. Deterministic timer/scoring module
+- Added `ComputeRoundResultMs(State)` in `internal/domain/engine/scoring.go`.
+- `finish_round` now uses scoring module, not inline math.
+- Rule fixed and test-covered: result is `lastCrossAt - firstCrossAt`, min 2 crossings.
+
+2. Full headless lifecycle test
+- Added `TestHeadlessTournamentLifecycle`.
+- Covers `create -> prepare -> start -> crossing -> crossing -> finish`.
+- Verifies terminal state is `completed` and result is deterministic.
+
+3. Crash/restart drill test
+- Added `TestCrashRestartDrillContinueAndFinish`.
+- Simulates crash after first crossing, restores from journal, continues round, finishes, and verifies final result.
 
 ## Next M1 tasks
-1. Add command validation schema (strict payload validation)
-2. Persist idempotency records beyond process restart
-3. Extend state model with round timing/result fields
-4. Add profile presets for multiple tournament boot scenarios
-
-- Validated full finish flow on Pi: unning -> completed and repeat finish rejection.
-
-- Added strict API payload validation for domain commands.
-- Expanded state with round timing/result fields.
-- Added restore-after-restart replay test (journal -> state).
+1. Persist idempotency records beyond process restart
+2. Add one-command local drill script for ops runbook
