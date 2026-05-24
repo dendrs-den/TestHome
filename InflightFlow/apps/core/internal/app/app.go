@@ -64,6 +64,16 @@ func Run() error {
 			if !item.Accepted {
 				continue
 			}
+			st := domainRuntime.State()
+			if st.RoundState == engine.RoundPrepared {
+				_, err := domainRuntime.Handle(commands.Command{
+					Type: commands.CmdStartRound,
+					Data: map[string]any{},
+				})
+				if err != nil {
+					log.Printf("domain auto-start skipped: %v", err)
+				}
+			}
 			_, err := domainRuntime.Handle(commands.Command{
 				Type: commands.CmdAcceptCrossing,
 				Data: map[string]any{"at": item.At.UnixMilli()},
@@ -327,7 +337,7 @@ func Run() error {
 
 	addr := fmt.Sprintf(":%s", cfg.Port)
 	log.Printf("core listening on %s (hardware=%s)", addr, hardware)
-	return http.ListenAndServe(addr, mux)
+	return http.ListenAndServe(addr, withCORS(mux))
 }
 
 func resolveHardwareMode(mode string) string {
@@ -363,6 +373,19 @@ func writeJSON(w http.ResponseWriter, status int, payload any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(payload)
+}
+
+func withCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Operator-Password")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 func validateCommandPayload(cmdType string, data map[string]any) error {
