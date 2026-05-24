@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"inflightflow/apps/core/internal/config"
+	"inflightflow/apps/core/internal/domain/commands"
+	"inflightflow/apps/core/internal/domain/engine"
 	"inflightflow/apps/core/internal/hardware/mock"
 	"inflightflow/apps/core/internal/hardware/real"
 	"inflightflow/apps/core/internal/health"
@@ -22,6 +24,10 @@ func Run() error {
 	cfg := config.Load()
 
 	if err := journal.EnsurePath(cfg.JournalPath); err != nil {
+		return err
+	}
+	domainRuntime := engine.NewRuntime(cfg.JournalPath)
+	if err := domainRuntime.Restore(); err != nil {
 		return err
 	}
 
@@ -48,6 +54,21 @@ func Run() error {
 		})
 		log.Printf("sensor source=gpio chip=%s line=%d activeLow=%t", cfg.SensorGPIOChip, cfg.SensorGPIOLine, cfg.SensorActiveLow)
 	}
+	sensorSub := sensorRuntime.Subscribe()
+	go func() {
+		for item := range sensorSub {
+			if !item.Accepted {
+				continue
+			}
+			_, err := domainRuntime.Handle(commands.Command{
+				Type: commands.CmdAcceptCrossing,
+				Data: map[string]any{"at": item.At.UnixMilli()},
+			})
+			if err != nil {
+				log.Printf("domain accept_crossing skipped: %v", err)
+			}
+		}
+	}()
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
@@ -61,6 +82,35 @@ func Run() error {
 	// Placeholder protected route for operator control APIs.
 	mux.HandleFunc("/v1/control/ping", passwordGate(func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"message": "control channel alive"})
+	}))
+	mux.HandleFunc("/v1/domain/state", passwordGate(func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(w, http.StatusOK, domainRuntime.State())
+	}))
+	mux.HandleFunc("/v1/domain/command", passwordGate(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		var body struct {
+			Type string         `json:"type"`
+			Data map[string]any `json:"data"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_json"})
+			return
+		}
+		evs, err := domainRuntime.Handle(commands.Command{
+			Type: commands.Type(body.Type),
+			Data: body.Data,
+		})
+		if err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{
+			"state":  domainRuntime.State(),
+			"events": evs,
+		})
 	}))
 
 	// Live sensor debug endpoints for real hardware bring-up and noise analysis.

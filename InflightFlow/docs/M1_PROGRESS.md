@@ -11,6 +11,14 @@
   - finish round (requires >= 2 crossings)
   - cancel round
 - Event journal append/replay (`internal/journal`)
+- Domain runtime with:
+  - restore state from journal on startup
+  - command handling with event persistence
+- API endpoints:
+  - `GET /v1/domain/state`
+  - `POST /v1/domain/command`
+- Sensor integration:
+  - every accepted sensor crossing is forwarded to domain command `accept_crossing`
 
 ## Tests added
 - Engine happy-path lifecycle test
@@ -18,7 +26,7 @@
 - Journal append/replay integrity test
 
 ## Next M1 tasks
-1. Wire sensor accepted events into engine command `accept_crossing`
-2. Persist all domain events to journal in runtime
-3. Build restore path from journal on startup
-4. Add API endpoints for command submission and current state
+1. Add idempotency keys for write commands
+2. Add command validation schema (strict payload validation)
+3. Extend state model with round timing/result fields
+4. Add startup bootstrap command flow (create tournament + prepare/start round) profile
