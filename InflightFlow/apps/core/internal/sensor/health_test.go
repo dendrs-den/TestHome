@@ -35,7 +35,7 @@ func TestEvaluateHealthWarningOnRecentRestart(t *testing.T) {
 	}
 }
 
-func TestEvaluateHealthCriticalNoEvents(t *testing.T) {
+func TestEvaluateHealthNoEventDoesNotTriggerWarningOrCritical(t *testing.T) {
 	now := time.Now().UTC()
 	p := DefaultHealthPolicy()
 	w := GPIOWatchdogSnapshot{
@@ -43,11 +43,11 @@ func TestEvaluateHealthCriticalNoEvents(t *testing.T) {
 		LastEventAt: now.Add(-2 * time.Minute),
 	}
 	h := EvaluateHealth(now, w, p, "real", "gpio")
-	if h.Level != HealthCritical {
-		t.Fatalf("expected CRITICAL, got %s", h.Level)
+	if h.Level != HealthOK {
+		t.Fatalf("expected OK, got %s", h.Level)
 	}
-	if h.Action != ActionCheckWiring {
-		t.Fatalf("expected CHECK_WIRING, got %s", h.Action)
+	if h.Action != ActionNone {
+		t.Fatalf("expected NONE, got %s", h.Action)
 	}
 }
 

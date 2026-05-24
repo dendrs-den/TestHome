@@ -28,16 +28,12 @@ type HealthStatus struct {
 }
 
 type HealthPolicy struct {
-	NoEventWarningAfter  time.Duration
-	NoEventCriticalAfter time.Duration
-	RecentRestartWindow  time.Duration
+	RecentRestartWindow time.Duration
 }
 
 func DefaultHealthPolicy() HealthPolicy {
 	return HealthPolicy{
-		NoEventWarningAfter:  30 * time.Second,
-		NoEventCriticalAfter: 90 * time.Second,
-		RecentRestartWindow:  30 * time.Second,
+		RecentRestartWindow: 30 * time.Second,
 	}
 }
 
@@ -70,19 +66,6 @@ func EvaluateHealth(now time.Time, watchdog GPIOWatchdogSnapshot, policy HealthP
 			st.Action = ActionRestartSensor
 		}
 		st.Reasons = append(st.Reasons, "gpio reader was recently restarted")
-	}
-
-	if !watchdog.LastEventAt.IsZero() {
-		idle := now.Sub(watchdog.LastEventAt)
-		if idle >= policy.NoEventCriticalAfter {
-			st.Level = HealthCritical
-			st.Action = ActionCheckWiring
-			st.Reasons = append(st.Reasons, "no gpio events for too long")
-		} else if idle >= policy.NoEventWarningAfter && st.Level == HealthOK {
-			st.Level = HealthWarning
-			st.Action = ActionCheckWiring
-			st.Reasons = append(st.Reasons, "no recent gpio events")
-		}
 	}
 
 	if watchdog.LastError != "" &&
