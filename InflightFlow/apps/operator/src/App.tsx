@@ -1,191 +1,28 @@
-﻿import { useEffect, useMemo, useRef, useState } from "react";
-
-type CoreHealth = {
-  status: string;
-  service: string;
-  hardwareMode: string;
-};
-
-type DomainState = {
-  TournamentID: string;
-  RoundID: string;
-  RoundState: "idle" | "prepared" | "running" | "completed" | "cancelled";
-  Crossings: number;
-  RoundResultMs: number;
-};
-
-type SensorHealthPayload = {
-  enabled: boolean;
-  health: {
-    level: "OK" | "WARNING" | "CRITICAL";
-    action: "NONE" | "CHECK_WIRING" | "RESTART_SENSOR" | "HOLD_START";
-    reasons: string[];
-  };
-};
-
-type ReadinessPayload = {
-  canStartRound: boolean;
-  health: SensorHealthPayload["health"];
-};
-
-type PreflightStep = {
-  name: string;
-  pass: boolean;
-  message: string;
-};
-
-type PreflightStatus = {
-  running: boolean;
-  overall: "pending" | "pass" | "fail";
-  steps: PreflightStep[];
-};
-
-async function getJSON<T>(url: string): Promise<T> {
-  const resp = await fetch(url);
-  if (!resp.ok) {
-    const body = await resp.text();
-    throw new Error(body || `HTTP ${resp.status}`);
-  }
-  return resp.json() as Promise<T>;
-}
-
-async function postJSON<T>(url: string, body: unknown): Promise<T> {
-  const resp = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!resp.ok) {
-    const text = await resp.text();
-    throw new Error(text || `HTTP ${resp.status}`);
-  }
-  return resp.json() as Promise<T>;
-}
-
-function tsKey(prefix: string) {
-  return `${prefix}-${Date.now()}`;
-}
+﻿import { useMemo, useState } from "react";
+import { useOperatorState } from "./hooks/useOperatorState";
 
 export default function App() {
   const [baseUrl, setBaseUrl] = useState("http://192.168.0.177:18080");
   const [tournamentId, setTournamentId] = useState("event-main");
   const [roundId, setRoundId] = useState(`round-${new Date().toISOString().slice(11, 19).replace(/:/g, "")}`);
 
-  const [core, setCore] = useState<CoreHealth | null>(null);
-  const [domain, setDomain] = useState<DomainState | null>(null);
-  const [sensor, setSensor] = useState<SensorHealthPayload | null>(null);
-  const [readiness, setReadiness] = useState<ReadinessPayload | null>(null);
-  const [preflight, setPreflight] = useState<PreflightStatus | null>(null);
-
-  const [busy, setBusy] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState("");
-  const [lastOkAt, setLastOkAt] = useState("");
-
-  const inFlightRef = useRef(false);
   const trimmedBase = useMemo(() => baseUrl.replace(/\/+$/, ""), [baseUrl]);
-
-  async function refresh() {
-    if (inFlightRef.current) return;
-    inFlightRef.current = true;
-    setRefreshing(true);
-    try {
-      const [h, d, s, r, p] = await Promise.all([
-        getJSON<CoreHealth>(`${trimmedBase}/health`),
-        getJSON<DomainState>(`${trimmedBase}/v1/domain/state`),
-        getJSON<SensorHealthPayload>(`${trimmedBase}/v1/instructor/sensor-health`),
-        getJSON<ReadinessPayload>(`${trimmedBase}/v1/instructor/readiness`),
-        getJSON<PreflightStatus>(`${trimmedBase}/v1/instructor/preflight/status`),
-      ]);
-      setCore(h);
-      setDomain(d);
-      setSensor(s);
-      setReadiness(r);
-      setPreflight(p);
-      setLastOkAt(new Date().toLocaleTimeString());
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      inFlightRef.current = false;
-      setRefreshing(false);
-    }
-  }
-
-  async function runPreflight() {
-    setBusy(true);
-    try {
-      await fetch(`${trimmedBase}/v1/instructor/preflight/run`, { method: "POST" });
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      await refresh();
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function bootstrap() {
-    setBusy(true);
-    try {
-      await postJSON(`${trimmedBase}/v1/domain/bootstrap`, {
-        tournamentId,
-        roundId,
-        keyPrefix: tsKey("operator-bootstrap"),
-      });
-      await refresh();
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function sendCommand(type: string, data: Record<string, unknown> = {}) {
-    setBusy(true);
-    try {
-      await postJSON(`${trimmedBase}/v1/domain/command`, {
-        type,
-        data,
-        idempotencyKey: tsKey(`operator-${type}`),
-      });
-      await refresh();
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function prepareRound() {
-    setBusy(true);
-    try {
-      // UX rule: pressing Prepare for a new round should always reset round state.
-      // If current round is running, cancel it first, then prepare next round.
-      if (domain?.RoundState === "running") {
-        await postJSON(`${trimmedBase}/v1/domain/command`, {
-          type: "cancel_round",
-          data: {},
-          idempotencyKey: tsKey("operator-cancel-before-prepare"),
-        });
-      }
-      await postJSON(`${trimmedBase}/v1/domain/command`, {
-        type: "prepare_round",
-        data: { roundId },
-        idempotencyKey: tsKey("operator-prepare_round"),
-      });
-      await refresh();
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  useEffect(() => {
-    refresh();
-    const t = setInterval(refresh, 1500);
-    return () => clearInterval(t);
-  }, [trimmedBase]);
+  const {
+    core,
+    domain,
+    sensor,
+    readiness,
+    preflight,
+    busy,
+    refreshing,
+    error,
+    lastOkAt,
+    refresh,
+    runPreflight,
+    bootstrap,
+    sendCommand,
+    prepareRound,
+  } = useOperatorState(trimmedBase);
 
   return (
     <main style={{ fontFamily: "Segoe UI, sans-serif", padding: 20, maxWidth: 960 }}>
@@ -225,10 +62,10 @@ export default function App() {
         <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
           <input value={tournamentId} onChange={(e) => setTournamentId(e.target.value)} style={{ flex: 1, padding: 8 }} placeholder="tournamentId" />
           <input value={roundId} onChange={(e) => setRoundId(e.target.value)} style={{ flex: 1, padding: 8 }} placeholder="roundId" />
-          <button disabled={busy} onClick={bootstrap}>Bootstrap</button>
+          <button disabled={busy} onClick={() => bootstrap(tournamentId, roundId)}>Bootstrap</button>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button disabled={busy} onClick={prepareRound}>Prepare</button>
+          <button disabled={busy} onClick={() => prepareRound(roundId)}>Prepare</button>
           <button disabled={busy} onClick={() => sendCommand("start_round")}>Start</button>
           <button disabled={busy} onClick={() => sendCommand("finish_round")}>Finish</button>
           <button disabled={busy} onClick={() => sendCommand("cancel_round")}>Cancel</button>
