@@ -49,7 +49,7 @@
 - Имитирует сбой после первого пересечения, восстановление из журнала, продолжение и корректное завершение.
 
 ## Следующие задачи M1
-1. Добавить локальный drill-скрипт одной командой для ops runbook
+- Нет открытых задач. M1 закрыт.
 
 ## Закрытый долг (2026-05-24)
 - Идемпотентность команд теперь сохраняется после перезапуска процесса.
@@ -57,3 +57,15 @@
   - ключи и кешированные результаты idempotency записываются в отдельный dedup-журнал рядом с domain journal;
   - при `Restore()` dedup-индекс восстанавливается вместе с состоянием домена.
 - Добавлен тест `TestRuntime_IdempotencyPersistsAfterRestart`.
+
+## Ops drill (one-command)
+- Добавлен скрипт: `infra/scripts/m1_ops_drill.ps1`
+- Запуск:
+  - `powershell -ExecutionPolicy Bypass -File .\infra\scripts\m1_ops_drill.ps1`
+- Скрипт выполняет:
+  - health check
+  - prepare/start нового раунда
+  - crossing/crossing/finish
+  - restart сервиса на Pi
+  - проверку восстановления состояния после restart
+- Отчет сохраняется в `docs/reports/m1_ops_drill_*.md`
