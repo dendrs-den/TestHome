@@ -92,16 +92,18 @@ func Run() error {
 			return
 		}
 		var body struct {
-			Type string         `json:"type"`
-			Data map[string]any `json:"data"`
+			Type           string         `json:"type"`
+			Data           map[string]any `json:"data"`
+			IdempotencyKey string         `json:"idempotencyKey"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_json"})
 			return
 		}
 		evs, err := domainRuntime.Handle(commands.Command{
-			Type: commands.Type(body.Type),
-			Data: body.Data,
+			Type:           commands.Type(body.Type),
+			Data:           body.Data,
+			IdempotencyKey: body.IdempotencyKey,
 		})
 		if err != nil {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})

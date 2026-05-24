@@ -12,6 +12,7 @@ const (
 )
 
 type Command struct {
-	Type Type
-	Data map[string]any
+	Type           Type
+	Data           map[string]any
+	IdempotencyKey string
 }

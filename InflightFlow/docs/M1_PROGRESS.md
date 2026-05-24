@@ -19,6 +19,9 @@
   - `POST /v1/domain/command`
 - Sensor integration:
   - every accepted sensor crossing is forwarded to domain command `accept_crossing`
+- Idempotency for API commands:
+  - `idempotencyKey` supported in `POST /v1/domain/command`
+  - duplicate key returns cached result without re-applying command
 
 ## Tests added
 - Engine happy-path lifecycle test
@@ -26,8 +29,8 @@
 - Journal append/replay integrity test
 
 ## Next M1 tasks
-1. Add idempotency keys for write commands
-2. Add command validation schema (strict payload validation)
+1. Add command validation schema (strict payload validation)
+2. Persist idempotency records beyond process restart
 3. Extend state model with round timing/result fields
 4. Add startup bootstrap command flow (create tournament + prepare/start round) profile
 
