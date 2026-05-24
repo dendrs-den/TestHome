@@ -1,0 +1,15 @@
+﻿node_modules/
+dist/
+build/
+coverage/
+.env
+.env.local
+.DS_Store
+*.log
+
+# Go
+bin/
+*.test
+
+# Tauri
+apps/operator/src-tauri/target/

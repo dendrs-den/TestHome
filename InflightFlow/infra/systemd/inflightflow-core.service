@@ -1,0 +1,18 @@
+﻿[Unit]
+Description=InflightFlow Core Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=flow
+WorkingDirectory=/home/flow/InflightFlow/apps/core
+EnvironmentFile=/home/flow/InflightFlow/apps/core/.env
+ExecStart=/usr/bin/env bash -lc 'set -a; source .env; set +a; /usr/bin/go run ./cmd/core'
+Restart=always
+RestartSec=2
+StandardOutput=append:/home/flow/inflightflow-core.log
+StandardError=append:/home/flow/inflightflow-core.log
+
+[Install]
+WantedBy=multi-user.target

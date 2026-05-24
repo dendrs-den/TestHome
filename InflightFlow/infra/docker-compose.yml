@@ -1,0 +1,30 @@
+﻿services:
+  core:
+    image: golang:1.22
+    container_name: inflightflow-core-dev
+    working_dir: /workspace/apps/core
+    command: sh -c "go run ./cmd/core"
+    volumes:
+      - ./:/workspace
+    environment:
+      CORE_PORT: "8080"
+      HARDWARE_MODE: "mock"
+      JOURNAL_PATH: "/workspace/.runtime/journal.log"
+      OPERATOR_PASSWORD: ""
+    ports:
+      - "8080:8080"
+
+  postgres:
+    image: postgres:16
+    container_name: inflightflow-postgres-dev
+    environment:
+      POSTGRES_DB: inflightflow
+      POSTGRES_USER: inflightflow
+      POSTGRES_PASSWORD: inflightflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - inflightflow_pg_data:/var/lib/postgresql/data
+
+volumes:
+  inflightflow_pg_data:
