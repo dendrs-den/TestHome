@@ -17,11 +17,16 @@ type GPIOReaderConfig struct {
 }
 
 // StartGPIOReader bridges libgpiod gpiomon events into sensor runtime samples.
-func StartGPIOReader(ctx context.Context, rt *Runtime, cfg GPIOReaderConfig) {
+func StartGPIOReader(ctx context.Context, rt *Runtime, cfg GPIOReaderConfig) *GPIOWatchdog {
+	wd := NewGPIOWatchdog()
 	go func() {
 		for {
-			if err := runGPIOReader(ctx, rt, cfg); err != nil {
+			wd.MarkStart()
+			if err := runGPIOReader(ctx, rt, cfg, wd); err != nil {
+				wd.MarkStop(err)
 				log.Printf("sensor gpio reader stopped: %v", err)
+			} else {
+				wd.MarkStop(nil)
 			}
 			select {
 			case <-ctx.Done():
@@ -30,9 +35,10 @@ func StartGPIOReader(ctx context.Context, rt *Runtime, cfg GPIOReaderConfig) {
 			}
 		}
 	}()
+	return wd
 }
 
-func runGPIOReader(ctx context.Context, rt *Runtime, cfg GPIOReaderConfig) error {
+func runGPIOReader(ctx context.Context, rt *Runtime, cfg GPIOReaderConfig, wd *GPIOWatchdog) error {
 	args := []string{
 		"--chip", cfg.Chip,
 		"--edges", "both",
@@ -70,8 +76,10 @@ func runGPIOReader(ctx context.Context, rt *Runtime, cfg GPIOReaderConfig) error
 		switch line {
 		case "rising":
 			rt.Ingest(Sample{At: now, Level: true})
+			wd.MarkEvent(now)
 		case "falling":
 			rt.Ingest(Sample{At: now, Level: false})
+			wd.MarkEvent(now)
 		default:
 			// Ignore unknown lines, but keep running.
 		}

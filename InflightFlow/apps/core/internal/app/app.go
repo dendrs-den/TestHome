@@ -36,6 +36,7 @@ func Run() error {
 		DebounceWindow:   cfg.SensorDebounce,
 		RefractoryWindow: cfg.SensorRefractory,
 	}, cfg.SensorHistoryLimit)
+	var sensorWatchdog *sensor.GPIOWatchdog
 	if cfg.HardwareMode == real.Name() && cfg.SensorSource == "gpio" {
 		if cfg.SensorPowerEnabled {
 			if err := sensor.EnablePowerLine(sensor.PowerConfig{
@@ -47,7 +48,7 @@ func Run() error {
 			}
 			log.Printf("sensor power enabled chip=%s line=%d active=%t", cfg.SensorPowerChip, cfg.SensorPowerLine, cfg.SensorPowerActive)
 		}
-		sensor.StartGPIOReader(context.Background(), sensorRuntime, sensor.GPIOReaderConfig{
+		sensorWatchdog = sensor.StartGPIOReader(context.Background(), sensorRuntime, sensor.GPIOReaderConfig{
 			Chip:      cfg.SensorGPIOChip,
 			Line:      cfg.SensorGPIOLine,
 			ActiveLow: cfg.SensorActiveLow,
@@ -182,6 +183,16 @@ func Run() error {
 	}))
 	mux.HandleFunc("/debug/sensor/state", passwordGate(func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(w, http.StatusOK, sensorRuntime.Snapshot())
+	}))
+	mux.HandleFunc("/debug/sensor/watchdog", passwordGate(func(w http.ResponseWriter, _ *http.Request) {
+		if sensorWatchdog == nil {
+			writeJSON(w, http.StatusOK, map[string]any{"enabled": false})
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{
+			"enabled":  true,
+			"watchdog": sensorWatchdog.Snapshot(),
+		})
 	}))
 	mux.HandleFunc("/debug/sensor/sample", passwordGate(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

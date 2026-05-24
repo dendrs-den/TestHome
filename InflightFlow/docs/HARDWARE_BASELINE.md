@@ -30,6 +30,16 @@ Quick command used to validate raw GPIO events:
 gpiomon --chip gpiochip0 --edges both --format 'line=%o edge=%E ts=%U' 17
 ```
 
+Watchdog diagnostic endpoint (core in `real+gpio` mode):
+```bash
+curl http://<pi-ip>:18080/debug/sensor/watchdog
+```
+Expected fields:
+- `running`: current reader state
+- `restartCount`: auto-restart counter after reader failures
+- `lastError`: last reader error text
+- `lastEventAt`: timestamp of last GPIO edge seen by reader
+
 ## Core integration model
 - Hardware adapters are part of `apps/core`
 - Runtime modes:
