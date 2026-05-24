@@ -1,22 +1,22 @@
-﻿# Reference Specification - inFight -> InflightFlow
+﻿# Референс-спецификация - inFight -> InflightFlow
 
-`inFight_pi_snapshot` is a behavior reference source for InflightFlow.
+`inFight_pi_snapshot` — это источник референсного поведения для InflightFlow.
 
-## What we reuse as reference
-- Tournament domain rules and state transitions
-- Timing/scoring behavior
-- Operator workflows and screen sequence
-- Hardware command semantics for DMX and sensor pipeline
+## Что берем как референс
+- Правила домена турнира и переходы состояний
+- Поведение тайминга/скоринга
+- Операторские workflow и последовательность экранов
+- Семантику hardware-команд для DMX и пайплайна датчика
 
-## What we do not reuse directly
-- Legacy server/runtime structure
-- Legacy transport choices (for example, longpoll)
-- Legacy packaging and deployment scripts as-is
+## Что не переносим напрямую
+- Легаси-структуру server/runtime
+- Легаси-транспорт (например, longpoll)
+- Легаси-скрипты упаковки и деплоя «как есть»
 
-## Reference extraction tracks
+## Треки извлечения референса
 
-### R0 - Domain behavior reference
-Source:
+### R0 - Референс доменного поведения
+Источник:
 - `src_frontend/server/routes/tournaments.js`
 - `src_frontend/server/routes/stages.js`
 - `src_frontend/server/routes/rounds.js`
@@ -24,26 +24,26 @@ Source:
 - `src_frontend/server/routes/disciplines.js`
 - `src_frontend/server/routes/actions.js`
 
-Target:
-- Formal command and state-machine specification in `apps/core`
+Цель:
+- Формальная спецификация command/state-machine в `apps/core`
 
-### R1 - Operator UX reference
-Source:
+### R1 - Референс UX оператора
+Источник:
 - `src_frontend/client/src/Components/*`
 - `src_frontend/client/src/Sections/*`
 
-Target:
-- Equivalent operator flows in `apps/operator` (Tauri + React)
+Цель:
+- Эквивалентные operator-flow в `apps/operator` (Tauri + React)
 
-### R2 - Hardware behavior reference
-Source:
-- Existing bluetooth/sensor/DMX-related routes and runtime artifacts
+### R2 - Референс поведения железа
+Источник:
+- Существующие bluetooth/sensor/DMX-related route и runtime artifacts
 
-Target:
-- Stable adapters in `apps/core` with real/mock modes and reliability guards
+Цель:
+- Стабильные адаптеры в `apps/core` с режимами real/mock и guard-механизмами надежности
 
-## Acceptance criteria for reference parity
-- Tournament lifecycle behavior matches reference scenarios
-- Timing/scoring outputs match expected outcomes
-- Hardware command sequences preserve required semantics
-- Operator can execute event procedures with equivalent UX flow
+## Критерии приемки паритета с референсом
+- Поведение жизненного цикла турнира соответствует референсным сценариям
+- Выходы тайминга/скоринга совпадают с ожидаемыми
+- Последовательности hardware-команд сохраняют нужную семантику
+- Оператор может выполнять процедуры соревнования при эквивалентном UX-flow

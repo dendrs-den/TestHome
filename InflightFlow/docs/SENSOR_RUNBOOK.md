@@ -1,11 +1,11 @@
-﻿# InflightFlow Sensor Runbook
+﻿# Runbook датчика InflightFlow
 
-## Known-good hardware mapping
-- Sensor signal input: `gpiochip0` line `17`
-- Sensor power/enable: `gpiochip0` line `27` set to active (`1`)
+## Подтвержденная рабочая распиновка
+- Сигнал датчика: `gpiochip0` линия `17`
+- Питание/enable датчика: `gpiochip0` линия `27` в активном состоянии (`1`)
 
-## Core env (real mode)
-Use these values in `apps/core/.env`:
+## Core env (режим real)
+Используй эти значения в `apps/core/.env`:
 
 ```env
 CORE_PORT=18080
@@ -24,42 +24,42 @@ SENSOR_POWER_LINE=27
 SENSOR_POWER_ACTIVE=true
 ```
 
-## Manual start
-From `apps/core`:
+## Ручной запуск
+Из `apps/core`:
 
 ```bash
 set -a; source .env; set +a
 go run ./cmd/core
 ```
 
-Open live debug page:
+Открой live debug страницу:
 - `http://<pi-ip>:18080/debug/sensor`
 
-## Service install (systemd)
-1. Copy unit file:
+## Установка сервиса (systemd)
+1. Скопировать unit-файл:
 ```bash
 sudo cp infra/systemd/inflightflow-core.service /etc/systemd/system/
 ```
-2. Reload and enable:
+2. Перезагрузить конфиг и включить сервис:
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable inflightflow-core.service
 sudo systemctl restart inflightflow-core.service
 ```
-3. Check status/logs:
+3. Проверить статус/логи:
 ```bash
 sudo systemctl status inflightflow-core.service --no-pager
 journalctl -u inflightflow-core.service -n 200 --no-pager
 ```
 
-## Fast diagnostics
-Check if sensor signal events exist on raw GPIO:
+## Быстрая диагностика
+Проверка сырых событий датчика в GPIO:
 
 ```bash
 timeout 20s gpiomon --chip gpiochip0 --edges both --format 'line=%o edge=%E ts=%U' 17
 ```
 
-If no events:
-- verify sensor wiring and shared GND
-- verify sensor is powered
-- verify `SENSOR_POWER_ENABLED=true` and line `27`
+Если событий нет:
+- проверить проводку датчика и общий GND
+- проверить, что датчик получает питание
+- проверить `SENSOR_POWER_ENABLED=true` и линию `27`

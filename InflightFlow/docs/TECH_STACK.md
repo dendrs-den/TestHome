@@ -1,76 +1,76 @@
-﻿# Tech Stack Decision - InflightFlow
+﻿# Решение по стеку технологий - InflightFlow
 
-## 1) Engineering goals
-- Maximum stability during live competitions
-- Fault tolerance and safe recovery after crashes/restarts
-- Deterministic scoring/timing behavior with auditable history
-- Tight hardware compatibility with Raspberry Pi 5, DMX LED, and sensor drivers
-- Minimal external attack surface in venue environments
+## 1) Инженерные цели
+- Максимальная стабильность во время соревнований
+- Отказоустойчивость и безопасное восстановление после сбоев/перезапусков
+- Детерминированное поведение тайминга/скоринга с проверяемой историей
+- Плотная совместимость с Raspberry Pi 5, DMX LED и драйверами датчика
+- Минимальная внешняя поверхность атаки на площадке
 
-## 2) Selected architecture
+## 2) Выбранная архитектура
 
 ### Core runtime
-- Go (single binary service)
-- Clear module boundaries: tournament, rounds, timing, actions, hardware adapters
-- Command processing with idempotency keys and strict validation
+- Go (единый бинарный сервис)
+- Четкие модульные границы: турнир, раунды, тайминг, действия, hardware adapters
+- Обработка команд с idempotency keys и строгой валидацией
 
-Why:
-- Predictable runtime profile and strong reliability for long-running processes
-- Easy service management on Linux/systemd
-- Good fit for hardware-facing control loops
+Почему:
+- Предсказуемый runtime-профиль и высокая надежность long-running процессов
+- Удобное управление сервисом в Linux/systemd
+- Хорошо подходит для hardware-oriented control loop
 
-### Operator client
+### Клиент оператора
 - Tauri + React + TypeScript
-- Kiosk mode on Pi display or trusted operator workstation
+- Kiosk mode на экране Pi или доверенной рабочей станции оператора
 
-Why:
-- Keeps familiar UI development model
-- Avoids browser-first deployment risks as the primary control surface
-- Lower resource footprint than Electron
+Почему:
+- Сохраняет знакомую модель UI-разработки
+- Убирает риски browser-first деплоя как основного канала управления
+- Меньше потребление ресурсов, чем у Electron
 
 ### Data layer
-- SQLite with WAL as primary local store
-- Event journal + snapshots for recovery
-- Optional PostgreSQL for external analytics/sync
+- SQLite с WAL как основное локальное хранилище
+- Event journal + snapshots для восстановления
+- Опционально PostgreSQL для внешней аналитики/синхронизации
 
-Why:
-- Local durability and robust behavior under intermittent network
-- Fast restore and replay capabilities
+Почему:
+- Локальная надежность при нестабильной сети
+- Быстрое восстановление и replay
 
-### Hardware integration
-- Dedicated Go adapters for:
-  - DMX LED control
-  - Sensor driver input pipeline
-- Real/mock hardware modes with same contracts
+### Интеграция с железом
+- Отдельные Go-адаптеры для:
+  - управления DMX LED
+  - входного пайплайна датчика
+- Режимы real/mock с одинаковыми контрактами
 
-Why:
-- Clean isolation of unstable I/O edges
-- Reproducible tests without physical devices
+Почему:
+- Чистая изоляция нестабильного I/O
+- Воспроизводимые тесты без физических устройств
 
-### Communication and interfaces
-- gRPC between operator client and core
-- Internal event bus for state updates and telemetry
-- Optional gateway for controlled LAN access and remote diagnostics
+### Коммуникации и интерфейсы
+- gRPC между операторским клиентом и core
+- Внутренняя event bus для обновления состояния и телеметрии
+- Опциональный gateway для контролируемого LAN-доступа и удаленной диагностики
 
-### Operations
-- systemd units with restart policies and dependency ordering
-- Structured logs + rotation
+### Эксплуатация
+- systemd units с политиками рестарта и порядком зависимостей
+- Структурированные логи + ротация
 - Health/readiness endpoints
-- Backup/export jobs
+- Backup/export задачи
 
-## 3) Security baseline
-- v1: no user roles
-- v1: page/service access protected by shared password gate
-- network restrictions by default (local subnet or allowlist)
-- phase 2: per-user auth and audit trails
+## 3) Базовая безопасность
+- v1: без ролей
+- v1: доступ к странице/сервису через общий пароль
+- сетевые ограничения по умолчанию (локальная подсеть или allowlist)
+- phase 2: per-user auth и аудит
 
-## 4) Non-goals for v1
-- No microservices split
-- No Kubernetes
-- No cloud dependency for core functionality
-- No browser-only operator control path as primary mode
+## 4) Что не делаем в v1
+- Без разделения на микросервисы
+- Без Kubernetes
+- Без облачной зависимости для основной функциональности
+- Без browser-only operator path как основного режима
 
-## 5) Decision checkpoints
-Re-check after:
-- M2 (core + hardware adapters stable)
-- M3 (operator flows complete)
+## 5) Контрольные точки пересмотра
+Перепроверить после:
+- M2 (core + hardware adapters стабилизированы)
+- M3 (operator flow завершены)

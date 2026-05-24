@@ -1,28 +1,28 @@
-﻿# M0 Bootstrap Guide
+﻿# Руководство по Bootstrap M0
 
 ## Core (Go)
-From `apps/core`:
+Из `apps/core`:
 
 ```bash
 go run ./cmd/core
 ```
 
-Check:
+Проверка:
 - `GET http://localhost:8080/health`
 
-Optional password protection:
-- set `OPERATOR_PASSWORD` env
-- call protected endpoints with header `X-Operator-Password`
+Необязательная защита паролем:
+- задать env `OPERATOR_PASSWORD`
+- вызывать защищенные endpoint с заголовком `X-Operator-Password`
 
 ## Operator (Tauri + React)
-From `apps/operator`:
+Из `apps/operator`:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Tauri desktop (requires Rust + Tauri prerequisites):
+Tauri desktop (нужны Rust + зависимости Tauri):
 
 ```bash
 npm run build
@@ -30,31 +30,31 @@ cargo tauri dev
 ```
 
 ## Docker (dev core + postgres)
-From repository root:
+Из корня репозитория:
 
 ```bash
 docker compose -f infra/docker-compose.yml up
 ```
 
-## Next technical step
-- Introduce command/event model in `apps/core` for tournament state machine.
+## Следующий технический шаг
+- Ввести command/event model в `apps/core` для state machine турнира.
 
-## Sensor debug (live)
-Run core and open:
+## Отладка датчика (live)
+Запусти core и открой:
 - `http://<pi-ip>:8080/debug/sensor`
 
-Available debug APIs:
-- `GET /debug/sensor/state` - counters and recent samples
-- `GET /debug/sensor/stream` - SSE live stream
-- `POST /debug/sensor/sample` - inject sample manually (`{ "level": true|false }`)
+Доступные debug API:
+- `GET /debug/sensor/state` - счетчики и последние sample
+- `GET /debug/sensor/stream` - live SSE-поток
+- `POST /debug/sensor/sample` - ручная инъекция sample (`{ "level": true|false }`)
 
-What you can see in real time:
-- raw level transitions (HIGH/LOW)
-- accepted crossings
-- rejected samples with reason (`debounced`, `refractory`, etc.)
+Что видно в реальном времени:
+- сырые переходы уровня (HIGH/LOW)
+- принятые пересечения
+- отклоненные sample с причиной (`debounced`, `refractory` и т.д.)
 
-## Real sensor setup (validated on bench)
-For real hardware stream from GPIO:
+## Настройка реального датчика (подтверждено на стенде)
+Для чтения с реального GPIO:
 
 ```bash
 export CORE_PORT=18080
@@ -68,14 +68,14 @@ export SENSOR_REFRACTORY_MS=120
 go run ./cmd/core
 ```
 
-Important:
-- In current bench wiring, sensor power/enable must be held via GPIO27:
+Важно:
+- В текущей схеме стенда питание/enable датчика нужно удерживать через `GPIO27`:
 
 ```bash
 gpioset -z --chip gpiochip0 27=1
 ```
 
-- Then open:
+- После этого открой:
   - `http://<pi-ip>:18080/debug/sensor`
 
-See also: [SENSOR_RUNBOOK.md](./SENSOR_RUNBOOK.md) for real hardware startup and diagnostics.
+См. также: [SENSOR_RUNBOOK.md](./SENSOR_RUNBOOK.md) для запуска и диагностики на реальном железе.

@@ -1,52 +1,52 @@
-﻿# Roadmap - InflightFlow
+﻿# Дорожная карта - InflightFlow
 
-## M0 (Week 1): Foundation
-- Initialize repository structure for `core`, `operator`, `contracts`
-- Define domain model and invariant list (timers, scores, round state transitions)
-- Define hardware contracts (DMX, sensor) and failure semantics
-- Set coding standards, CI, and release conventions
+## M0 (Неделя 1): Основа
+- Инициализировать структуру репозитория для `core`, `operator`, `contracts`
+- Определить доменную модель и список инвариантов (таймеры, результаты, переходы состояний раунда)
+- Определить контракты с железом (DMX, датчик) и семантику отказов
+- Зафиксировать стандарты кодирования, CI и правила релизов
 
-Done when:
-- Core service starts with health checks
-- Operator shell connects locally to core
-- Architecture docs and operational assumptions are signed off
+Готово, когда:
+- Сервис core запускается и отдает health-check
+- Операторская оболочка локально подключается к core
+- Архитектурные документы и операционные допущения согласованы
 
-## M1 (Week 2-4): Core engine first
-- Implement competition state machine in Go
-- Implement durable event journal + snapshot restore
-- Implement command validation and idempotency
-- Build deterministic timer and scoring services
+## M1 (Недели 2-4): Сначала core-движок
+- Реализовать state machine соревнования на Go
+- Реализовать надежный журнал событий + восстановление из snapshot
+- Реализовать валидацию команд и идемпотентность
+- Реализовать детерминированные таймер и скоринг
 
-Done when:
-- Full tournament lifecycle runs headless without UI
-- Crash/restart restores exact prior state
+Готово, когда:
+- Полный жизненный цикл турнира проходит headless (без UI)
+- После сбоя/перезапуска состояние восстанавливается точно
 
-## M2 (Week 4-6): Hardware reliability layer
-- Implement DMX adapter with retry/backoff and fault isolation
-- Implement sensor adapter with watchdog and input debouncing rules
-- Add real/mock adapter switch with identical contracts
-- Validate on Raspberry Pi 5 under stress scenarios
+## M2 (Недели 4-6): Слой надежности железа
+- Реализовать DMX-адаптер с retry/backoff и изоляцией отказов
+- Реализовать адаптер датчика с watchdog и правилами антидребезга
+- Добавить переключение real/mock при одинаковых контрактах
+- Провести валидацию на Raspberry Pi 5 под стресс-сценариями
 
-Done when:
-- Hardware I/O remains stable under reconnects and restarts
-- Error states are recoverable without corrupting competition state
+Готово, когда:
+- Ввод/вывод железа стабилен при переподключениях и перезапусках
+- Ошибочные состояния восстанавливаются без порчи состояния соревнования
 
-## M3 (Week 6-8): Operator client
-- Build Tauri operator app with React UI
-- Recreate proven inFight user flows and layouts as functional reference parity
-- Integrate realtime state updates from core
-- Add password gate for client/service access
+## M3 (Недели 6-8): Операторский клиент
+- Собрать Tauri-приложение оператора на React
+- Воссоздать проверенные user flow и макеты inFight с функциональным паритетом
+- Интегрировать обновления состояния core в реальном времени
+- Добавить парольную защиту доступа клиент/сервис
 
-Done when:
-- Operator can execute full event flow without browser dependency
-- UI behavior matches required competition procedures
+Готово, когда:
+- Оператор может провести полный сценарий соревнования без браузера
+- Поведение UI соответствует требуемым регламентам проведения
 
-## M4 (Week 8-9): Hardening and release
-- End-to-end reliability tests (including failure injection)
-- Operational runbooks (backup/restore, restart, degraded mode)
-- Packaging and one-command deployment for Pi 5
-- Release candidate and rollback plan
+## M4 (Недели 8-9): Укрепление и релиз
+- End-to-end тесты надежности (включая инъекции отказов)
+- Операционные runbook (backup/restore, restart, degraded mode)
+- Пакетирование и деплой на Pi 5 одной командой
+- Release candidate и план отката
 
-Done when:
-- System passes live simulation and recovery drills
-- Team can operate event day with documented procedures
+Готово, когда:
+- Система проходит живую симуляцию и recovery-drill
+- Команда может провести соревновательный день по документации

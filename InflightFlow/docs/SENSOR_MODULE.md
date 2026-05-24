@@ -1,21 +1,21 @@
-# Sensor Module (M1 Gate)
+﻿# Модуль датчика (ворота M1)
 
-`apps/core/internal/sensor` is the first quality gate for InflightFlow hardware reliability.
+`apps/core/internal/sensor` — первые ворота качества для надежности железа в InflightFlow.
 
-Current behavior:
-- input: timestamped digital level samples (`true/false`)
-- output: stable `crossing` events
-- filters:
-  - debounce window for contact/noise bounce
-  - refractory window for duplicate crossing suppression
-  - rising-edge only event generation
+Текущее поведение:
+- вход: цифровые samples уровня (`true/false`) с timestamp
+- выход: стабильные события `crossing`
+- фильтры:
+  - окно debounce для дребезга/шума
+  - окно refractory для подавления дублей пересечения
+  - генерация событий только по rising edge
 
-Why this matters:
-- prevents false crossings during noisy GPIO/driver conditions
-- gives deterministic behavior for timing/scoring core
-- keeps hardware instability isolated from domain logic
+Почему это важно:
+- предотвращает ложные пересечения при шумном GPIO/драйвере
+- дает детерминированное поведение для core тайминга/скоринга
+- изолирует нестабильность железа от доменной логики
 
-Next steps:
-1. Wire this processor to real input adapter (`/dev/crossing_detector` reader).
-2. Add soak tests with recorded real traces from Pi.
-3. Add fault metrics (`debounced`, `refractory`, `invalid_timestamp`) for observability.
+Следующие шаги:
+1. Подключить процессор к реальному input adapter (`/dev/crossing_detector` reader).
+2. Добавить soak-тесты с записанными реальными трассами с Pi.
+3. Добавить fault-метрики (`debounced`, `refractory`, `invalid_timestamp`) для observability.

@@ -1,56 +1,56 @@
-﻿# Instructor Ops Drill Report
+﻿# Отчет по drill инструктора
 
-Generated: 2026-05-24
-Target: `InflightFlow core on Pi`
+Сформировано: 2026-05-24
+Цель: `InflightFlow core на Pi`
 Pi: `192.168.0.177:18080`
 
-## Scope
-Validate instructor-facing failure handling loop:
-1. normal operation
-2. sensor reader failure
-3. automatic recovery
-4. permission to start new round
+## Область проверки
+Проверка цикла обработки отказа с точки зрения инструктора:
+1. нормальная работа
+2. отказ reader датчика
+3. автоматическое восстановление
+4. разрешение запуска нового раунда
 
-## Endpoints Used
+## Использованные endpoints
 - `GET /v1/instructor/sensor-health`
 - `GET /v1/instructor/readiness`
-- `POST /v1/domain/command` (`start_round` guard behavior)
+- `POST /v1/domain/command` (guard для `start_round`)
 - `GET /debug/sensor/watchdog`
 
-## Drill Steps and Observed Results
-1. Baseline check (normal state)
+## Шаги и наблюдаемые результаты
+1. Базовая проверка (нормальное состояние)
 - `sensor-health`: `level=OK`, `action=NONE`
 - `readiness`: `canStartRound=true`
 
-2. Simulate sensor reader failure
-- Action: terminate `gpiomon` process on Pi.
-- Immediate result:
+2. Имитация отказа reader датчика
+- Действие: завершить процесс `gpiomon` на Pi.
+- Немедленный результат:
   - `sensor-health`: `level=CRITICAL`, `action=HOLD_START`
   - `readiness`: `canStartRound=false`
 
-3. Start guard verification under CRITICAL
-- Action: send `start_round` command.
-- Result: rejected with `error=sensor_health_critical`.
+3. Проверка guard при CRITICAL
+- Действие: отправить команду `start_round`.
+- Результат: отклонено с `error=sensor_health_critical`.
 
-4. Auto-recovery verification
-- Watchdog restarts `gpiomon` automatically.
-- During recent restart window:
+4. Проверка авто-восстановления
+- Watchdog автоматически перезапускает `gpiomon`.
+- В окне недавнего рестарта:
   - `sensor-health`: `level=WARNING`, `action=RESTART_SENSOR`
-- After stable window:
+- После окна стабилизации:
   - `sensor-health`: `level=OK`, `action=NONE`
   - `readiness`: `canStartRound=true`
 
-## Instructor Checklist
-- If `CRITICAL/HOLD_START`:
-  - do not start round;
-  - inspect wiring/power and sensor line;
-  - wait for status to recover.
-- If `WARNING/RESTART_SENSOR`:
-  - verify sensor process recovered;
-  - confirm state returns to `OK` before critical runs.
-- Start new round only when readiness reports `canStartRound=true`.
+## Чеклист для инструктора
+- Если `CRITICAL/HOLD_START`:
+  - не запускать раунд;
+  - проверить проводку/питание и линию датчика;
+  - дождаться восстановления статуса.
+- Если `WARNING/RESTART_SENSOR`:
+  - проверить, что процесс датчика восстановился;
+  - убедиться, что статус вернулся в `OK` перед критичными заездами.
+- Новый раунд запускать только при `canStartRound=true`.
 
-## Acceptance
-- Health signaling works.
-- Start-round hard guard works.
-- Auto-recovery path returns system to start-ready state.
+## Критерии приемки
+- Сигнализация health работает.
+- Жесткий guard на `start_round` работает.
+- Путь авто-восстановления возвращает систему в состояние готовности к старту.

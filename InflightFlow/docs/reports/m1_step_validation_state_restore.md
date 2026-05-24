@@ -1,34 +1,34 @@
-﻿# M1 Step Report - Validation, State, Restore
+﻿# Отчет по шагу M1 - Валидация, состояние, восстановление
 
-Date: 2026-05-24
+Дата: 2026-05-24
 
-## Scope completed
-1. Strict command payload validation at API layer
-2. Expanded round state model with timing/result fields
-3. Restore-after-restart test through journal replay
+## Что закрыто
+1. Строгая валидация payload команд на API-слое
+2. Расширение модели состояния раунда полями времени/результата
+3. Тест восстановления после перезапуска через replay журнала
 
-## Changes
-- API validation added for:
-  - `create_tournament` requires string `tournamentId`
-  - `prepare_round` requires string `roundId`
-  - `accept_crossing` requires numeric `at`
-  - unsupported command types are rejected
-- State model expanded with:
+## Изменения
+- API-валидация добавлена для:
+  - `create_tournament` требует строку `tournamentId`
+  - `prepare_round` требует строку `roundId`
+  - `accept_crossing` требует числовой `at`
+  - неподдерживаемые типы команд отклоняются
+- Модель состояния расширена полями:
   - `FirstCrossAt`
   - `RoundStartedAt`
   - `RoundEndedAt`
   - `RoundResultMs`
-- Finish event now stores:
+- Событие завершения теперь хранит:
   - `resultMs` (lastCross - firstCross)
   - `finishedAt`
-- Restart restore test validates full cycle replay and resulting state consistency.
+- Тест восстановления после перезапуска валидирует replay полного цикла и консистентность итогового состояния.
 
-## Test status
-- `go test ./...` in `apps/core`: PASS
-- New restore test expectation:
-  - finished round restored as `completed`
-  - crossings restored correctly
-  - calculated result restored correctly
+## Статус тестов
+- `go test ./...` в `apps/core`: PASS
+- Ожидания нового restore-теста:
+  - завершенный раунд восстановлен как `completed`
+  - количество пересечений восстановлено корректно
+  - рассчитанный результат восстановлен корректно
 
-## Notes
-- Idempotency remains in-memory by design (as agreed) for current stage.
+## Примечания
+- Идемпотентность пока остается in-memory по согласованному плану текущего этапа.

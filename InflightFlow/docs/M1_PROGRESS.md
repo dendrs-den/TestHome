@@ -1,53 +1,53 @@
-﻿# M1 Progress - Core Engine
+﻿# Прогресс M1 - Core Engine
 
-## Implemented now
-- Domain command model (`internal/domain/commands`)
-- Domain event model (`internal/domain/events`)
-- Round state machine (`internal/domain/engine`) with guarded transitions:
+## Что уже реализовано
+- Модель доменных команд (`internal/domain/commands`)
+- Модель доменных событий (`internal/domain/events`)
+- State machine раунда (`internal/domain/engine`) с контролем переходов:
   - create tournament
   - prepare round
   - start round
   - accept crossing
-  - finish round (requires >= 2 crossings)
+  - finish round (требует >= 2 пересечений)
   - cancel round
-- Event journal append/replay (`internal/journal`)
-- Domain runtime with:
-  - restore state from journal on startup
-  - command handling with event persistence
+- Журнал событий append/replay (`internal/journal`)
+- Domain runtime с:
+  - восстановлением состояния из журнала при старте
+  - обработкой команд с сохранением событий
 - API endpoints:
   - `GET /v1/domain/state`
   - `POST /v1/domain/command`
   - `POST /v1/domain/bootstrap`
   - `GET /v1/domain/bootstrap/profiles`
-- Sensor integration:
-  - every accepted sensor crossing is forwarded to domain command `accept_crossing`
-- Idempotency for API commands:
-  - `idempotencyKey` supported in `POST /v1/domain/command`
-  - duplicate key returns cached result without re-applying command
+- Интеграция с датчиком:
+  - каждое принятое пересечение отправляется как `accept_crossing`
+- Идемпотентность API-команд:
+  - поддержан `idempotencyKey` в `POST /v1/domain/command`
+  - повтор с тем же ключом возвращает кешированный результат без повторного применения
 
-## Tests added
-- Engine happy-path lifecycle test
-- Engine invalid finish (<2 crossings) test
-- Journal append/replay integrity test
-- Restore-after-restart replay test (journal -> state)
-- Bootstrap idempotency test
-- Bootstrap profile resolver tests
+## Добавленные тесты
+- Позитивный тест жизненного цикла engine
+- Негативный тест finish при <2 пересечениях
+- Тест целостности journal append/replay
+- Тест восстановления после перезапуска (journal -> state)
+- Тест идемпотентности bootstrap
+- Тесты резолвера bootstrap-профилей
 
-## Completed in this step (2026-05-24)
-1. Deterministic timer/scoring module
-- Added `ComputeRoundResultMs(State)` in `internal/domain/engine/scoring.go`.
-- `finish_round` now uses scoring module, not inline math.
-- Rule fixed and test-covered: result is `lastCrossAt - firstCrossAt`, min 2 crossings.
+## Выполнено на этом шаге (2026-05-24)
+1. Детерминированный модуль таймера/скоринга
+- Добавлен `ComputeRoundResultMs(State)` в `internal/domain/engine/scoring.go`.
+- `finish_round` теперь использует отдельный scoring-модуль.
+- Правило зафиксировано и покрыто тестами: `result = lastCrossAt - firstCrossAt`, минимум 2 пересечения.
 
-2. Full headless lifecycle test
-- Added `TestHeadlessTournamentLifecycle`.
-- Covers `create -> prepare -> start -> crossing -> crossing -> finish`.
-- Verifies terminal state is `completed` and result is deterministic.
+2. Полный headless-тест жизненного цикла
+- Добавлен `TestHeadlessTournamentLifecycle`.
+- Покрывает `create -> prepare -> start -> crossing -> crossing -> finish`.
+- Проверяет конечное состояние `completed` и детерминированный результат.
 
-3. Crash/restart drill test
-- Added `TestCrashRestartDrillContinueAndFinish`.
-- Simulates crash after first crossing, restores from journal, continues round, finishes, and verifies final result.
+3. Crash/restart drill-тест
+- Добавлен `TestCrashRestartDrillContinueAndFinish`.
+- Имитирует сбой после первого пересечения, восстановление из журнала, продолжение и корректное завершение.
 
-## Next M1 tasks
-1. Persist idempotency records beyond process restart
-2. Add one-command local drill script for ops runbook
+## Следующие задачи M1
+1. Сохранять идемпотентность не только в памяти, но и после перезапуска процесса
+2. Добавить локальный drill-скрипт одной командой для ops runbook

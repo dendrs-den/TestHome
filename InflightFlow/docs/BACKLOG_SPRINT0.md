@@ -1,19 +1,19 @@
-﻿# Backlog - Sprint 0
+﻿# Бэклог - Sprint 0
 
 ## P0
-- Initialize monorepo package manager and workspace config
-- Bootstrap `apps/web` with React + Vite + TypeScript
-- Bootstrap `apps/api` with Fastify + TypeScript
-- Add `packages/shared` with first `HealthResponse` contract
-- Add docker compose with web/api/postgres
-- Add CI pipeline for lint/test/build
+- Инициализировать monorepo package manager и workspace-конфиг
+- Поднять `apps/web` на React + Vite + TypeScript
+- Поднять `apps/api` на Fastify + TypeScript
+- Добавить `packages/shared` с первым контрактом `HealthResponse`
+- Добавить docker compose с web/api/postgres
+- Добавить CI-пайплайн для lint/test/build
 
 ## P1
-- Add Prisma schema with initial entities
-- Implement `/health` and `/version` endpoints
-- Set up API validation and error middleware
-- Add frontend API client and environment config
+- Добавить Prisma schema с начальными сущностями
+- Реализовать endpoint `/health` и `/version`
+- Настроить API-валидацию и error-middleware
+- Добавить frontend API-клиент и env-конфиг
 
 ## P2
-- Add test harness (unit + integration smoke)
-- Add structured logger with request id correlation
+- Добавить test harness (unit + integration smoke)
+- Добавить структурированный логгер с корреляцией request id

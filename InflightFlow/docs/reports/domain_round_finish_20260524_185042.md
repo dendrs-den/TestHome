@@ -1,21 +1,21 @@
-﻿# Domain Round Finish Validation
+﻿# Проверка завершения раунда в домене
 
-Generated: 2026-05-24T15:50:42.2017345Z
-Target: http://192.168.0.177:18080/v1/domain/*
+Сформировано: 2026-05-24T15:50:42.2017345Z
+Цель: `http://192.168.0.177:18080/v1/domain/*`
 
-## Steps
-1. Round was in unning with accumulated crossings.
-2. Sent command inish_round.
-3. Verified state transition.
-4. Sent second inish_round (negative case).
+## Шаги
+1. Раунд находился в состоянии `running` с накопленными пересечениями.
+2. Отправлена команда `finish_round`.
+3. Проверен переход состояния.
+4. Отправлена повторная `finish_round` (негативный кейс).
 
-## Results
-- First inish_round: success
-- State after first finish:
-  - RoundState=completed
-  - Crossings=18
-- Second inish_round: rejected with error
-  - ound must be running, got=completed
+## Результаты
+- Первая `finish_round`: успешно
+- Состояние после первого завершения:
+  - `RoundState=completed`
+  - `Crossings=18`
+- Вторая `finish_round`: отклонена с ошибкой
+  - `round must be running, got=completed`
 
-## Conclusion
-Domain state machine correctly enforces one-way transition unning -> completed and rejects repeated finish.
+## Вывод
+Domain state machine корректно обеспечивает односторонний переход `running -> completed` и отклоняет повторное завершение.
