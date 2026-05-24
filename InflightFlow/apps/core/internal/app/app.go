@@ -100,6 +100,10 @@ func Run() error {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_json"})
 			return
 		}
+		if err := validateCommandPayload(body.Type, body.Data); err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
 		evs, err := domainRuntime.Handle(commands.Command{
 			Type:           commands.Type(body.Type),
 			Data:           body.Data,
@@ -211,6 +215,34 @@ func writeJSON(w http.ResponseWriter, status int, payload any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(payload)
+}
+
+func validateCommandPayload(cmdType string, data map[string]any) error {
+	switch commands.Type(cmdType) {
+	case commands.CmdCreateTournament:
+		v, ok := data["tournamentId"].(string)
+		if !ok || v == "" {
+			return fmt.Errorf("tournamentId is required and must be string")
+		}
+	case commands.CmdPrepareRound:
+		v, ok := data["roundId"].(string)
+		if !ok || v == "" {
+			return fmt.Errorf("roundId is required and must be string")
+		}
+	case commands.CmdAcceptCrossing:
+		if _, okInt := data["at"].(int64); okInt {
+			return nil
+		}
+		if _, okF := data["at"].(float64); okF {
+			return nil
+		}
+		return fmt.Errorf("at is required and must be number")
+	case commands.CmdStartRound, commands.CmdFinishRound, commands.CmdCancelRound:
+		return nil
+	default:
+		return fmt.Errorf("unsupported command type: %s", cmdType)
+	}
+	return nil
 }
 
 const sensorDebugHTML = `<!doctype html>

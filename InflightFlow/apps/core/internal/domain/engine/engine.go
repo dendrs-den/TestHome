@@ -20,11 +20,15 @@ const (
 )
 
 type State struct {
-	TournamentID string
-	RoundID      string
-	RoundState   RoundState
-	Crossings    int
-	LastCrossAt  int64
+	TournamentID   string
+	RoundID        string
+	RoundState     RoundState
+	Crossings      int
+	FirstCrossAt   int64
+	LastCrossAt    int64
+	RoundStartedAt int64
+	RoundEndedAt   int64
+	RoundResultMs  int64
 }
 
 type Engine struct {
@@ -71,16 +75,27 @@ func (e *Engine) Apply(ev events.Event) error {
 		e.state.RoundID = str(ev.Data["roundId"])
 		e.state.RoundState = RoundPrepared
 		e.state.Crossings = 0
+		e.state.FirstCrossAt = 0
 		e.state.LastCrossAt = 0
+		e.state.RoundStartedAt = 0
+		e.state.RoundEndedAt = 0
+		e.state.RoundResultMs = 0
 	case events.TypeRoundStarted:
 		e.state.RoundState = RoundRunning
+		e.state.RoundStartedAt = int64Num(ev.Data["startedAt"])
 	case events.TypeCrossingAccepted:
+		if e.state.Crossings == 0 {
+			e.state.FirstCrossAt = int64Num(ev.Data["at"])
+		}
 		e.state.Crossings++
 		e.state.LastCrossAt = int64Num(ev.Data["at"])
 	case events.TypeRoundFinished:
 		e.state.RoundState = RoundCompleted
+		e.state.RoundEndedAt = int64Num(ev.Data["finishedAt"])
+		e.state.RoundResultMs = int64Num(ev.Data["resultMs"])
 	case events.TypeRoundCancelled:
 		e.state.RoundState = RoundCancelled
+		e.state.RoundEndedAt = int64Num(ev.Data["cancelledAt"])
 	default:
 		return fmt.Errorf("unsupported event type: %s", ev.Type)
 	}
@@ -120,7 +135,9 @@ func (e *Engine) startRound(_ commands.Command) ([]events.Event, error) {
 	if e.state.RoundState != RoundPrepared {
 		return nil, fmt.Errorf("round must be prepared, got=%s", e.state.RoundState)
 	}
-	return e.newEvents(events.TypeRoundStarted, map[string]any{}), nil
+	return e.newEvents(events.TypeRoundStarted, map[string]any{
+		"startedAt": time.Now().UnixMilli(),
+	}), nil
 }
 
 func (e *Engine) acceptCrossing(cmd commands.Command) ([]events.Event, error) {
@@ -147,8 +164,14 @@ func (e *Engine) finishRound(_ commands.Command) ([]events.Event, error) {
 	if e.state.Crossings < 2 {
 		return nil, errors.New("cannot finish round with less than 2 crossings")
 	}
+	result := e.state.LastCrossAt - e.state.FirstCrossAt
+	if result < 0 {
+		result = 0
+	}
 	return e.newEvents(events.TypeRoundFinished, map[string]any{
-		"crossings": e.state.Crossings,
+		"crossings":  e.state.Crossings,
+		"resultMs":   result,
+		"finishedAt": time.Now().UnixMilli(),
 	}), nil
 }
 
@@ -156,7 +179,9 @@ func (e *Engine) cancelRound(_ commands.Command) ([]events.Event, error) {
 	if e.state.RoundState == RoundIdle {
 		return nil, errors.New("no active round to cancel")
 	}
-	return e.newEvents(events.TypeRoundCancelled, map[string]any{}), nil
+	return e.newEvents(events.TypeRoundCancelled, map[string]any{
+		"cancelledAt": time.Now().UnixMilli(),
+	}), nil
 }
 
 func (e *Engine) newEvents(t events.Type, data map[string]any) []events.Event {

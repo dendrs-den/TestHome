@@ -35,3 +35,7 @@
 4. Add startup bootstrap command flow (create tournament + prepare/start round) profile
 
 - Validated full finish flow on Pi: unning -> completed and repeat finish rejection.
+
+- Added strict API payload validation for domain commands.
+- Expanded state with round timing/result fields.
+- Added restore-after-restart replay test (journal -> state).

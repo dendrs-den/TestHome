@@ -51,3 +51,46 @@ func TestRuntime_IdempotencyKeyPreventsDuplicateApply(t *testing.T) {
 		t.Fatalf("expected 2 journaled events, got %d", len(evs))
 	}
 }
+
+func TestRuntime_RestoreAfterRestart(t *testing.T) {
+	dir := t.TempDir()
+	jpath := filepath.Join(dir, "journal.log")
+	if err := journal.EnsurePath(jpath); err != nil {
+		t.Fatalf("ensure path: %v", err)
+	}
+
+	rt1 := NewRuntime(jpath)
+	_, _ = rt1.Handle(commands.Command{
+		Type: commands.CmdCreateTournament,
+		Data: map[string]any{"tournamentId": "t-rst"},
+	})
+	_, _ = rt1.Handle(commands.Command{
+		Type: commands.CmdPrepareRound,
+		Data: map[string]any{"roundId": "r-rst"},
+	})
+	_, _ = rt1.Handle(commands.Command{Type: commands.CmdStartRound, Data: map[string]any{}})
+	_, _ = rt1.Handle(commands.Command{Type: commands.CmdAcceptCrossing, Data: map[string]any{"at": int64(1000)}})
+	_, _ = rt1.Handle(commands.Command{Type: commands.CmdAcceptCrossing, Data: map[string]any{"at": int64(1300)}})
+	_, _ = rt1.Handle(commands.Command{Type: commands.CmdFinishRound, Data: map[string]any{}})
+
+	rt2 := NewRuntime(jpath)
+	if err := rt2.Restore(); err != nil {
+		t.Fatalf("restore: %v", err)
+	}
+	st := rt2.State()
+	if st.TournamentID != "t-rst" {
+		t.Fatalf("unexpected tournament id: %s", st.TournamentID)
+	}
+	if st.RoundID != "r-rst" {
+		t.Fatalf("unexpected round id: %s", st.RoundID)
+	}
+	if st.RoundState != RoundCompleted {
+		t.Fatalf("expected completed, got %s", st.RoundState)
+	}
+	if st.Crossings != 2 {
+		t.Fatalf("expected 2 crossings, got %d", st.Crossings)
+	}
+	if st.RoundResultMs != 300 {
+		t.Fatalf("expected result 300ms, got %d", st.RoundResultMs)
+	}
+}
