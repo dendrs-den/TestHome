@@ -8,3 +8,5 @@ dist/
 *.spec
 flyer_generators_app/flyer_generators_*.pdf
 flyer_generators_app/draw_generators_*.pdf
+
+inFight_pi_snapshot/_pi_sync/prod_backups/*.tar.gz

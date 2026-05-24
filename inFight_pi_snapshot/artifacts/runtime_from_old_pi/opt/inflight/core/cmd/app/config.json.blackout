@@ -1,0 +1,17 @@
+{
+    "dbAddress":"127.0.0.1", 
+	"DMXaddress":"127.0.0.1:9090",
+    "crossServiceAddress":"127.0.0.1:15001",
+    "bluetoothServiceAddress":"127.0.0.1:15002",
+	"AdministrationColor":[],
+	"PreparationColor":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "ExpectationColor":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "PerformanceColor":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "CompletionColor":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "FaultColor":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	"FaultColorTime":1000,
+	"FaultCheckTime":3000,
+	"MaxLogSizeMB":10,
+	"MaxLogsCount":3,
+	"Debug":false
+}

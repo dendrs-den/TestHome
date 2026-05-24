@@ -1,4 +1,4 @@
-﻿const { response } = require("express");
+const { response } = require("express");
 const express = require("express");
 const router = express.Router();
 const axios = require("axios").default;
@@ -6,7 +6,7 @@ const SocketServer = require("../models/SocketServer");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "./.env") });
 
-const API_URL = process.env.CORE_API_URL || "http://127.0.0.1:15000";
+const API_URL = (process.env.CORE_API_URL || "http://127.0.0.1:15000").trim();
 const FINALIZATION_IN_PROGRESS_STATUS = "Round finalization is already in progress";
 const handleApiError = (res, error, context) => {
   const status = error?.response?.status || 502;
@@ -62,7 +62,13 @@ router.post("/start", (req, res) => {
       });
     })
     .catch((error) => {
-      console.log("failed to start round with terminal");
+      const status = error?.response?.status || 500;
+      const details = error?.response?.data || error?.message || "Start round failed";
+      console.log("failed to start round with terminal:", details);
+      return res.status(status).json({
+        error: "Start round error",
+        details,
+      });
     });
 });
 
@@ -347,3 +353,4 @@ router.post("/updateTeam", (req, res) => {
 });
 
 module.exports = router;
+

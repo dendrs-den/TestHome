@@ -1,0 +1,38 @@
+stages: 
+  - build
+  - deploy
+
+Build:
+  stage: build
+  tags: 
+    - arm64
+  script:
+    - mkdir bin-release build-release
+    - pushd build-release
+    - cmake .. -D CMAKE_BUILD_TYPE=Release -D CMAKE_RUNTIME_OUTPUT_DIRECTORY="../bin-release"
+    - cmake --build . -j4
+    - popd
+    - cp detectorConfig.json build-release/bin-release/
+    - tar czf bluetooth_${CI_COMMIT_SHORT_SHA}.tar.gz --directory build-release/bin-release {detectorConfig.json,jsm.crossing-detector-front}
+  artifacts:
+    when: always
+    paths:
+      - ./*.tar.gz
+    expire_in: 1 week
+  when: manual
+
+
+
+Deploy:
+  stage: deploy
+  tags:
+    - raspberry
+  script:
+    - sudo systemctl stop inflight-crossfront.service || /bin/true
+    - tar xf *.tar.gz -C /opt/inflight/bins/
+    - sudo systemctl start inflight-crossfront.service || /bin/true
+  needs:
+    - job: Build
+      artifacts: true
+
+  when: manual

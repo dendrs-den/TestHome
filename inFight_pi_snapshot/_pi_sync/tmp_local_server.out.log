@@ -1,0 +1,8 @@
+
+> server@1.0.0 start
+> node server.js
+
+webserver address: http://localhost:3201 
+core api address:  http://127.0.0.1:15010 
+An error occured during loading all tournaments: Request failed with status code 400
+An error occured during loading all tournaments: Request failed with status code 400

@@ -1,0 +1,15 @@
+[Unit]
+Description=inFlight Client service
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/inFlight/frontend/server
+ExecStart=/usr/bin/node /home/pi/inFlight/frontend/server/server.js
+#Restart=always # or always, on-abort, etc
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

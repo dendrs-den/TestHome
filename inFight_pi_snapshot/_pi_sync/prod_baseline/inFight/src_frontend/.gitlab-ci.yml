@@ -1,0 +1,33 @@
+stages: 
+  - build
+  - deploy
+
+Build:
+  stage: build
+  tags: 
+    - arm64
+  script:
+    - echo "There will be build stage..."
+  when: manual
+
+
+Deploy frontend:
+  stage: deploy
+  tags:
+    - raspberry
+  variables:
+    CI: "false"
+  script:
+    - pushd ./client 
+    - cp .env.example .env 
+    - npm install   
+    - npm run build
+    - popd && pushd ./server
+    - cp .env.example .env 
+    - npm install
+    - popd
+    - sudo systemctl stop inflight-server.service || /bin/true 
+    - sudo /opt/inflight/rm-front.sh
+    - cp -r . /opt/inflight/frontend
+    - sudo systemctl start inflight-server.service || /bin/true
+  when: manual

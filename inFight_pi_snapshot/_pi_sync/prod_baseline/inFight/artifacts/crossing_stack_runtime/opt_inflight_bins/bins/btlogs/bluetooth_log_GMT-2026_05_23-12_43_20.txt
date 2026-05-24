@@ -1,0 +1,190 @@
+GMT-2026:05:23-12:43:20 (548395265984): 18SupportDeviceEvent catched by 13DeviceStorage
+GMT-2026:05:23-12:43:20 (548403658688): 17AddUSBDeviceEvent processed by 10UsbCatcher
+GMT-2026:05:23-12:43:20 (548386873280): FOUND: 1:1:0002:1d6b
+GMT-2026:05:23-12:43:20 (548386873280): 19AddedUSBDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:43:20 (548386873280): send "add"
+GMT-2026:05:23-12:43:20 (548386873280): sended "add" result status : Bad server address
+GMT-2026:05:23-12:43:20 (548386873280): 19AddedUSBDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:43:20 (548378480576): 18SupportDeviceEvent catched by 13DeviceStorage
+GMT-2026:05:23-12:43:20 (548370087872): FOUND: 2:1:0003:1d6b
+GMT-2026:05:23-12:43:20 (548370087872): 19AddedUSBDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:43:20 (548370087872): send "add"
+GMT-2026:05:23-12:43:20 (548420444096): 17AddUSBDeviceEvent processed by 10UsbCatcher
+GMT-2026:05:23-12:43:20 (548370087872): sended "add" result status : Bad server address
+GMT-2026:05:23-12:43:20 (548370087872): 19AddedUSBDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:43:20 (548361695168): 18SupportDeviceEvent catched by 13DeviceStorage
+GMT-2026:05:23-12:43:20 (548353302464): FOUND: 1:2:3431:2109
+GMT-2026:05:23-12:43:20 (548353302464): 19AddedUSBDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:43:20 (548353302464): send "add"
+GMT-2026:05:23-12:43:20 (548353302464): sended "add" result status : Bad server address
+GMT-2026:05:23-12:43:20 (548353302464): 19AddedUSBDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:43:20 (548412051392): 17AddUSBDeviceEvent processed by 10UsbCatcher
+GMT-2026:05:23-12:43:20 (548344909760): 18SupportDeviceEvent catched by 13DeviceStorage
+GMT-2026:05:23-12:43:20 (548336517056): FOUND: 8C:35:92:47:D2:FF
+GMT-2026:05:23-12:43:20 (548336517056): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:43:20 (548336517056): send "add"
+GMT-2026:05:23-12:43:20 (548336517056): sended "add" result status : Bad server address
+GMT-2026:05:23-12:43:20 (548336517056): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:43:20 (548328124352): 18SupportDeviceEvent catched by 13DeviceStorage
+GMT-2026:05:23-12:43:20 (548403658688): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:43:20 (548403658688): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:43:20 (548403658688): send "add"
+GMT-2026:05:23-12:43:20 (548403658688): sended "add" result status : Bad server address
+GMT-2026:05:23-12:43:20 (548403658688): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:43:21 (548395265984): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:43:21 (548395265984): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:43:21 (548395265984): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:43:23 (548386873280): 18SupportDeviceEvent catched by 13DeviceStorage
+GMT-2026:05:23-12:43:23 (548378480576): FOUND: 50:56:BF:8C:8C:56
+GMT-2026:05:23-12:43:23 (548378480576): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:43:23 (548378480576): send "add"
+GMT-2026:05:23-12:43:23 (548378480576): sended "add" result status : Bad server address
+GMT-2026:05:23-12:43:23 (548378480576): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:43:24 (548420444096): FOUND: 50:56:BF:8C:8C:56
+GMT-2026:05:23-12:43:24 (548420444096): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:43:24 (548420444096): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:43:24 (548370087872): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:43:24 (548370087872): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:43:24 (548370087872): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:43:24 (548361695168): FOUND: 8C:35:92:47:D2:FF
+GMT-2026:05:23-12:43:24 (548361695168): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:43:24 (548361695168): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:46:12 (548344909760): 32DisconnectedBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:46:12 (548412051392): 32DisconnectedBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:46:12 (548353302464): 32DisconnectedBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:46:12 (548412051392): send "remove"
+GMT-2026:05:23-12:46:12 (548353302464): send "remove"
+GMT-2026:05:23-12:46:12 (548344909760): send "remove"
+GMT-2026:05:23-12:46:12 (548412051392): sended "remove" result status : OK
+GMT-2026:05:23-12:46:12 (548412051392): 32DisconnectedBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:46:12 (548353302464): sended "remove" result status : OK
+GMT-2026:05:23-12:46:12 (548353302464): 32DisconnectedBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:46:12 (548344909760): sended "remove" result status : OK
+GMT-2026:05:23-12:46:12 (548344909760): 32DisconnectedBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:46:18 (548336517056): 18SupportDeviceEvent catched by 13DeviceStorage
+GMT-2026:05:23-12:46:18 (548336517056): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:46:18 (548336517056): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:46:18 (548336517056): send "add"
+GMT-2026:05:23-12:46:18 (548336517056): sended "add" result status : OK
+GMT-2026:05:23-12:46:18 (548336517056): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:46:21 (548403658688): 18SupportDeviceEvent catched by 13DeviceStorage
+GMT-2026:05:23-12:46:21 (548395265984): FOUND: 48:5C:2C:2F:5A:A2
+GMT-2026:05:23-12:46:21 (548395265984): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:46:21 (548395265984): send "add"
+GMT-2026:05:23-12:46:21 (548395265984): sended "add" result status : OK
+GMT-2026:05:23-12:46:21 (548395265984): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:46:32 (548386873280): FOUND: 48:5C:2C:2F:5A:A2
+GMT-2026:05:23-12:46:32 (548386873280): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:46:32 (548386873280): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:46:32 (548386873280): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:46:32 (548386873280): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:46:32 (548386873280): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:46:38 (548420444096): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:46:38 (548420444096): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:46:38 (548420444096): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:46:41 (548370087872): FOUND: 48:5C:2C:2F:5A:A2
+GMT-2026:05:23-12:46:41 (548370087872): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:46:41 (548370087872): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:46:53 (548361695168): FOUND: 48:5C:2C:2F:5A:A2
+GMT-2026:05:23-12:46:53 (548361695168): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:46:53 (548361695168): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:46:53 (548412051392): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:46:53 (548412051392): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:46:53 (548412051392): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:46:59 (548353302464): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:46:59 (548353302464): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:46:59 (548353302464): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:47:01 (548344909760): FOUND: 48:5C:2C:2F:5A:A2
+GMT-2026:05:23-12:47:01 (548344909760): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:47:01 (548344909760): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:47:13 (548328124352): FOUND: 48:5C:2C:2F:5A:A2
+GMT-2026:05:23-12:47:13 (548328124352): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:47:13 (548328124352): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:47:13 (548336517056): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:47:13 (548336517056): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:47:13 (548336517056): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:47:20 (548403658688): FOUND: 48:5C:2C:2F:5A:A2
+GMT-2026:05:23-12:47:20 (548403658688): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:47:20 (548403658688): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:47:22 (548395265984): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:47:22 (548395265984): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:47:22 (548395265984): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:47:22 (548386873280): 18SupportDeviceEvent catched by 13DeviceStorage
+GMT-2026:05:23-12:47:22 (548378480576): FOUND: 8C:35:92:47:D2:FF
+GMT-2026:05:23-12:47:22 (548378480576): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:47:22 (548378480576): send "add"
+GMT-2026:05:23-12:47:22 (548378480576): sended "add" result status : OK
+GMT-2026:05:23-12:47:22 (548378480576): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:47:34 (548420444096): FOUND: 8C:35:92:47:D2:FF
+GMT-2026:05:23-12:47:34 (548420444096): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:47:34 (548420444096): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:47:34 (548370087872): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:47:34 (548370087872): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:47:34 (548370087872): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:47:34 (548361695168): FOUND: 48:5C:2C:2F:5A:A2
+GMT-2026:05:23-12:47:34 (548361695168): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:47:34 (548361695168): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:47:41 (548412051392): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:47:41 (548412051392): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:47:41 (548412051392): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:47:41 (548353302464): FOUND: 8C:35:92:47:D2:FF
+GMT-2026:05:23-12:47:41 (548353302464): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:47:41 (548353302464): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:47:54 (548344909760): FOUND: 8C:35:92:47:D2:FF
+GMT-2026:05:23-12:47:54 (548344909760): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:47:54 (548344909760): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:47:54 (548328124352): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:47:54 (548328124352): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:47:54 (548328124352): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:48:01 (548336517056): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:48:01 (548336517056): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:48:01 (548336517056): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:48:15 (548403658688): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:48:15 (548403658688): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:48:15 (548403658688): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:48:15 (548395265984): FOUND: 48:5C:2C:2F:5A:A2
+GMT-2026:05:23-12:48:15 (548395265984): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:48:15 (548395265984): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:48:21 (548386873280): FOUND: 48:5C:2C:2F:5A:A2
+GMT-2026:05:23-12:48:21 (548386873280): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:48:21 (548386873280): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:48:23 (548378480576): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:48:23 (548378480576): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:48:23 (548378480576): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:48:35 (548420444096): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:48:35 (548420444096): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:48:35 (548420444096): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:48:35 (548370087872): FOUND: 48:5C:2C:2F:5A:A2
+GMT-2026:05:23-12:48:35 (548370087872): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:48:35 (548370087872): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:48:42 (548361695168): FOUND: 48:5C:2C:2F:5A:A2
+GMT-2026:05:23-12:48:42 (548361695168): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:48:42 (548361695168): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:48:42 (548412051392): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:48:42 (548412051392): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:48:42 (548412051392): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:48:44 (548353302464): 18SupportDeviceEvent catched by 13DeviceStorage
+GMT-2026:05:23-12:48:44 (548344909760): FOUND: 50:56:BF:8C:8C:56
+GMT-2026:05:23-12:48:44 (548344909760): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:48:44 (548344909760): send "add"
+GMT-2026:05:23-12:48:44 (548344909760): sended "add" result status : OK
+GMT-2026:05:23-12:48:44 (548344909760): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:48:56 (548328124352): FOUND: 50:56:BF:8C:8C:56
+GMT-2026:05:23-12:48:56 (548328124352): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:48:56 (548328124352): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:48:56 (548336517056): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:48:56 (548336517056): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:48:56 (548336517056): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:48:56 (548403658688): FOUND: 48:5C:2C:2F:5A:A2
+GMT-2026:05:23-12:48:56 (548403658688): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:48:56 (548403658688): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:48:56 (548395265984): 32DisconnectedBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:48:56 (548395265984): send "remove"
+GMT-2026:05:23-12:48:56 (548395265984): sended "remove" result status : OK
+GMT-2026:05:23-12:48:56 (548395265984): 32DisconnectedBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:49:03 (548386873280): FOUND: 4C:6B:B8:18:79:BA
+GMT-2026:05:23-12:49:03 (548386873280): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:49:03 (548386873280): 25FoundBluetoothDeviceEvent processed by 9WebClient
+GMT-2026:05:23-12:49:03 (548378480576): FOUND: 48:5C:2C:2F:5A:A2
+GMT-2026:05:23-12:49:03 (548378480576): 25FoundBluetoothDeviceEvent processed by 13DeviceStorage
+GMT-2026:05:23-12:49:03 (548378480576): 25FoundBluetoothDeviceEvent processed by 9WebClient

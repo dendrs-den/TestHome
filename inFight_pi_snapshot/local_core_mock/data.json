@@ -112,21 +112,21 @@
           "device_id": 0,
           "device_type": "terminal",
           "type": "bust",
-          "time": 9023,
+          "time": 372,
           "valid": true
         },
         {
           "device_id": 0,
           "device_type": "terminal",
           "type": "bust",
-          "time": 11968,
+          "time": 540,
           "valid": true
         },
         {
           "device_id": 0,
           "device_type": "terminal",
           "type": "bust",
-          "time": 16454,
+          "time": 678,
           "valid": true
         }
       ],
@@ -135,18 +135,30 @@
           "cross": 0
         },
         {
-          "cross": 25358
+          "cross": 93
         },
         {
-          "cross": 25550
+          "cross": 169
         },
         {
-          "cross": 25779
+          "cross": 817
+        },
+        {
+          "cross": 972
+        },
+        {
+          "cross": 1172
+        },
+        {
+          "cross": 1249
+        },
+        {
+          "cross": 1403
         }
       ],
-      "round_start": 1779481879858,
-      "time_real": 25779,
-      "time_result": 40779,
+      "round_start": 1779492099967,
+      "time_real": 1403,
+      "time_result": 16403,
       "stage_rank": 1,
       "tournament_rank": null
     },
@@ -161,12 +173,64 @@
         "name": "Round 1",
         "battle": false
       },
-      "faults": [],
-      "crossings": [],
-      "round_start": 0,
-      "time_real": null,
-      "time_result": null,
-      "stage_rank": null,
+      "faults": [
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 3292,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 4726,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 6156,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 8533,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "skip",
+          "time": 10986,
+          "valid": true
+        }
+      ],
+      "crossings": [
+        {
+          "cross": 0
+        },
+        {
+          "cross": 12979
+        },
+        {
+          "cross": 13874
+        },
+        {
+          "cross": 25098
+        },
+        {
+          "cross": 25406
+        }
+      ],
+      "round_start": 1779485223481,
+      "time_real": 25406,
+      "time_result": 65406,
+      "stage_rank": 3,
       "tournament_rank": null
     },
     {
@@ -180,12 +244,41 @@
         "name": "Round 1",
         "battle": false
       },
-      "faults": [],
-      "crossings": [],
-      "round_start": 0,
-      "time_real": null,
-      "time_result": null,
-      "stage_rank": null,
+      "faults": [
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 8868,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 14977,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 26673,
+          "valid": true
+        }
+      ],
+      "crossings": [
+        {
+          "cross": 0
+        },
+        {
+          "cross": 35490
+        }
+      ],
+      "round_start": 1779489262609,
+      "time_real": 35490,
+      "time_result": 50490,
+      "stage_rank": 2,
       "tournament_rank": null
     },
     {
@@ -199,12 +292,37 @@
         "name": "Round 2",
         "battle": false
       },
-      "faults": [],
-      "crossings": [],
-      "round_start": 0,
-      "time_real": null,
-      "time_result": null,
-      "stage_rank": null,
+      "faults": [
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 7578,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 10107,
+          "valid": true
+        }
+      ],
+      "crossings": [
+        {
+          "cross": 0
+        },
+        {
+          "cross": 11595
+        },
+        {
+          "cross": 12743
+        }
+      ],
+      "round_start": 1779483381525,
+      "time_real": 12743,
+      "time_result": 22743,
+      "stage_rank": 2,
       "tournament_rank": null
     },
     {
@@ -219,11 +337,21 @@
         "battle": false
       },
       "faults": [],
-      "crossings": [],
-      "round_start": 0,
-      "time_real": null,
-      "time_result": null,
-      "stage_rank": null,
+      "crossings": [
+        {
+          "cross": 0
+        },
+        {
+          "cross": 8312
+        },
+        {
+          "cross": 9830
+        }
+      ],
+      "round_start": 1779484230355,
+      "time_real": 9830,
+      "time_result": 9830,
+      "stage_rank": 1,
       "tournament_rank": null
     },
     {
@@ -237,12 +365,90 @@
         "name": "Round 2",
         "battle": false
       },
-      "faults": [],
-      "crossings": [],
-      "round_start": 0,
-      "time_real": null,
-      "time_result": null,
-      "stage_rank": null,
+      "faults": [
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 617,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 769,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 970,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 1047,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 1109,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 1293,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "skip",
+          "time": 1401,
+          "valid": true
+        }
+      ],
+      "crossings": [
+        {
+          "cross": 0
+        },
+        {
+          "cross": 153
+        },
+        {
+          "cross": 338
+        },
+        {
+          "cross": 523
+        },
+        {
+          "cross": 1555
+        },
+        {
+          "cross": 1663
+        },
+        {
+          "cross": 1801
+        },
+        {
+          "cross": 1909
+        },
+        {
+          "cross": 2109
+        }
+      ],
+      "round_start": 1779491476041,
+      "time_real": 2109,
+      "time_result": 52109,
+      "stage_rank": 3,
       "tournament_rank": null
     },
     {
@@ -256,12 +462,50 @@
         "name": "Round 3",
         "battle": true
       },
-      "faults": [],
-      "crossings": [],
-      "round_start": 0,
-      "time_real": null,
-      "time_result": null,
-      "stage_rank": null,
+      "faults": [
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 5493,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 29613,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 35579,
+          "valid": true
+        }
+      ],
+      "crossings": [
+        {
+          "cross": 0
+        },
+        {
+          "cross": 41684
+        },
+        {
+          "cross": 42923
+        },
+        {
+          "cross": 45415
+        },
+        {
+          "cross": 48682
+        }
+      ],
+      "round_start": 1779482365785,
+      "time_real": 48682,
+      "time_result": 63682,
+      "stage_rank": 2,
       "tournament_rank": null
     },
     {
@@ -276,11 +520,21 @@
         "battle": true
       },
       "faults": [],
-      "crossings": [],
-      "round_start": 0,
-      "time_real": null,
-      "time_result": null,
-      "stage_rank": null,
+      "crossings": [
+        {
+          "cross": 0
+        },
+        {
+          "cross": 3943
+        },
+        {
+          "cross": 7512
+        }
+      ],
+      "round_start": 1779482449072,
+      "time_real": 7512,
+      "time_result": 7512,
+      "stage_rank": 1,
       "tournament_rank": null
     },
     {
@@ -294,12 +548,48 @@
         "name": "Round 4",
         "battle": true
       },
-      "faults": [],
-      "crossings": [],
-      "round_start": 0,
-      "time_real": null,
-      "time_result": null,
-      "stage_rank": null,
+      "faults": [
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 2451,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 4541,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 7326,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 9779,
+          "valid": true
+        }
+      ],
+      "crossings": [
+        {
+          "cross": 0
+        },
+        {
+          "cross": 17650
+        }
+      ],
+      "round_start": 1779484676979,
+      "time_real": 17650,
+      "time_result": 37650,
+      "stage_rank": 2,
       "tournament_rank": null
     },
     {
@@ -313,12 +603,38 @@
         "name": "Round 4",
         "battle": true
       },
-      "faults": [],
-      "crossings": [],
-      "round_start": 0,
-      "time_real": null,
-      "time_result": null,
-      "stage_rank": null,
+      "faults": [
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 3970,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 8035,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 13366,
+          "valid": true
+        }
+      ],
+      "crossings": [
+        {
+          "cross": 0
+        }
+      ],
+      "round_start": 1779484732827,
+      "time_real": 0,
+      "time_result": 15000,
+      "stage_rank": 1,
       "tournament_rank": null
     },
     {
@@ -332,12 +648,66 @@
         "name": "Round 4",
         "battle": true
       },
-      "faults": [],
-      "crossings": [],
-      "round_start": 0,
-      "time_real": null,
-      "time_result": null,
-      "stage_rank": null,
+      "faults": [
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 3507,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 10873,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 37302,
+          "valid": true
+        },
+        {
+          "device_id": 0,
+          "device_type": "terminal",
+          "type": "bust",
+          "time": 40159,
+          "valid": true
+        }
+      ],
+      "crossings": [
+        {
+          "cross": 0
+        },
+        {
+          "cross": 24506
+        },
+        {
+          "cross": 24748
+        },
+        {
+          "cross": 24911
+        },
+        {
+          "cross": 52100
+        },
+        {
+          "cross": 52350
+        },
+        {
+          "cross": 52538
+        },
+        {
+          "cross": 52728
+        }
+      ],
+      "round_start": 1779485136385,
+      "time_real": 52728,
+      "time_result": 72728,
+      "stage_rank": 3,
       "tournament_rank": null
     }
   ],
@@ -346,21 +716,21 @@
       "device_id": 0,
       "device_type": "terminal",
       "type": "bust",
-      "time": 9023,
+      "time": 372,
       "valid": true
     },
     {
       "device_id": 0,
       "device_type": "terminal",
       "type": "bust",
-      "time": 11968,
+      "time": 540,
       "valid": true
     },
     {
       "device_id": 0,
       "device_type": "terminal",
       "type": "bust",
-      "time": 16454,
+      "time": 678,
       "valid": true
     }
   ],
@@ -369,13 +739,25 @@
       "cross": 0
     },
     {
-      "cross": 25358
+      "cross": 93
     },
     {
-      "cross": 25550
+      "cross": 169
     },
     {
-      "cross": 25779
+      "cross": 817
+    },
+    {
+      "cross": 972
+    },
+    {
+      "cross": 1172
+    },
+    {
+      "cross": 1249
+    },
+    {
+      "cross": 1403
     }
   ],
   "devices": {
@@ -496,21 +878,21 @@
               "device_id": 0,
               "device_type": "terminal",
               "type": "bust",
-              "time": 9023,
+              "time": 372,
               "valid": true
             },
             {
               "device_id": 0,
               "device_type": "terminal",
               "type": "bust",
-              "time": 11968,
+              "time": 540,
               "valid": true
             },
             {
               "device_id": 0,
               "device_type": "terminal",
               "type": "bust",
-              "time": 16454,
+              "time": 678,
               "valid": true
             }
           ],
@@ -519,18 +901,30 @@
               "cross": 0
             },
             {
-              "cross": 25358
+              "cross": 93
             },
             {
-              "cross": 25550
+              "cross": 169
             },
             {
-              "cross": 25779
+              "cross": 817
+            },
+            {
+              "cross": 972
+            },
+            {
+              "cross": 1172
+            },
+            {
+              "cross": 1249
+            },
+            {
+              "cross": 1403
             }
           ],
-          "round_start": 1779481879858,
-          "time_real": 25779,
-          "time_result": 40779,
+          "round_start": 1779492099967,
+          "time_real": 1403,
+          "time_result": 16403,
           "stage_rank": 1,
           "tournament_rank": null
         },
@@ -545,12 +939,64 @@
             "name": "Round 1",
             "battle": false
           },
-          "faults": [],
-          "crossings": [],
-          "round_start": 0,
-          "time_real": null,
-          "time_result": null,
-          "stage_rank": null,
+          "faults": [
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 3292,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 4726,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 6156,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 8533,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "skip",
+              "time": 10986,
+              "valid": true
+            }
+          ],
+          "crossings": [
+            {
+              "cross": 0
+            },
+            {
+              "cross": 12979
+            },
+            {
+              "cross": 13874
+            },
+            {
+              "cross": 25098
+            },
+            {
+              "cross": 25406
+            }
+          ],
+          "round_start": 1779485223481,
+          "time_real": 25406,
+          "time_result": 65406,
+          "stage_rank": 3,
           "tournament_rank": null
         },
         {
@@ -564,12 +1010,41 @@
             "name": "Round 1",
             "battle": false
           },
-          "faults": [],
-          "crossings": [],
-          "round_start": 0,
-          "time_real": null,
-          "time_result": null,
-          "stage_rank": null,
+          "faults": [
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 8868,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 14977,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 26673,
+              "valid": true
+            }
+          ],
+          "crossings": [
+            {
+              "cross": 0
+            },
+            {
+              "cross": 35490
+            }
+          ],
+          "round_start": 1779489262609,
+          "time_real": 35490,
+          "time_result": 50490,
+          "stage_rank": 2,
           "tournament_rank": null
         },
         {
@@ -583,12 +1058,37 @@
             "name": "Round 2",
             "battle": false
           },
-          "faults": [],
-          "crossings": [],
-          "round_start": 0,
-          "time_real": null,
-          "time_result": null,
-          "stage_rank": null,
+          "faults": [
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 7578,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 10107,
+              "valid": true
+            }
+          ],
+          "crossings": [
+            {
+              "cross": 0
+            },
+            {
+              "cross": 11595
+            },
+            {
+              "cross": 12743
+            }
+          ],
+          "round_start": 1779483381525,
+          "time_real": 12743,
+          "time_result": 22743,
+          "stage_rank": 2,
           "tournament_rank": null
         },
         {
@@ -603,11 +1103,21 @@
             "battle": false
           },
           "faults": [],
-          "crossings": [],
-          "round_start": 0,
-          "time_real": null,
-          "time_result": null,
-          "stage_rank": null,
+          "crossings": [
+            {
+              "cross": 0
+            },
+            {
+              "cross": 8312
+            },
+            {
+              "cross": 9830
+            }
+          ],
+          "round_start": 1779484230355,
+          "time_real": 9830,
+          "time_result": 9830,
+          "stage_rank": 1,
           "tournament_rank": null
         },
         {
@@ -621,12 +1131,90 @@
             "name": "Round 2",
             "battle": false
           },
-          "faults": [],
-          "crossings": [],
-          "round_start": 0,
-          "time_real": null,
-          "time_result": null,
-          "stage_rank": null,
+          "faults": [
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 617,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 769,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 970,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 1047,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 1109,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 1293,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "skip",
+              "time": 1401,
+              "valid": true
+            }
+          ],
+          "crossings": [
+            {
+              "cross": 0
+            },
+            {
+              "cross": 153
+            },
+            {
+              "cross": 338
+            },
+            {
+              "cross": 523
+            },
+            {
+              "cross": 1555
+            },
+            {
+              "cross": 1663
+            },
+            {
+              "cross": 1801
+            },
+            {
+              "cross": 1909
+            },
+            {
+              "cross": 2109
+            }
+          ],
+          "round_start": 1779491476041,
+          "time_real": 2109,
+          "time_result": 52109,
+          "stage_rank": 3,
           "tournament_rank": null
         },
         {
@@ -640,12 +1228,50 @@
             "name": "Round 3",
             "battle": true
           },
-          "faults": [],
-          "crossings": [],
-          "round_start": 0,
-          "time_real": null,
-          "time_result": null,
-          "stage_rank": null,
+          "faults": [
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 5493,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 29613,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 35579,
+              "valid": true
+            }
+          ],
+          "crossings": [
+            {
+              "cross": 0
+            },
+            {
+              "cross": 41684
+            },
+            {
+              "cross": 42923
+            },
+            {
+              "cross": 45415
+            },
+            {
+              "cross": 48682
+            }
+          ],
+          "round_start": 1779482365785,
+          "time_real": 48682,
+          "time_result": 63682,
+          "stage_rank": 2,
           "tournament_rank": null
         },
         {
@@ -660,11 +1286,21 @@
             "battle": true
           },
           "faults": [],
-          "crossings": [],
-          "round_start": 0,
-          "time_real": null,
-          "time_result": null,
-          "stage_rank": null,
+          "crossings": [
+            {
+              "cross": 0
+            },
+            {
+              "cross": 3943
+            },
+            {
+              "cross": 7512
+            }
+          ],
+          "round_start": 1779482449072,
+          "time_real": 7512,
+          "time_result": 7512,
+          "stage_rank": 1,
           "tournament_rank": null
         },
         {
@@ -678,12 +1314,48 @@
             "name": "Round 4",
             "battle": true
           },
-          "faults": [],
-          "crossings": [],
-          "round_start": 0,
-          "time_real": null,
-          "time_result": null,
-          "stage_rank": null,
+          "faults": [
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 2451,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 4541,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 7326,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 9779,
+              "valid": true
+            }
+          ],
+          "crossings": [
+            {
+              "cross": 0
+            },
+            {
+              "cross": 17650
+            }
+          ],
+          "round_start": 1779484676979,
+          "time_real": 17650,
+          "time_result": 37650,
+          "stage_rank": 2,
           "tournament_rank": null
         },
         {
@@ -697,12 +1369,38 @@
             "name": "Round 4",
             "battle": true
           },
-          "faults": [],
-          "crossings": [],
-          "round_start": 0,
-          "time_real": null,
-          "time_result": null,
-          "stage_rank": null,
+          "faults": [
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 3970,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 8035,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 13366,
+              "valid": true
+            }
+          ],
+          "crossings": [
+            {
+              "cross": 0
+            }
+          ],
+          "round_start": 1779484732827,
+          "time_real": 0,
+          "time_result": 15000,
+          "stage_rank": 1,
           "tournament_rank": null
         },
         {
@@ -716,12 +1414,66 @@
             "name": "Round 4",
             "battle": true
           },
-          "faults": [],
-          "crossings": [],
-          "round_start": 0,
-          "time_real": null,
-          "time_result": null,
-          "stage_rank": null,
+          "faults": [
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 3507,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 10873,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 37302,
+              "valid": true
+            },
+            {
+              "device_id": 0,
+              "device_type": "terminal",
+              "type": "bust",
+              "time": 40159,
+              "valid": true
+            }
+          ],
+          "crossings": [
+            {
+              "cross": 0
+            },
+            {
+              "cross": 24506
+            },
+            {
+              "cross": 24748
+            },
+            {
+              "cross": 24911
+            },
+            {
+              "cross": 52100
+            },
+            {
+              "cross": 52350
+            },
+            {
+              "cross": 52538
+            },
+            {
+              "cross": 52728
+            }
+          ],
+          "round_start": 1779485136385,
+          "time_real": 52728,
+          "time_result": 72728,
+          "stage_rank": 3,
           "tournament_rank": null
         }
       ]

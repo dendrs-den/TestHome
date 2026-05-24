@@ -1,0 +1,5 @@
+artifact: inflight_runtime_export.tar.gz
+source_pi: 192.168.0.177 (old working)
+created_at: 2026-05-23
+sha256: 5859B187645502C54C496B690D039F4699616E460C54D533D60F16215BCF238D
+notes: Includes /opt/inflight runtime, systemd units, udev/modules and boot configs from old stable Pi.

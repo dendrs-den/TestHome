@@ -1,0 +1,6 @@
+
+> server@1.0.0 start
+> node server.js
+
+webserver address: http://localhost:3301 
+core api address:  http://127.0.0.1:15010 

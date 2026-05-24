@@ -1,0 +1,17 @@
+[Unit]
+Description=inFlight Core service
+After=mongod.service
+Requires=mongod.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/inflight/core/cmd/app
+#ExectStartPre=/opt/go/swag init -g /opt/inflight/core/server/echoServer/echoServer.go
+ExecStart=/opt/inflight/core/cmd/app/main
+#Restart=always # or always, on-abort, etc
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

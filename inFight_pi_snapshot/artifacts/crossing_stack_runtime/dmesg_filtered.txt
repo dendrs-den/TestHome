@@ -1,0 +1,61 @@
+[    0.073678] Serial: AMBA PL011 UART driver
+[    0.171644] usbcore: registered new interface driver usbfs
+[    0.171712] usbcore: registered new interface driver hub
+[    0.171787] usbcore: registered new device driver usb
+[    0.280673] RPC: Registered named UNIX socket transport module.
+[    0.280706] RPC: Registered udp transport module.
+[    0.280727] RPC: Registered tcp transport module.
+[    0.280746] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    0.282969] hw perfevents: enabled with armv8_cortex_a72 PMU driver, 7 counters available
+[    1.197664] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    1.197690] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    1.199065] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 247)
+[    1.292919] gpiomem-bcm2835 fe200000.gpiomem: Initialised: Registers at 0xfe200000
+[    1.304473] brd: module loaded
+[    1.314017] loop: module loaded
+[    1.379525] usbcore: registered new interface driver r8152
+[    1.379605] usbcore: registered new interface driver lan78xx
+[    1.379670] usbcore: registered new interface driver smsc95xx
+[    1.434605] Module dwc_common_port init
+[    1.435131] usbcore: registered new interface driver uas
+[    1.435240] usbcore: registered new interface driver usb-storage
+[    1.440880] sdhci: Secure Digital Host Controller Interface driver
+[    1.441558] sdhci-pltfm: SDHCI platform and OF driver helper
+[    1.445731] hid: raw HID events driver (C) Jiri Kosina
+[    1.445893] usbcore: registered new interface driver usbhid
+[    1.445918] usbhid: USB HID core driver
+[    1.478699] bcm2835-power bcm2835-power: Broadcom BCM2835 power domains driver
+[    2.950376] systemd[1]: Condition check resulted in Kernel Module supporting RPCSEC_GSS being skipped.
+[    2.975452] systemd[1]: Starting Load Kernel Module configfs...
+[    2.982181] systemd[1]: Starting Load Kernel Module drm...
+[    2.990014] systemd[1]: Starting Load Kernel Module fuse...
+[    3.031886] systemd[1]: Starting Load Kernel Modules...
+[    3.090328] systemd[1]: Finished Load Kernel Module configfs.
+[    3.094634] crossing_detector: loading out-of-tree module taints kernel.
+[    3.095129] systemd[1]: Finished Load Kernel Module drm.
+[    3.095403] crossing_detector: initializing on pin 17...
+[    3.099824] systemd[1]: Finished Load Kernel Module fuse.
+[    3.151367] systemd[1]: Finished Load Kernel Modules.
+[    4.550508] vc_sm_cma: module is from the staging directory, the quality is unknown, you have been warned.
+[    4.566204] snd_bcm2835: module is from the staging directory, the quality is unknown, you have been warned.
+[    4.571129] bcm2835_vc_sm_cma_probe: Videocore shared memory driver
+[    4.638013] bcm2835_mmal_vchiq: module is from the staging directory, the quality is unknown, you have been warned.
+[    4.640398] bcm2835_mmal_vchiq: module is from the staging directory, the quality is unknown, you have been warned.
+[    4.655848] bcm2835_v4l2: module is from the staging directory, the quality is unknown, you have been warned.
+[    4.657020] bcm2835_isp: module is from the staging directory, the quality is unknown, you have been warned.
+[    4.750779] bcm2835_codec: module is from the staging directory, the quality is unknown, you have been warned.
+[    5.625677] usbcore: registered new interface driver brcmfmac
+[    6.932964] Adding 102396k swap on /var/swap.  Priority:-2 extents:2 across:110588k SSFS
+[   13.595401] Bluetooth: Core ver 2.22
+[   13.595540] NET: Registered PF_BLUETOOTH protocol family
+[   13.595551] Bluetooth: HCI device and connection manager initialized
+[   13.595575] Bluetooth: HCI socket layer initialized
+[   13.595589] Bluetooth: L2CAP socket layer initialized
+[   13.595613] Bluetooth: SCO socket layer initialized
+[   13.605103] Bluetooth: HCI UART driver ver 2.3
+[   13.605135] Bluetooth: HCI UART protocol H4 registered
+[   13.605229] Bluetooth: HCI UART protocol Three-wire (H5) registered
+[   13.605512] Bluetooth: HCI UART protocol Broadcom registered
+[   13.929778] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[   13.929797] Bluetooth: BNEP filters: protocol multicast
+[   13.929809] Bluetooth: BNEP socket layer initialized

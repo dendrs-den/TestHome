@@ -178,24 +178,8 @@ const TournamentsRounds = (props) => {
         [null, undefined].includes(row.time_real) === false ||
         [null, undefined].includes(row.time_result) === false;
       if (hasResults) return;
-      const stageRows = rowData
-        .map((item, i) => ({ ...item, roundsArrId: i }))
-        .filter((item) => item?.stage?.id === row.stageId);
       const visible = battleVisibleSlots[row.stageId] || MIN_BATTLE_SLOTS;
       if (visible <= MIN_BATTLE_SLOTS) return;
-
-      const rowPos = stageRows.findIndex((r) => r.roundsArrId === row.roundsArrId);
-      const lastVisiblePos = visible - 1;
-      if (rowPos < 0 || rowPos >= visible) return;
-
-      // Move selected row to the end of visible segment, then hide that segment tail.
-      for (let i = rowPos; i < lastVisiblePos; i += 1) {
-        const from = stageRows[i]?.roundsArrId;
-        const to = stageRows[i + 1]?.roundsArrId;
-        if ([from, to].every((v) => Number.isInteger(v))) {
-          await swapTeamPositions(from, to);
-        }
-      }
 
       setBattleVisibleSlots((prev) => ({
         ...prev,
@@ -266,8 +250,9 @@ const TournamentsRounds = (props) => {
       sortable: false,
       type: "actions",
       headerName: "actions",
-      maxWidth: 340,
-      flex: 3,
+      minWidth: 420,
+      maxWidth: 460,
+      flex: 4.2,
       cellClassName: "actions",
       renderCell: ({ row }) => {
         const { roundsArrId } = row;
@@ -286,7 +271,7 @@ const TournamentsRounds = (props) => {
             >
               <Box>
                 <IconButton
-                  disabled={row.index === row.totalCount - 1}
+                  disabled={row.stage?.battle || row.index === row.totalCount - 1}
                   onClick={async () => {
                     let newRowData = [...rowData];
 
@@ -310,7 +295,7 @@ const TournamentsRounds = (props) => {
                   <ArrowDropDownIcon />
                 </IconButton>
                 <IconButton
-                  disabled={row.index === 0}
+                  disabled={row.stage?.battle || row.index === 0}
                   onClick={async () => {
                     let newRowData = [...rowData];
 
@@ -382,6 +367,7 @@ const TournamentsRounds = (props) => {
           row.stageId === selectedRow.stageId &&
           row.stage.battle &&
           (battleVisibleSlots[row.stageId] || MIN_BATTLE_SLOTS) > MIN_BATTLE_SLOTS &&
+          row.index === (battleVisibleSlots[row.stageId] || MIN_BATTLE_SLOTS) - 1 &&
           !hasResults && (
             <GridActionsCellItem
               icon={
@@ -414,6 +400,18 @@ const TournamentsRounds = (props) => {
             label: `${team.name}`,
           })),
           renderCell: (params) => {
+            const hasResults =
+              (Array.isArray(params.row?.crossings) && params.row.crossings.length > 0) ||
+              (Array.isArray(params.row?.faults) && params.row.faults.length > 0) ||
+              [null, undefined].includes(params.row?.time_real) === false ||
+              [null, undefined].includes(params.row?.time_result) === false;
+            if (!params.row?.name && hasResults) {
+              return (
+                <Box sx={{ color: "#b26a00", fontWeight: 500 }}>
+                  select athlete
+                </Box>
+              );
+            }
             return (
               (params.row.name?.length === 30 && <CircularProgress />) ||
               params.row.name
@@ -545,16 +543,6 @@ const TournamentsRounds = (props) => {
                   )}
                   {battle === true && (
                     <>
-                    <Box
-                      sx={{
-                        color: "#6d6d6d",
-                        fontSize: "12px",
-                        px: 2,
-                        pb: 1,
-                      }}
-                    >
-                      Battle stage: minimum 2 slots. Delete is available only for rows without results.
-                    </Box>
                     <BaseDataGrid
                       sx={{
                         height: "320px",

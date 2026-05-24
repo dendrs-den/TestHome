@@ -1,0 +1,73 @@
+﻿version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: vp_postgres
+    environment:
+      POSTGRES_DB: video_portal
+      POSTGRES_USER: vp_user
+      POSTGRES_PASSWORD: vp_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vp_user -d video_portal"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: vp_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./api
+    container_name: vp_api
+    environment:
+      DATABASE_URL: postgresql://vp_user:vp_pass@postgres:5432/video_portal
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./worker
+    container_name: vp_worker
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  ingest:
+    build:
+      context: ./ingest
+    container_name: vp_ingest
+    environment:
+      HLS_ROOT: /data/hls
+    ports:
+      - "8010:8010"
+    volumes:
+      - hls_data:/data/hls
+
+volumes:
+  postgres_data:
+  redis_data:
+  hls_data:

@@ -4,7 +4,7 @@ const axios = require("axios").default;
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "./.env") });
 
-const API_URL = process.env.CORE_API_URL || "http://127.0.0.1:15000";
+const API_URL = (process.env.CORE_API_URL || "http://127.0.0.1:15000").trim();
 
 // GET STAGE BY ID
 router.get("/getbyid/:id", (req, res) => {
@@ -113,3 +113,4 @@ router.post("/update", (req, res) => {
 });
 
 module.exports = router;
+

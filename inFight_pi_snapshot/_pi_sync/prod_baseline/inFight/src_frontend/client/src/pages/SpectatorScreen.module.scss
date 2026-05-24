@@ -1,0 +1,339 @@
+.background * {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+}
+
+.background {
+  color: #000;
+}
+
+.background.background--Preparation,
+.background.background--Expectation,
+.background.background--Performance,
+.background.background--Completion {
+  background: #000;
+  color: #FFFFFF;
+}
+
+.background--Administration {
+  background-color: #000;
+}
+
+.container {
+  margin: auto;
+  max-width: 2300px;
+  height: 100%;
+}
+
+.logo img {
+  position: relative;
+  transform: translateX(5px);
+  max-width: 150px;
+  height: auto;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+.upper-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.upper-row h3,
+.prepare_status {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 57px;
+}
+
+.main-info-block {
+  margin-top: 125px;
+}
+
+.team-name {
+  margin-bottom: 100px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 96px;
+  line-height: 112px;
+}
+
+.timer-score-row {
+  display: flex;
+  justify-content: space-between;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 80px;
+}
+
+.score {
+  gap: 10px;
+  position: relative;
+}
+
+.fault-score-digital {
+  display: flex;
+  gap: 60px;
+}
+
+.fault-score-circle {
+  position: absolute;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  font-size: 24px;
+  width: 100%;
+  top: 100px;
+  left: 0;
+  height: 50px;
+}
+
+.bust-circle {
+  content: "";
+  height: 24px;
+  width: 24px;
+  background-color: #ff5454;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.result-timer {
+  display: inline-block;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 152px;
+  line-height: 204px;
+}
+
+.previous-battle-result {
+  position: absolute;
+  right: 78px;
+  bottom: 42px;
+  width: min(640px, 38vw);
+  z-index: 1;
+}
+
+@media (max-width: 1650px) {
+  .result-timer {
+    font-size: 120px;
+    line-height: normal;
+  }
+}
+
+@media (max-width: 1470px) {
+  .team-name {
+    font-size: 70px;
+  }
+}
+@media (max-width: 1370px) {
+  .upper-row {
+    gap: 15px;
+  }
+
+  .upper-row h3.tournament-name {
+    text-align: end;
+  }
+  .score {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .timer-score-row,
+  .score {
+    font-size: 55px;
+  }
+
+  .result-timer {
+    font-size: 90px;
+  }
+
+  .main-info-block {
+    margin-top: 150px;
+  }
+}
+@media (max-width: 1240px) {
+  .fault .fault-score-digital {
+    flex-direction: column;
+    line-height: 100%;
+    font-size: 36px;
+    gap: 10px;
+  }
+
+  .fault .fault-score-digital div {
+    text-align: end;
+  }
+
+  .fault-score-circle {
+    justify-self: flex-end;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .background {
+    padding: 40px;
+  }
+  .upper-row h3,
+  .prepare_status {
+    font-size: 40px;
+  }
+  .upper-row h3.tournament-name {
+    text-align: right;
+    max-width: 450px;
+  }
+  .stage-disc-name {
+    display: flex;
+    flex-direction: column;
+  }
+  .divider {
+    display: none;
+  }
+  .main-info-block {
+    margin-top: 20px;
+  }
+  .team-name {
+    font-size: 50px;
+    margin: 40px 0 60px 0;
+    line-height: 100%;
+  }
+  .timer-score-row,
+  .score {
+    font-size: 40px;
+    line-height: 100%;
+  }
+
+  .score {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .fault-score-digital {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .fault-score-circle {
+    top: 110px;
+  }
+
+  .fault-score-circle {
+    justify-self: flex-end;
+    flex-flow: row-reverse;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .bust-circle {
+    height: 18px;
+    width: 18px;
+  }
+
+  .result-timer {
+    font-size: 70px;
+  }
+
+  .previous-battle-result {
+    right: 40px;
+    bottom: 32px;
+    width: min(500px, 44vw);
+  }
+}
+
+@media (max-width: 700px) {
+  .background {
+    padding: 20px 20px;
+  }
+  .logo {
+    display: flex;
+    justify-content: flex-start;
+  }
+  .logo img {
+    max-width: 70px;
+  }
+  .upper-row,
+  .prepare_status {
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 0;
+    text-align: center;
+  }
+
+  .upper-row h3,
+  .prepare_status {
+    font-size: 36px;
+    margin-top: 20px;
+  }
+  .upper-row h3.tournament-name {
+    text-align: center;
+    margin-top: 0;
+  }
+
+  .main-info-block {
+    margin-top: 40px;
+  }
+  .team-name {
+    font-size: 40px;
+    margin: 40px 0 60px 0;
+    line-height: 100%;
+    text-align: center;
+  }
+  .timer-score-row,
+  .score {
+    font-size: 30px;
+  }
+  .timer-score-row {
+    flex-direction: column-reverse;
+    justify-content: space-between;
+  }
+  .score {
+    display: flex;
+    justify-content: space-between;
+    line-height: 100%;
+    flex-direction: row;
+  }
+  .fault-score-digital {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .fault-score-circle {
+    width: 200px;
+    justify-self: flex-end;
+    flex-flow: row-reverse;
+    flex-wrap: wrap;
+    gap: 12px;
+    top: 0;
+    position: relative;
+  }
+  .bust-circle {
+    height: 12px;
+    width: 12px;
+  }
+
+  .stopWatch__container {
+    margin-top: 40px;
+    padding: 0;
+    line-height: 100%;
+  }
+
+  .result-timer {
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 50px;
+  }
+
+  .previous-battle-result {
+    position: static;
+    width: 100%;
+    margin-top: 12px;
+  }
+}

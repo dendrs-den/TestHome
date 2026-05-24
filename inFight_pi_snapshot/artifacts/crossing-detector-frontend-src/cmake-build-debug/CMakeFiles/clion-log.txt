@@ -1,0 +1,31 @@
+/home/mdnghtboy/Downloads/clion-2021.1.3/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/mdnghtboy/Work/mf-inflight/crossing-detector-frontend
+-- The C compiler identification is GNU 12.2.0
+-- The CXX compiler identification is GNU 12.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found Jsoncpp: /usr/include/jsoncpp  
+-- jsoncpp verson:1.9.5
+-- Found OpenSSL: /home/linuxbrew/.linuxbrew/Cellar/openssl@3/3.1.1_1/lib/libcrypto.so (found version "3.1.1")  
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Found UUID: /usr/lib/x86_64-linux-gnu/libuuid.so
+-- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.2.11") 
+-- Found Brotli: /usr/lib/x86_64-linux-gnu/libbrotlidec.so  
+-- Looking for C++ include filesystem
+-- Looking for C++ include filesystem - found
+-- Performing Test CXX_FILESYSTEM_NO_LINK_NEEDED
+-- Performing Test CXX_FILESYSTEM_NO_LINK_NEEDED - Success
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/mdnghtboy/Work/mf-inflight/crossing-detector-frontend/cmake-build-debug

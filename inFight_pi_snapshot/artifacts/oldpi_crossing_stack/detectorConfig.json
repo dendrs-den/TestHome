@@ -1,0 +1,8 @@
+{
+    "relePin": 27,
+    "signalHigh": false,
+    "ignorSmallCrossTime": 2000,
+    "smallCrossTime": 30,
+    "sendAddress": [ "http://127.0.0.1:15000/" ],
+    "longCrossTime": 5000
+}

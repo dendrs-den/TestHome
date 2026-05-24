@@ -1,0 +1,34 @@
+.submitDeletion__window{
+  width: 320px;
+  height: 200px;
+  padding:30px;
+  background-color: #FFF;
+  color: #000;
+  background: #FCFCFC;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+  border-radius: 28px;
+}
+.submitDeletion__header{
+  font-size: 24px;
+  line-height: 28,44px;
+  font-weight: 400;
+  margin: 0;
+}
+
+.submitDeletion__text{
+  margin: 20px 0;
+  font-size: 14px;
+  line-height: 16,59px;
+}
+
+.submitDeletion_btnRow{
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.submitDeletion_btnRow > button{
+  text-transform: capitalize;
+  font-weight: 400;
+  font-size: 18px;
+}

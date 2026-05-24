@@ -1,0 +1,30 @@
+.faults_table .MuiDataGrid-row {
+  cursor: pointer;
+}
+
+.faults_table .super-app-theme--device-type {
+  text-transform: capitalize;
+}
+
+.faults_table .MuiDataGrid-row.Mui-selected {
+  background-color: rgb(236, 227, 255);
+  font-weight: 600;
+}
+
+.faults_table .MuiDataGrid-row.Mui-selected:hover {
+  background-color: rgb(236, 227, 255);
+}
+
+.faults_table .MuiDataGrid-columnSeparator:nth-last-child(1) {
+  display: none;
+}
+
+.faults_table .super-app-theme--true {
+  background-color: #ffd1d1 !important;
+}
+
+@media (max-width: 600px) {
+  .faults_table {
+    height: 350px;
+  }
+}

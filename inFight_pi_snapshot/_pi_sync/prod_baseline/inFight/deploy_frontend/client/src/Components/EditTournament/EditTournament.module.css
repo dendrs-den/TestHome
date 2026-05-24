@@ -1,0 +1,13 @@
+.editTournament_Block {
+  width: 100%;
+  max-width: 1110px;
+  margin: auto;
+  padding: 10px;
+}
+
+.newTournament__header {
+  font-size: 36px;
+  line-height: 43px;
+  font-weight: 600px;
+  margin: 0 0 30px 0;
+}

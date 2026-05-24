@@ -5,7 +5,8 @@ import getHistory from "../../../Api_requests/getHistory";
 import formatTime from "../../../utils/formatTime";
 import trimString from "../../../utils/trimString";
 import BaseDataGrid from "../../UI/BaseDataGrid/BaseDataGrid";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 const columns = [
   {
@@ -100,6 +101,7 @@ const CustomNoRowsOverlay = () => {
 
 const HistoryBlock = () => {
   const [renderedData, setRenderedData] = useState([]);
+  const [rawHistoryData, setRawHistoryData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchDataHandler = useCallback(async () => {
@@ -107,6 +109,7 @@ const HistoryBlock = () => {
     try {
       const data = await getHistory();
       console.log("HISTORY: ", data);
+      setRawHistoryData(Array.isArray(data) ? data : []);
       setRenderedData(
         data.map((row, i) => ({
           ...row,
@@ -130,8 +133,82 @@ const HistoryBlock = () => {
     fetchDataHandler();
   }, [fetchDataHandler]);
 
+  const exportHistoryToExcel = () => {
+    const rows = Array.isArray(rawHistoryData) ? rawHistoryData : [];
+    if (!rows.length) return;
+
+    const formatExportTime = (value) =>
+      formatTime(value || 0).fullTime().replace(".", ",");
+
+    const columnsForExport = [
+      ["#", "Tournament", "Team", "Discipline", "Stage", "Battle", "Bust value", "Skip value", "Bust count", "Skip count", "Result time", "Actual time"],
+      ...rows.map((row, index) => {
+        const bustCount = Array.isArray(row?.faults)
+          ? row.faults.filter((fault) => fault?.type === "bust" && fault?.valid !== false).length
+          : Number(row?.bust_count || 0);
+        const skipCount = Array.isArray(row?.faults)
+          ? row.faults.filter((fault) => fault?.type === "skip" && fault?.valid !== false).length
+          : Number(row?.skip_count || 0);
+
+        return [
+          index + 1,
+          row?.tournament || "",
+          row?.team || "",
+          row?.discipline || "",
+          row?.stage || "",
+          row?.is_battle ? "Yes" : "No",
+          row?.bust_price ?? "",
+          row?.skip_price ?? "",
+          bustCount,
+          skipCount,
+          formatExportTime(row?.result_time),
+          formatExportTime(row?.actual_time),
+        ];
+      }),
+    ];
+
+    const csvContent = columnsForExport
+      .map((line) =>
+        line
+          .map((value) => `"${String(value ?? "").replace(/"/g, '""')}"`)
+          .join(";")
+      )
+      .join("\n");
+
+    const BOM = "\uFEFF";
+    const blob = new Blob([BOM + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const downloadLink = document.createElement("a");
+    const now = new Date();
+    const stamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(
+      now.getDate()
+    ).padStart(2, "0")}_${String(now.getHours()).padStart(2, "0")}-${String(now.getMinutes()).padStart(
+      2,
+      "0"
+    )}`;
+
+    downloadLink.href = url;
+    downloadLink.download = `history_export_${stamp}.csv`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <Box className="history__container">
+      <Box className="history__toolbar">
+        <Button
+          variant="outlined"
+          startIcon={<FileDownloadIcon />}
+          onClick={exportHistoryToExcel}
+          disabled={isLoading || !rawHistoryData.length}
+        >
+          Export to Excel
+        </Button>
+      </Box>
       <BaseDataGrid
         loading={isLoading}
         className="history__table"

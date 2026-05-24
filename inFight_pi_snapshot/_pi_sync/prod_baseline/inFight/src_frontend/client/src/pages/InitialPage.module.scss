@@ -1,0 +1,221 @@
+:root {
+  --header-height: 80px;
+  --color-main: #ffffff;
+  --color-primary: #191d2b;
+  --navigation-width: 300px;
+  --navigation-width_thin: 200px;
+  --main-content-width: calc(100% - var(--navigation-width));
+  --main-content-width-thinner: calc(100% - var(--navigation-width_thin));
+  --main-content-width-full: 100%;
+}
+.container {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+}
+.logo {
+  height: var(--header-height);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  height: var(--header-height);
+  border-bottom: 1px solid #d3d3d3;
+}
+
+.logo img {
+  max-width: 100%;
+  height: auto;
+}
+
+.logo .header_text {
+  align-self: center;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 21px;
+  color: #5c5c5c;
+}
+
+.dynamic_content {
+  padding: 20px 0 30px 0;
+  min-width: 1000px;
+  max-width: 100%;
+  margin: auto;
+}
+
+.rightSideWrapper {
+  width: var(--main-content-width);
+  background-color: var(--color-main);
+  height: 100%;
+  float: right;
+}
+
+/* When round controls or training panel are shown remove navigation
+and spread width to full */
+.rightSideWrapper.refereePanel,
+.rightSideWrapper.trainingRefereePanel {
+  width: var(--main-content-width-full);
+}
+
+header.refereePanel,
+header.trainingRefereePanel {
+  width: 100%;
+}
+
+.navigation {
+  z-index: 100;
+  position: fixed;
+  width: var(--navigation-width);
+  background-color: #fff;
+  min-height: 100%;
+  border-right: 1px solid #d3d3d3;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  z-index: 2;
+  position: fixed;
+  display: flex;
+  width: var(--main-content-width);
+  height: var(--header-height);
+  border-bottom: 1px solid #d3d3d3;
+  border-right: none;
+  background-color: var(--color-main);
+}
+
+.main {
+  margin-top: var(--header-height);
+}
+
+.content_header {
+  width: 1100px;
+  margin: auto;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 28px;
+  color: #5c5c5c;
+}
+
+.header.NewTournamentBlock .content_header {
+  padding: 0 10px;
+}
+
+h2.History {
+  width: 1500px;
+}
+
+.bluetoothBlock {
+  z-index: 100;
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  margin-left: 0;
+}
+
+.drawer {
+  z-index: 10;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 10px;
+  height: 10px;
+  display: none;
+}
+
+@media (max-width: 1500px) {
+  .dynamic_content {
+    min-width: 100%;
+  }
+
+  .main {
+    width: 100%;
+  }
+
+  header.tournamentsList h2 {
+    max-width: 1000px;
+    padding: 0 20px;
+  }
+
+  header.refereePanel h2 {
+    padding: 0;
+  }
+}
+
+@media (max-width: 1400px) {
+  .header.NewTournamentBlock .content_header {
+    margin: 0 20px;
+  }
+}
+
+@media (max-width: 1250px) {
+  .navigation {
+    width: var(--navigation-width_thin);
+  }
+
+  .rightSideWrapper,
+  .header {
+    width: var(--main-content-width-thinner);
+  }
+
+  .logo {
+    justify-content: start;
+  }
+
+  .logo img {
+    padding: 0 25px;
+  }
+
+  .logo .header_text {
+    display: none;
+    white-space: pre;
+  }
+
+  header.tournamentsList h2 {
+    max-width: 980px;
+    margin: 20px;
+  }
+
+  header.refereePanel h2 {
+    margin: 0 75px;
+  }
+}
+
+@media (max-width: 900px) {
+  .navigation {
+    display: none;
+  }
+
+  .rightSideWrapper,
+  .header {
+    width: var(--main-content-width-full);
+  }
+
+  .content_header.History {
+    padding-left: 40px;
+  }
+
+  .drawer {
+    display: block;
+  }
+
+  .bluetoothBlock > button {
+    display: none;
+  }
+}
+
+@media (max-width: 681px) {
+  .header.refereePanel {
+    display: none;
+  }
+
+  .header.refereePanel + main {
+    margin: 0;
+  }
+
+  .header.refereePanel h2 {
+    text-align: center;
+    display: none;
+  }
+}

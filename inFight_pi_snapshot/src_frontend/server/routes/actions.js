@@ -1,11 +1,11 @@
-﻿const express = require("express");
+const express = require("express");
 const router = express.Router();
 const axios = require("axios").default;
 const SocketServer = require("../models/SocketServer");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "./.env") });
 
-const API_URL = process.env.CORE_API_URL || "http://127.0.0.1:15000";
+const API_URL = (process.env.CORE_API_URL || "http://127.0.0.1:15000").trim();
 const SERVICE_MODE_ENABLED = process.env.SERVICE_MODE === "1";
 
 // In local service mode we keep round telemetry in-memory so UI can work
@@ -923,3 +923,4 @@ router.post("/service/stop", async (req, res) => {
 });
 
 module.exports = router;
+

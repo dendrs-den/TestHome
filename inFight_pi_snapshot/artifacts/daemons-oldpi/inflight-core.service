@@ -1,0 +1,16 @@
+[Unit]
+Description=inFlight Core service
+After=mongod.service
+Requires=mongod.service
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/inFlight/core
+ExecStart=/home/pi/inFlight/core/jsCore
+#Restart=always # or always, on-abort, etc
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

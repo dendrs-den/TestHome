@@ -1,0 +1,21 @@
+﻿== inFlight verify clean Pi ==
+date: 2026-05-23T23:26:07+03:00
+host: inflight
+[OK] inflight-core active
+[OK] inflight-core enabled
+[OK] inflight-server active
+[OK] inflight-server enabled
+[OK] inflight-crossfront active
+[OK] inflight-crossfront enabled
+[OK] /dev/crossing_detector exists
+[OK] crossing_detector module loaded
+[OK] storageBackend=sqlite
+[OK] sqlitePath present
+[OK] sqlite db file exists
+[OK] core listens on :15000 (sqlite check via config)
+[OK] crossfront reader initialized
+[OK] API /tournaments/getall = 200
+== summary ==
+PASS: 14
+FAIL: 0
+Result: PASS

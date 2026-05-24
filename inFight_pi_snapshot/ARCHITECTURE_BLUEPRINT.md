@@ -135,6 +135,10 @@ Response:
 - Integration: command -> event -> read model -> stream.
 - Replay tests: known problematic logs (`bust spam`, stop jitter, race cases).
 - Soak tests on Pi with simulator for multi-hour runs.
+- Production Pi regression:
+  - `run_tests_prod_pi.sh --mode safe` for non-invasive health checks.
+  - `run_tests_prod_pi.sh --mode full` for end-to-end sensor workflow.
+  - Acceptance gate by iteration success rate (`--min-pass-rate`), instead of strict "all iterations must pass", to tolerate rare physical miss events while keeping deterministic threshold.
 
 ## 11. Incremental Migration Plan
 

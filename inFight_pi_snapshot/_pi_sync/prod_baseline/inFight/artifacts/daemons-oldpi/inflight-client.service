@@ -1,0 +1,16 @@
+[Unit]
+Description=inFlight Client service
+After=inflight-server.service
+Requires=inflight-server.service
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/inFlight/frontend/client
+ExecStart=/usr/bin/npm start --prefix /home/pi/inFlight/frontend/client
+#Restart=always # or always, on-abort, etc
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

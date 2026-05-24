@@ -4,7 +4,7 @@ const axios = require("axios").default;
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "./.env") });
 
-const API_URL = process.env.CORE_API_URL || "http://127.0.0.1:15000";
+const API_URL = (process.env.CORE_API_URL || "http://127.0.0.1:15000").trim();
 
 router.post("/start", (req, res) => {
   try {
@@ -89,3 +89,4 @@ router.post("/loop", (req, res) => {
 });
 
 module.exports = router;
+
