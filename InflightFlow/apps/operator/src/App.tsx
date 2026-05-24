@@ -191,7 +191,8 @@ export default function App() {
           <p>state: <b>{domain?.RoundState ?? "-"}</b></p>
           <p>tournament: <b>{domain?.TournamentID || "-"}</b></p>
           <p>round: <b>{domain?.RoundID || "-"}</b></p>
-          <p>crossings/result: <b>{domain?.Crossings ?? 0} / {domain?.RoundResultMs ?? 0} ms</b></p>
+          <p>crossings: <b>{domain?.Crossings ?? 0}</b></p>
+          <p>result: <b>{domain?.RoundResultMs ?? 0} ms</b></p>
         </div>
       </div>
 
