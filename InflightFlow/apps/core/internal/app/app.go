@@ -92,6 +92,32 @@ func Run() error {
 		}
 		return sensor.EvaluateHealth(time.Now().UTC(), snap, sensorHealthPolicy, cfg.HardwareMode, cfg.SensorSource)
 	}
+	realtime := newRealtimeHub()
+	buildRealtimePayload := func() realtimePayload {
+		healthStatus := computeHealth()
+		return realtimePayload{
+			Core:      health.Response{Status: "ok", Service: "inflightflow-core", HardwareMode: hardware},
+			Domain:    domainRuntime.State(),
+			Sensor:    map[string]any{"enabled": sensorWatchdog != nil, "health": healthStatus},
+			Readiness: map[string]any{"canStartRound": healthStatus.Level != sensor.HealthCritical, "health": healthStatus},
+			Preflight: preflightMgr.Status(),
+			ServerAt:  time.Now().UTC().Format(time.RFC3339Nano),
+		}
+	}
+	go func() {
+		t := time.NewTicker(120 * time.Millisecond)
+		defer t.Stop()
+		last := ""
+		for range t.C {
+			payload := buildRealtimePayload()
+			raw, _ := json.Marshal(payload)
+			if string(raw) == last {
+				continue
+			}
+			last = string(raw)
+			realtime.Broadcast(payload)
+		}
+	}()
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(w, http.StatusOK, health.Response{
 			Status:       "ok",
@@ -104,6 +130,9 @@ func Run() error {
 	mux.HandleFunc("/v1/control/ping", passwordGate(func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"message": "control channel alive"})
 	}))
+	mux.HandleFunc("/v1/realtime/ws", func(w http.ResponseWriter, r *http.Request) {
+		realtime.HandleWS(w, r)
+	})
 	mux.HandleFunc("/v1/domain/state", passwordGate(func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(w, http.StatusOK, domainRuntime.State())
 	}))

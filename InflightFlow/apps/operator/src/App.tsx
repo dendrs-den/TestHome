@@ -1,10 +1,17 @@
-﻿import { useMemo, useState } from "react";
+﻿import { useMemo } from "react";
 import { useOperatorState } from "./hooks/useOperatorState";
 
+function statusClass(level?: string) {
+  if (level === "OK") return "ok";
+  if (level === "WARNING") return "warn";
+  if (level === "CRITICAL") return "bad";
+  return "neutral";
+}
+
 export default function App() {
-  const [baseUrl, setBaseUrl] = useState("http://192.168.0.177:18080");
-  const [tournamentId, setTournamentId] = useState("event-main");
-  const [roundId, setRoundId] = useState(`round-${new Date().toISOString().slice(11, 19).replace(/:/g, "")}`);
+  const baseUrl = "http://192.168.0.177:18080";
+  const tournamentId = "event-main";
+  const roundId = "round-201621";
 
   const trimmedBase = useMemo(() => baseUrl.replace(/\/+$/, ""), [baseUrl]);
   const {
@@ -12,97 +19,95 @@ export default function App() {
     domain,
     sensor,
     readiness,
-    preflight,
     busy,
-    refreshing,
     error,
-    lastOkAt,
-    refresh,
-    runPreflight,
     bootstrap,
     sendCommand,
     prepareRound,
   } = useOperatorState(trimmedBase);
 
+  const state = domain?.RoundState ?? "idle";
+  const crossings = domain?.Crossings ?? 0;
+
+  const isStage1 = state === "idle" || state === "completed" || state === "cancelled";
+  const isStage2 = state === "prepared";
+  const isStage3 = state === "running" && crossings > 0;
+
+  const canActivate = isStage1;
+  const canStop = isStage2 || isStage3;
+  const canBustSkip = isStage3;
+  const canExit = isStage1;
+
   return (
-    <main style={{ fontFamily: "Segoe UI, sans-serif", padding: 20, maxWidth: 960 }}>
-      <h1>InflightFlow Operator</h1>
+    <main className="operator-root">
+      <div className="control-shell">
+        <header className="topbar">
+          <div className="brand">FlowCUP</div>
+        </header>
 
-      <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <input
-          value={baseUrl}
-          onChange={(e) => setBaseUrl(e.target.value)}
-          style={{ flex: 1, padding: 8 }}
-          placeholder="http://192.168.0.177:18080"
-        />
-        <button onClick={refresh}>Обновить</button>
-        <button disabled={busy} onClick={runPreflight}>Preflight</button>
-      </div>
+        <section className="content">
+          <div className="left-panel card">
+            <h2>Referee Panel</h2>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
-        <div style={{ border: "1px solid #ddd", padding: 10 }}>
-          <h3>Готовность</h3>
-          <p>canStartRound: <b>{String(readiness?.canStartRound ?? false)}</b></p>
-          <p>health: <b>{readiness?.health.level ?? "-"}</b></p>
-          <p>action: <b>{readiness?.health.action ?? "-"}</b></p>
-          <p>last refresh: {lastOkAt || "-"} {refreshing ? "(обновление...)" : ""}</p>
-        </div>
-        <div style={{ border: "1px solid #ddd", padding: 10 }}>
-          <h3>Раунд</h3>
-          <p>state: <b>{domain?.RoundState ?? "-"}</b></p>
-          <p>tournament: <b>{domain?.TournamentID || "-"}</b></p>
-          <p>round: <b>{domain?.RoundID || "-"}</b></p>
-          <p>crossings: <b>{domain?.Crossings ?? 0}</b></p>
-          <p>result: <b>{domain?.RoundResultMs ?? 0} ms</b></p>
-        </div>
-      </div>
+            <div className="grid-row">
+              <span>Stage:</span>
+              <b>{domain?.RoundState ?? "-"}</b>
+            </div>
+            <div className="grid-row">
+              <span>Team:</span>
+              <b>{domain?.TournamentID || tournamentId}</b>
+            </div>
+            <div className="grid-row">
+              <span>Round:</span>
+              <b>{domain?.RoundID || roundId}</b>
+            </div>
+            <div className="grid-row">
+              <span>Result:</span>
+              <b>{domain?.RoundResultMs ?? 0} ms</b>
+            </div>
+          </div>
 
-      <div style={{ border: "1px solid #ddd", padding: 10, marginBottom: 12 }}>
-        <h3>Управление раундом</h3>
-        <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-          <input value={tournamentId} onChange={(e) => setTournamentId(e.target.value)} style={{ flex: 1, padding: 8 }} placeholder="tournamentId" />
-          <input value={roundId} onChange={(e) => setRoundId(e.target.value)} style={{ flex: 1, padding: 8 }} placeholder="roundId" />
-          <button disabled={busy} onClick={() => bootstrap(tournamentId, roundId)}>Bootstrap</button>
-        </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button disabled={busy} onClick={() => prepareRound(roundId)}>Prepare</button>
+          <div className="right-panel">
+            <button className="next-round" disabled={busy} onClick={() => bootstrap(tournamentId, roundId)}>
+              NEXT ROUND
+            </button>
+          </div>
+        </section>
+
+        <section className="actions card">
+          <button className="btn-primary" disabled={busy || !canActivate} onClick={() => prepareRound(roundId)}>ACTIVATE</button>
           <button
-            disabled={busy || domain?.RoundState !== "running"}
-            onClick={() => sendCommand("finish_round")}
+            className={isStage2 || isStage3 ? "btn-danger-outline" : "btn-secondary"}
+            disabled={busy || !canStop}
+            onClick={() => sendCommand(isStage2 ? "cancel_round" : "finish_round")}
           >
-            Finish
+            STOP
           </button>
-          <button
-            disabled={busy || (domain?.RoundState !== "running" && domain?.RoundState !== "prepared")}
-            onClick={() => sendCommand("cancel_round")}
-          >
-            Cancel
+          <button className={isStage3 ? "btn-danger-solid" : "btn-muted"} disabled={busy || !canBustSkip} onClick={() => sendCommand("cancel_round")}>BUST</button>
+          <button className={isStage3 ? "btn-danger-solid" : "btn-muted"} disabled={busy || !canBustSkip} onClick={() => sendCommand("cancel_round")}>SKIP</button>
+        </section>
+
+        <section className="footer-actions">
+          <button className="btn-danger" disabled={busy || !canExit} onClick={() => sendCommand("cancel_round")}>EXIT</button>
+          <button className="btn-muted" disabled>EDIT RESULTS</button>
+        </section>
+      </div>
+
+      <section className="health card">
+        <div className="health-left">
+          <div className={`badge ${statusClass(readiness?.health.level)}`}>health: {readiness?.health.level ?? "-"}</div>
+          <div>action: {readiness?.health.action ?? "-"}</div>
+          <div>sensor: {sensor?.enabled ? "enabled" : "disabled"}</div>
+          <div>core: {core?.status ?? "-"} / {core?.service ?? "-"}</div>
+          {error ? <div className="error">Ошибка: {error}</div> : null}
+        </div>
+        <div className="health-right">
+          <button className="pill health-pill" disabled>
+            SENSOR CROSS: {domain?.Crossings ?? 0}
           </button>
         </div>
-        <p style={{ color: "#555", marginTop: 8 }}>
-          Старт вручную не требуется: после <b>Prepare</b> раунд запускается автоматически по первому пересечению датчика.
-        </p>
-      </div>
-
-      <div style={{ border: "1px solid #ddd", padding: 10 }}>
-        <h3>Preflight</h3>
-        <p>overall: <b>{preflight?.overall ?? "pending"}</b></p>
-        <ul>
-          {(preflight?.steps ?? []).map((s) => (
-            <li key={s.name}>
-              [{s.pass ? "OK" : "FAIL"}] {s.name}: {s.message}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {error && <p style={{ color: "#b00020", marginTop: 12 }}>Ошибка: {error}</p>}
-      <p style={{ color: "#555", marginTop: 12 }}>
-        Core: {core?.service ?? "-"} ({core?.hardwareMode ?? "-"}), status={core?.status ?? "-"}
-      </p>
-      <p style={{ color: "#555" }}>
-        Sensor reasons: {(sensor?.health.reasons ?? []).join("; ") || "-"}
-      </p>
+      </section>
     </main>
   );
 }
+

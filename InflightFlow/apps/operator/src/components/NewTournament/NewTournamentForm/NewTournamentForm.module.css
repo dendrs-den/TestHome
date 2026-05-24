@@ -1,0 +1,117 @@
+.customForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.settings__header {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 43px;
+  margin-bottom: 20px;
+}
+
+.settings__options {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  border: 1px solid #eaeaea;
+  border-radius: 5px;
+  margin-bottom: 30px;
+  padding: 35px 15px;
+  gap: 40px;
+}
+.faultsBlock {
+  display: flex;
+  gap: 40px;
+}
+
+.settings__options > * {
+  position: relative;
+}
+
+.option_hint {
+  position: absolute;
+  bottom: -30px;
+}
+
+.settings .option {
+  width: 100%;
+}
+
+.tourInput {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 280px;
+}
+.skipInput,
+.bustInput {
+  width: 130px;
+}
+.table-parameters {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  justify-content: space-between;
+}
+
+.table-parameters > * {
+  flex: 1;
+}
+
+.table-parameters h4 {
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.buttonRow > button {
+  width: 110px;
+}
+
+.buttonRow > button:nth-of-type(1) {
+  margin-right: 15px;
+}
+
+@media (max-width: 1000px) {
+  .settings .settings__options {
+    gap: 20px;
+  }
+
+  .settings .settings__options .tourInput .option {
+    width: 100%;
+  }
+
+  .table-parameters {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 680px) {
+  .settings__header,
+  .table-parameter__header {
+    font-size: 20px;
+    line-height: 100%;
+  }
+}
+
+@media (max-width: 630px) {
+  .faultsBlock {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .skipInput,
+  .bustInput {
+    flex: 2;
+    width: auto;
+  }
+}

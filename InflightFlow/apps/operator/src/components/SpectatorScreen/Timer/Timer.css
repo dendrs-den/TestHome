@@ -1,0 +1,38 @@
+.timer {
+  box-sizing: border-box;
+  position: relative;
+  width: 400px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.digits {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  /* font-size: 72px; */
+  font-size: 152px;
+}
+
+@media (max-width: 1620px) {
+  .digits {
+    font-size: 120px;
+  }
+}
+
+@media (max-width: 1620px) {
+  .digits {
+    font-size: 100px;
+  }
+}
+
+@media (max-width: 912px) {
+  .digits {
+    font-size: 70px;
+  }
+}
+
+@media (max-width: 414px) {
+  .digits {
+    font-size: 40px;
+  }
+}

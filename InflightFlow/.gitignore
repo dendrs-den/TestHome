@@ -13,3 +13,4 @@ bin/
 
 # Tauri
 apps/operator/src-tauri/target/
+apps/spectator/src-tauri/target/

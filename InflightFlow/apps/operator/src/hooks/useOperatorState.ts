@@ -1,5 +1,6 @@
 ﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { createOperatorApi } from "../lib/api";
+import { toWebSocketUrl, type RealtimeMessage } from "../lib/realtime";
 import type { CoreHealth, DomainState, PreflightStatus, ReadinessPayload, SensorHealthPayload } from "../lib/types";
 
 function tsKey(prefix: string) {
@@ -95,10 +96,59 @@ export function useOperatorState(baseUrl: string) {
   }
 
   useEffect(() => {
-    refresh();
-    const t = setInterval(refresh, 1500);
-    return () => clearInterval(t);
-  }, [api]);
+    let stopped = false;
+    let ws: WebSocket | null = null;
+    let reconnectTimer: number | null = null;
+    const scheduleReconnect = () => {
+      if (stopped || reconnectTimer != null) return;
+      reconnectTimer = window.setTimeout(() => {
+        reconnectTimer = null;
+        connect();
+      }, 1000);
+    };
+
+    const connect = () => {
+      try {
+        ws = new WebSocket(toWebSocketUrl(baseUrl));
+      } catch {
+        scheduleReconnect();
+        return;
+      }
+
+      ws.onopen = () => {
+        setError("");
+      };
+      ws.onmessage = (evt) => {
+        try {
+          const msg = JSON.parse(String(evt.data)) as RealtimeMessage;
+          setCore(msg.core);
+          setDomain(msg.domain);
+          setSensor(msg.sensor);
+          setReadiness(msg.readiness);
+          setPreflight(msg.preflight);
+          setLastOkAt(new Date().toLocaleTimeString());
+          setError("");
+        } catch {
+          // Ignore malformed payload and wait the next frame.
+        }
+      };
+      ws.onerror = () => {
+        setError("realtime unavailable");
+      };
+      ws.onclose = () => {
+        setError("realtime disconnected");
+        scheduleReconnect();
+      };
+    };
+
+    connect();
+
+    return () => {
+      stopped = true;
+      if (reconnectTimer != null) window.clearTimeout(reconnectTimer);
+      if (ws && ws.readyState === WebSocket.OPEN) ws.close();
+    };
+  }, [api, baseUrl]);
 
   return {
     core,
