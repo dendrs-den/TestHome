@@ -85,7 +85,10 @@ func EvaluateHealth(now time.Time, watchdog GPIOWatchdogSnapshot, policy HealthP
 		}
 	}
 
-	if watchdog.LastError != "" && st.Level == HealthOK {
+	if watchdog.LastError != "" &&
+		st.Level == HealthOK &&
+		!watchdog.LastStartAt.IsZero() &&
+		now.Sub(watchdog.LastStartAt) <= policy.RecentRestartWindow {
 		st.Level = HealthWarning
 		st.Action = ActionRestartSensor
 		st.Reasons = append(st.Reasons, "last reader error is present")
