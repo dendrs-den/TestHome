@@ -134,3 +134,51 @@ func TestRuntime_BootstrapIdempotent(t *testing.T) {
 		t.Fatalf("expected 3 persisted events, got %d", len(replayed))
 	}
 }
+
+func TestRuntime_IdempotencyPersistsAfterRestart(t *testing.T) {
+	dir := t.TempDir()
+	jpath := filepath.Join(dir, "journal.log")
+	if err := journal.EnsurePath(jpath); err != nil {
+		t.Fatalf("ensure path: %v", err)
+	}
+
+	rt1 := NewRuntime(jpath)
+	_, err := rt1.Handle(commands.Command{
+		Type: commands.CmdCreateTournament,
+		Data: map[string]any{"tournamentId": "t-idem"},
+	})
+	if err != nil {
+		t.Fatalf("create tournament: %v", err)
+	}
+	key := "prepare-key-1"
+	_, err = rt1.Handle(commands.Command{
+		Type:           commands.CmdPrepareRound,
+		Data:           map[string]any{"roundId": "r-idem"},
+		IdempotencyKey: key,
+	})
+	if err != nil {
+		t.Fatalf("prepare first: %v", err)
+	}
+
+	rt2 := NewRuntime(jpath)
+	if err := rt2.Restore(); err != nil {
+		t.Fatalf("restore: %v", err)
+	}
+	_, err = rt2.Handle(commands.Command{
+		Type:           commands.CmdPrepareRound,
+		Data:           map[string]any{"roundId": "r-idem"},
+		IdempotencyKey: key,
+	})
+	if err != nil {
+		t.Fatalf("prepare duplicate after restart should not fail: %v", err)
+	}
+
+	replayed, err := journal.Replay(jpath)
+	if err != nil {
+		t.Fatalf("replay: %v", err)
+	}
+	// create + prepare once
+	if len(replayed) != 2 {
+		t.Fatalf("expected 2 persisted domain events, got %d", len(replayed))
+	}
+}
