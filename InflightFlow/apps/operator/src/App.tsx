@@ -66,10 +66,22 @@ export default function App() {
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <button disabled={busy} onClick={() => prepareRound(roundId)}>Prepare</button>
-          <button disabled={busy} onClick={() => sendCommand("start_round")}>Start</button>
-          <button disabled={busy} onClick={() => sendCommand("finish_round")}>Finish</button>
-          <button disabled={busy} onClick={() => sendCommand("cancel_round")}>Cancel</button>
+          <button
+            disabled={busy || domain?.RoundState !== "running"}
+            onClick={() => sendCommand("finish_round")}
+          >
+            Finish
+          </button>
+          <button
+            disabled={busy || (domain?.RoundState !== "running" && domain?.RoundState !== "prepared")}
+            onClick={() => sendCommand("cancel_round")}
+          >
+            Cancel
+          </button>
         </div>
+        <p style={{ color: "#555", marginTop: 8 }}>
+          Старт вручную не требуется: после <b>Prepare</b> раунд запускается автоматически по первому пересечению датчика.
+        </p>
       </div>
 
       <div style={{ border: "1px solid #ddd", padding: 10 }}>
