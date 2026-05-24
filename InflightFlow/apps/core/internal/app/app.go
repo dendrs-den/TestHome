@@ -17,6 +17,7 @@ import (
 	"inflightflow/apps/core/internal/hardware/real"
 	"inflightflow/apps/core/internal/health"
 	"inflightflow/apps/core/internal/journal"
+	"inflightflow/apps/core/internal/preflight"
 	"inflightflow/apps/core/internal/sensor"
 )
 
@@ -37,6 +38,7 @@ func Run() error {
 		RefractoryWindow: cfg.SensorRefractory,
 	}, cfg.SensorHistoryLimit)
 	sensorHealthPolicy := sensor.DefaultHealthPolicy()
+	preflightMgr := preflight.NewManager()
 	var sensorWatchdog *sensor.GPIOWatchdog
 	if cfg.HardwareMode == real.Name() && cfg.SensorSource == "gpio" {
 		if cfg.SensorPowerEnabled {
@@ -73,6 +75,13 @@ func Run() error {
 	}()
 
 	mux := http.NewServeMux()
+	computeHealth := func() sensor.HealthStatus {
+		snap := sensor.GPIOWatchdogSnapshot{}
+		if sensorWatchdog != nil {
+			snap = sensorWatchdog.Snapshot()
+		}
+		return sensor.EvaluateHealth(time.Now().UTC(), snap, sensorHealthPolicy, cfg.HardwareMode, cfg.SensorSource)
+	}
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(w, http.StatusOK, health.Response{
 			Status:       "ok",
@@ -106,8 +115,8 @@ func Run() error {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 			return
 		}
-		if commands.Type(body.Type) == commands.CmdStartRound && sensorWatchdog != nil {
-			health := sensor.EvaluateHealth(time.Now().UTC(), sensorWatchdog.Snapshot(), sensorHealthPolicy, cfg.HardwareMode, cfg.SensorSource)
+		if commands.Type(body.Type) == commands.CmdStartRound {
+			health := computeHealth()
 			if health.Level == sensor.HealthCritical {
 				writeJSON(w, http.StatusConflict, map[string]any{
 					"error":        "sensor_health_critical",
@@ -206,52 +215,65 @@ func Run() error {
 		})
 	}))
 	mux.HandleFunc("/v1/instructor/sensor-health", passwordGate(func(w http.ResponseWriter, _ *http.Request) {
-		if sensorWatchdog == nil {
-			writeJSON(w, http.StatusOK, map[string]any{
-				"enabled": false,
-				"health": sensor.EvaluateHealth(
-					time.Now().UTC(),
-					sensor.GPIOWatchdogSnapshot{},
-					sensorHealthPolicy,
-					cfg.HardwareMode,
-					cfg.SensorSource,
-				),
-			})
-			return
-		}
 		writeJSON(w, http.StatusOK, map[string]any{
-			"enabled": true,
-			"health": sensor.EvaluateHealth(
-				time.Now().UTC(),
-				sensorWatchdog.Snapshot(),
-				sensorHealthPolicy,
-				cfg.HardwareMode,
-				cfg.SensorSource,
-			),
+			"enabled": sensorWatchdog != nil,
+			"health":  computeHealth(),
 		})
 	}))
 	mux.HandleFunc("/v1/instructor/readiness", passwordGate(func(w http.ResponseWriter, _ *http.Request) {
-		health := sensor.EvaluateHealth(
-			time.Now().UTC(),
-			sensor.GPIOWatchdogSnapshot{},
-			sensorHealthPolicy,
-			cfg.HardwareMode,
-			cfg.SensorSource,
-		)
-		if sensorWatchdog != nil {
-			health = sensor.EvaluateHealth(
-				time.Now().UTC(),
-				sensorWatchdog.Snapshot(),
-				sensorHealthPolicy,
-				cfg.HardwareMode,
-				cfg.SensorSource,
-			)
-		}
+		health := computeHealth()
 		canStartRound := health.Level != sensor.HealthCritical
 		writeJSON(w, http.StatusOK, map[string]any{
 			"canStartRound": canStartRound,
 			"health":        health,
 		})
+	}))
+	mux.HandleFunc("/v1/instructor/preflight/run", passwordGate(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		err := preflightMgr.Start(func() []preflight.StepResult {
+			health := computeHealth()
+			canStartRound := health.Level != sensor.HealthCritical
+			steps := []preflight.StepResult{
+				{Name: "core_health", Pass: true, Message: "core service reachable"},
+				{Name: "sensor_health_endpoint", Pass: true, Message: "sensor health evaluated"},
+				{
+					Name:    "start_readiness_guard",
+					Pass:    !(health.Level == sensor.HealthCritical && canStartRound),
+					Message: "critical health must block start_round",
+				},
+				{
+					Name:    "start_readiness",
+					Pass:    canStartRound,
+					Message: "ready to start round",
+				},
+			}
+			if !canStartRound {
+				steps[3].Message = "cannot start round until sensor health recovers"
+			}
+			return steps
+		})
+		if err != nil {
+			if err == preflight.ErrAlreadyRunning {
+				writeJSON(w, http.StatusConflict, map[string]string{"error": "preflight_already_running"})
+				return
+			}
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "preflight_start_failed"})
+			return
+		}
+		writeJSON(w, http.StatusAccepted, map[string]any{
+			"message": "preflight_started",
+			"status":  preflightMgr.Status(),
+		})
+	}))
+	mux.HandleFunc("/v1/instructor/preflight/status", passwordGate(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		writeJSON(w, http.StatusOK, preflightMgr.Status())
 	}))
 	mux.HandleFunc("/debug/sensor/sample", passwordGate(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

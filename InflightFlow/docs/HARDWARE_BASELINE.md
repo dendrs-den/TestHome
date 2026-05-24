@@ -66,6 +66,15 @@ curl http://<pi-ip>:18080/v1/instructor/readiness
 - `canStartRound` (`true/false`)
 - `health` (тот же payload, что `/v1/instructor/sensor-health`)
 
+Preflight-проверка готовности с судейской консоли:
+```bash
+curl -X POST http://<pi-ip>:18080/v1/instructor/preflight/run
+curl http://<pi-ip>:18080/v1/instructor/preflight/status
+```
+Поведение:
+- `run` запускает асинхронную проверку и защищен от параллельного запуска
+- `status` возвращает `running`, `overall` (`pending|pass|fail`) и список шагов
+
 ## Модель интеграции core
 - Hardware adapters находятся в `apps/core`
 - Режимы runtime:
