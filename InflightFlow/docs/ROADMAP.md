@@ -61,3 +61,16 @@
 Готово, когда:
 - Система проходит живую симуляцию и recovery-drill
 - Команда может провести соревновательный день по документации
+
+## Чеклист перед commit/push
+- Проверить большие файлы:
+  - `Get-ChildItem -Recurse -File | Where-Object { $_.Length -gt 100MB }`
+- Убедиться, что build-артефакты не в индексе:
+  - `git ls-files | rg "src-tauri/target|node_modules|dist|build"`
+- Если артефакты попали в staged, убрать из индекса:
+  - `git rm -r --cached InflightFlow/apps/operator/src-tauri/target InflightFlow/apps/spectator/src-tauri/target`
+- Проверить статус перед коммитом:
+  - `git status --short`
+- Локальная проверка перед push:
+  - `git log --oneline -n 5`
+  - `git push --dry-run`
