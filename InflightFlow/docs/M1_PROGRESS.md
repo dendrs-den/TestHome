@@ -30,3 +30,5 @@
 2. Add command validation schema (strict payload validation)
 3. Extend state model with round timing/result fields
 4. Add startup bootstrap command flow (create tournament + prepare/start round) profile
+
+- Validated full finish flow on Pi: unning -> completed and repeat finish rejection.
