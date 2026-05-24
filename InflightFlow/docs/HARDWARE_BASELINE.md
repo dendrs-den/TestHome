@@ -58,6 +58,14 @@ Instructor quick procedure:
 - `WARNING + CHECK_WIRING`: inspect sensor power/signal/GND, verify `GPIO27` power line.
 - `CRITICAL + HOLD_START`: do not start new round until health returns to `OK` or accepted `WARNING`.
 
+Readiness endpoint for instructor UI:
+```bash
+curl http://<pi-ip>:18080/v1/instructor/readiness
+```
+Returns:
+- `canStartRound` (`true/false`)
+- `health` (same payload as `/v1/instructor/sensor-health`)
+
 ## Core integration model
 - Hardware adapters are part of `apps/core`
 - Runtime modes:

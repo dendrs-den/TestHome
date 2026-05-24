@@ -230,6 +230,29 @@ func Run() error {
 			),
 		})
 	}))
+	mux.HandleFunc("/v1/instructor/readiness", passwordGate(func(w http.ResponseWriter, _ *http.Request) {
+		health := sensor.EvaluateHealth(
+			time.Now().UTC(),
+			sensor.GPIOWatchdogSnapshot{},
+			sensorHealthPolicy,
+			cfg.HardwareMode,
+			cfg.SensorSource,
+		)
+		if sensorWatchdog != nil {
+			health = sensor.EvaluateHealth(
+				time.Now().UTC(),
+				sensorWatchdog.Snapshot(),
+				sensorHealthPolicy,
+				cfg.HardwareMode,
+				cfg.SensorSource,
+			)
+		}
+		canStartRound := health.Level != sensor.HealthCritical
+		writeJSON(w, http.StatusOK, map[string]any{
+			"canStartRound": canStartRound,
+			"health":        health,
+		})
+	}))
 	mux.HandleFunc("/debug/sensor/sample", passwordGate(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
