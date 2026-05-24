@@ -40,6 +40,14 @@ Expected fields:
 - `lastError`: last reader error text
 - `lastEventAt`: timestamp of last GPIO edge seen by reader
 
+Instructor panel health endpoint:
+```bash
+curl http://<pi-ip>:18080/v1/instructor/sensor-health
+```
+Behavior:
+- returns `OK | WARNING | CRITICAL` with reasons
+- when health is `CRITICAL`, `start_round` is blocked by core with `sensor_health_critical`
+
 ## Core integration model
 - Hardware adapters are part of `apps/core`
 - Runtime modes:

@@ -36,6 +36,7 @@ func Run() error {
 		DebounceWindow:   cfg.SensorDebounce,
 		RefractoryWindow: cfg.SensorRefractory,
 	}, cfg.SensorHistoryLimit)
+	sensorHealthPolicy := sensor.DefaultHealthPolicy()
 	var sensorWatchdog *sensor.GPIOWatchdog
 	if cfg.HardwareMode == real.Name() && cfg.SensorSource == "gpio" {
 		if cfg.SensorPowerEnabled {
@@ -104,6 +105,16 @@ func Run() error {
 		if err := validateCommandPayload(body.Type, body.Data); err != nil {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 			return
+		}
+		if commands.Type(body.Type) == commands.CmdStartRound && sensorWatchdog != nil {
+			health := sensor.EvaluateHealth(time.Now().UTC(), sensorWatchdog.Snapshot(), sensorHealthPolicy, cfg.HardwareMode, cfg.SensorSource)
+			if health.Level == sensor.HealthCritical {
+				writeJSON(w, http.StatusConflict, map[string]any{
+					"error":        "sensor_health_critical",
+					"sensorHealth": health,
+				})
+				return
+			}
 		}
 		evs, err := domainRuntime.Handle(commands.Command{
 			Type:           commands.Type(body.Type),
@@ -192,6 +203,31 @@ func Run() error {
 		writeJSON(w, http.StatusOK, map[string]any{
 			"enabled":  true,
 			"watchdog": sensorWatchdog.Snapshot(),
+		})
+	}))
+	mux.HandleFunc("/v1/instructor/sensor-health", passwordGate(func(w http.ResponseWriter, _ *http.Request) {
+		if sensorWatchdog == nil {
+			writeJSON(w, http.StatusOK, map[string]any{
+				"enabled": false,
+				"health": sensor.EvaluateHealth(
+					time.Now().UTC(),
+					sensor.GPIOWatchdogSnapshot{},
+					sensorHealthPolicy,
+					cfg.HardwareMode,
+					cfg.SensorSource,
+				),
+			})
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{
+			"enabled": true,
+			"health": sensor.EvaluateHealth(
+				time.Now().UTC(),
+				sensorWatchdog.Snapshot(),
+				sensorHealthPolicy,
+				cfg.HardwareMode,
+				cfg.SensorSource,
+			),
 		})
 	}))
 	mux.HandleFunc("/debug/sensor/sample", passwordGate(func(w http.ResponseWriter, r *http.Request) {
