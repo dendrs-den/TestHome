@@ -1,26 +1,26 @@
 {
-  "$schema": "https://schema.tauri.app/config/2",
-  "productName": "InflightFlow Operator",
-  "version": "0.1.0",
-  "identifier": "com.inflightflow.operator",
-  "build": {
-    "beforeDevCommand": "npm run dev -- --host 127.0.0.1 --port 5188 --strictPort",
-    "beforeBuildCommand": "npm run build",
-    "devUrl": "http://127.0.0.1:5188",
-    "frontendDist": "../dist"
-  },
-  "app": {
-    "windows": [
-      {
-        "title": "InflightFlow Operator",
-        "width": 1280,
-        "height": 800,
-        "resizable": true
-      }
-    ]
-  },
-  "bundle": {
-    "active": true,
-    "targets": "all"
-  }
+    "$schema":  "https://schema.tauri.app/config/2",
+    "productName":  "InflightFlow Operator",
+    "version":  "0.1.0",
+    "identifier":  "com.inflightflow.operator",
+    "build":  {
+                  "beforeDevCommand":  "npm run dev:tauri",
+                  "beforeBuildCommand":  "npm run build",
+                  "devUrl":  "http://127.0.0.1:5188",
+                  "frontendDist":  "../dist"
+              },
+    "app":  {
+                "windows":  [
+                                {
+                                    "title":  "InflightFlow Operator",
+                                    "width":  1280,
+                                    "height":  800,
+                                    "resizable":  true
+                                }
+                            ]
+            },
+    "bundle":  {
+                   "active":  true,
+                   "targets":  "all"
+               }
 }
