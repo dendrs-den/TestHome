@@ -118,6 +118,38 @@ func Run() error {
 			"events": evs,
 		})
 	}))
+	mux.HandleFunc("/v1/domain/bootstrap", passwordGate(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		var body struct {
+			TournamentID string `json:"tournamentId"`
+			RoundID      string `json:"roundId"`
+			KeyPrefix    string `json:"keyPrefix"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_json"})
+			return
+		}
+		if body.TournamentID == "" || body.RoundID == "" {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "tournamentId and roundId are required"})
+			return
+		}
+		if body.KeyPrefix == "" {
+			body.KeyPrefix = fmt.Sprintf("bootstrap:%s:%s", body.TournamentID, body.RoundID)
+		}
+
+		state, events, err := domainRuntime.Bootstrap(body.TournamentID, body.RoundID, body.KeyPrefix)
+		if err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{
+			"state":  state,
+			"events": events,
+		})
+	}))
 
 	// Live sensor debug endpoints for real hardware bring-up and noise analysis.
 	mux.HandleFunc("/debug/sensor", passwordGate(func(w http.ResponseWriter, _ *http.Request) {

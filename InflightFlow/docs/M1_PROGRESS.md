@@ -22,6 +22,9 @@
 - Idempotency for API commands:
   - `idempotencyKey` supported in `POST /v1/domain/command`
   - duplicate key returns cached result without re-applying command
+- Startup bootstrap flow added:
+  - `POST /v1/domain/bootstrap` performs idempotent `create -> prepare -> start`
+  - intended for fast event-day initialization
 
 ## Tests added
 - Engine happy-path lifecycle test
@@ -32,7 +35,7 @@
 1. Add command validation schema (strict payload validation)
 2. Persist idempotency records beyond process restart
 3. Extend state model with round timing/result fields
-4. Add startup bootstrap command flow (create tournament + prepare/start round) profile
+4. Add profile presets for multiple tournament boot scenarios
 
 - Validated full finish flow on Pi: unning -> completed and repeat finish rejection.
 

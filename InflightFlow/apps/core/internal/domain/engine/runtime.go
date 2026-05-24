@@ -70,3 +70,39 @@ func (r *Runtime) State() State {
 	defer r.mu.Unlock()
 	return r.engine.State()
 }
+
+func (r *Runtime) Bootstrap(tournamentID, roundID, keyPrefix string) (State, []events.Event, error) {
+	all := make([]events.Event, 0, 3)
+
+	evs, err := r.Handle(commands.Command{
+		Type:           commands.CmdCreateTournament,
+		Data:           map[string]any{"tournamentId": tournamentID},
+		IdempotencyKey: keyPrefix + ":create",
+	})
+	if err != nil {
+		return r.State(), all, err
+	}
+	all = append(all, evs...)
+
+	evs, err = r.Handle(commands.Command{
+		Type:           commands.CmdPrepareRound,
+		Data:           map[string]any{"roundId": roundID},
+		IdempotencyKey: keyPrefix + ":prepare",
+	})
+	if err != nil {
+		return r.State(), all, err
+	}
+	all = append(all, evs...)
+
+	evs, err = r.Handle(commands.Command{
+		Type:           commands.CmdStartRound,
+		Data:           map[string]any{},
+		IdempotencyKey: keyPrefix + ":start",
+	})
+	if err != nil {
+		return r.State(), all, err
+	}
+	all = append(all, evs...)
+
+	return r.State(), all, nil
+}
