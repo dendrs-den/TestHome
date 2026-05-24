@@ -102,7 +102,6 @@ export default function App() {
       setSensor(s);
       setReadiness(r);
       setPreflight(p);
-      setError("");
       setLastOkAt(new Date().toLocaleTimeString());
     } catch (e) {
       setError((e as Error).message);
@@ -148,6 +147,31 @@ export default function App() {
         type,
         data,
         idempotencyKey: tsKey(`operator-${type}`),
+      });
+      await refresh();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function prepareRound() {
+    setBusy(true);
+    try {
+      // UX rule: pressing Prepare for a new round should always reset round state.
+      // If current round is running, cancel it first, then prepare next round.
+      if (domain?.RoundState === "running") {
+        await postJSON(`${trimmedBase}/v1/domain/command`, {
+          type: "cancel_round",
+          data: {},
+          idempotencyKey: tsKey("operator-cancel-before-prepare"),
+        });
+      }
+      await postJSON(`${trimmedBase}/v1/domain/command`, {
+        type: "prepare_round",
+        data: { roundId },
+        idempotencyKey: tsKey("operator-prepare_round"),
       });
       await refresh();
     } catch (e) {
@@ -204,7 +228,7 @@ export default function App() {
           <button disabled={busy} onClick={bootstrap}>Bootstrap</button>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button disabled={busy} onClick={() => sendCommand("prepare_round", { roundId })}>Prepare</button>
+          <button disabled={busy} onClick={prepareRound}>Prepare</button>
           <button disabled={busy} onClick={() => sendCommand("start_round")}>Start</button>
           <button disabled={busy} onClick={() => sendCommand("finish_round")}>Finish</button>
           <button disabled={busy} onClick={() => sendCommand("cancel_round")}>Cancel</button>
