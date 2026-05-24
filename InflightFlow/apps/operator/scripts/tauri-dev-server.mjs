@@ -24,9 +24,13 @@ if (alreadyUp) {
   process.exit(0);
 }
 
-const child = spawn("npm.cmd", ["run", "dev", "--", "--host", host, "--port", String(port), "--strictPort"], {
+const cmd = process.platform === "win32"
+  ? "npm.cmd run dev -- --host 127.0.0.1 --port 5188 --strictPort"
+  : "npm run dev -- --host 127.0.0.1 --port 5188 --strictPort";
+
+const child = spawn(cmd, {
   stdio: "inherit",
-  shell: false,
+  shell: true,
 });
 
 child.on("exit", (code) => process.exit(code ?? 0));
