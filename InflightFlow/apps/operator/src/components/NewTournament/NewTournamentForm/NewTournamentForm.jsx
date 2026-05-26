@@ -51,9 +51,7 @@ const NewTournamentForm = (props) => {
 
   // Changes applied
   const [isModified, setIsModified] = useState(false);
-  const [createBtnEnabled, setCreateBtnEnabled] = useState(
-    editing === true ? true : false
-  );
+  const [createBtnEnabled, setCreateBtnEnabled] = useState(true);
 
   const [tourTitleInputIsTouched, setTourTitleInputIsTouched] = useState(false);
   const [tourDisciplineIsTouched, setTourDisciplineIsTouched] = useState(false);
@@ -69,6 +67,14 @@ const NewTournamentForm = (props) => {
     editing === true ? true : false
   );
   const [isLoading, setIsLoading] = useState(false);
+  const makeTournamentId = () => {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    return `tour-${Date.now().toString(36)}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+  };
 
   const tourTitleIsValid = enteredTitle.trim() !== "";
   const tourDisciplineIsValid = enteredDiscipline?.name?.trim().length > 0;
@@ -93,6 +99,17 @@ const NewTournamentForm = (props) => {
     Number(enteredSkipFine) <= 40 &&
     reValid.test(enteredSkipFine);
   const skipFineInputIsInValid = !skipValueIsValid && skipFineInputTouched;
+  const validTeamsCount = teamsList.filter((team) => {
+    const hasName = typeof team?.name === "string" && team.name.trim().length > 0;
+    const hasNumber =
+      team?.number !== null &&
+      team?.number !== undefined &&
+      String(team.number).trim() !== "";
+    return hasName && hasNumber;
+  }).length;
+  const validStagesCount = stageList.filter((stage) => {
+    return typeof stage?.name === "string" && stage.name.trim().length > 0;
+  }).length;
 
   const titleChangeHandler = (event) => {
     setEnteredTitle(event.target.value);
@@ -151,103 +168,140 @@ const NewTournamentForm = (props) => {
   // CREATING NEW TOURNAMENT
   const formSubmitHandler = async (event) => {
     event.preventDefault();
+
+    const validationErrors = [];
+    if (!tourTitleIsValid) validationErrors.push("Название турнира");
+    if (!tourDisciplineIsValid) validationErrors.push("Имя дисциплины");
+    if (!bustValueInputIsValid) validationErrors.push("Bust value");
+    if (!skipValueIsValid) validationErrors.push("Skip value");
+    if (validTeamsCount < 1) {
+      validationErrors.push("Минимум 1 участник с номером");
+    }
+    if (validStagesCount < 1) {
+      validationErrors.push("Минимум 1 раунд");
+    }
+
+    if (validationErrors.length > 0) {
+      setTourTitleInputIsTouched(true);
+      setTourDisciplineIsTouched(true);
+      setMistakeFineInputIsTouched(true);
+      setSkipFineInputTouched(true);
+      alert(`Заполните обязательные поля:\n- ${validationErrors.join("\n- ")}`);
+      return;
+    }
+
     setIsLoading(true);
+    try {
+      const teamArr = [];
+      const disciplineArr = [];
+      const stageArr = [];
 
-    const teamArr = [];
-    const disciplineArr = [];
-    const stageArr = [];
+      // Manage teams
+      for (const team of teamsList) {
+        if (team.name.trim().length > 0) {
+          // add new team
+          if (!team.inDB) {
+            const createdTeam = await createNewTeam(team);
+            const createdId =
+              typeof createdTeam === "string" ? createdTeam : createdTeam?.id;
 
-    // Manage teams
-    for (const team of teamsList) {
-      if (team.name.trim().length > 0) {
-        // add new team
-        if (!team.inDB) {
-          const returnedId = await createNewTeam(team);
-
-          teamArr.push({
-            id: returnedId,
-            name: team.name,
-            number: team.number,
-          });
-        } else {
-          if (team.inDB && team.isEdited) {
-            await updateTeamInfo(team);
+            teamArr.push({
+              id: createdId,
+              name: team.name,
+              number: team.number,
+            });
+          } else {
+            if (team.inDB && team.isEdited) {
+              await updateTeamInfo(team);
+            }
+            teamArr.push({ id: team.id, name: team.name, number: team.number });
           }
-          teamArr.push({ id: team.id, name: team.name, number: team.number });
         }
       }
-    }
 
-    // Manage stages
-    for (const { id, name, battle, inDB, isEdited } of stageList) {
-      const battleBoolean = battle === "Yes" ? true : false;
+      // Manage stages
+      for (const { id, name, battle, inDB, isEdited } of stageList) {
+        const battleBoolean = battle === "Yes" ? true : false;
 
-      if (name.trim().length > 0) {
-        //added new stage
-        if (!inDB) {
-          const returnedId = await createNewStage({ name, battleBoolean });
+        if (name.trim().length > 0) {
+          //added new stage
+          if (!inDB) {
+            const createdStage = await createNewStage({ name, battleBoolean });
+            const createdId =
+              typeof createdStage === "string"
+                ? createdStage
+                : createdStage?.id;
 
-          stageArr.push({
-            id: returnedId,
-            name,
-            battle: battleBoolean,
-          });
-        } else {
-          if (inDB && isEdited) {
-            updateStageInfo({ id, name, battleBoolean });
+            stageArr.push({
+              id: createdId,
+              name,
+              battle: battleBoolean,
+            });
+          } else {
+            if (inDB && isEdited) {
+              updateStageInfo({ id, name, battleBoolean });
+            }
+            stageArr.push({
+              id,
+              name,
+              battle: battleBoolean,
+            });
           }
-          stageArr.push({
-            id,
-            name,
-            battle: battleBoolean,
-          });
         }
       }
-    }
 
-    if (preFilledData) {
-      await updateDisciplineInfo(enteredDiscipline);
-      disciplineArr.push({
-        id: preFilledData.disciplineList[0].id,
-        name: enteredDiscipline.name,
-      });
-    } else if (
-      !enteredDiscipline.inDB &&
-      enteredDiscipline.name.trim().length > 0
-    ) {
-      const returnedId = await createNewDiscipline(enteredDiscipline);
-      disciplineArr.push({ id: returnedId, name: enteredDiscipline.name });
-    }
+      if (preFilledData) {
+        await updateDisciplineInfo(enteredDiscipline);
+        disciplineArr.push({
+          id: preFilledData.disciplineList[0].id,
+          name: enteredDiscipline.name,
+        });
+      } else if (
+        !enteredDiscipline.inDB &&
+        enteredDiscipline.name.trim().length > 0
+      ) {
+        const createdDiscipline = await createNewDiscipline(enteredDiscipline);
+        const createdId =
+          typeof createdDiscipline === "string"
+            ? createdDiscipline
+            : createdDiscipline?.id;
+        disciplineArr.push({ id: createdId, name: enteredDiscipline.name });
+      }
 
-    // DELETING EXTRA ENTITIES
-    for (const team_id of teamsToDelete) {
-      await deleteTeamById(team_id);
-    }
-    for (const stage_id of stagesToDelete) {
-      await deleteStageById(stage_id);
-    }
+      // DELETING EXTRA ENTITIES
+      for (const team_id of teamsToDelete) {
+        await deleteTeamById(team_id);
+      }
+      for (const stage_id of stagesToDelete) {
+        await deleteStageById(stage_id);
+      }
 
-    setTourTitleInputIsTouched(true);
+      setTourTitleInputIsTouched(true);
 
-    const sentData = {
-      id: preFilledData?.id || "",
-      name: enteredTitle,
-      teams: teamArr,
-      disciplines: disciplineArr,
-      stages: stageArr.filter((stage) => !stagesToDelete.includes(stage.id)),
-      bust_value: Number(enteredMistakeFine),
-      skip_value: Number(enteredSkipFine),
-    };
+      const sentData = {
+        id: preFilledData?.id || makeTournamentId(),
+        name: enteredTitle,
+        teams: teamArr,
+        disciplines: disciplineArr,
+        stages: stageArr.filter((stage) => !stagesToDelete.includes(stage.id)),
+        bust_value: Number(enteredMistakeFine),
+        skip_value: Number(enteredSkipFine),
+      };
 
-    if (props.editing) {
-      await updateTournament({ id: preFilledData.id, ...sentData });
-    } else {
-      await createTournament(sentData);
+      if (props.editing) {
+        await updateTournament({ id: preFilledData.id, ...sentData });
+      } else {
+        await createTournament(sentData);
+      }
+      setChangesMade(false);
+      // "Redirect" to AllTournaments list
+      props.changeCurrentMainContent("tournamentsList");
+    } catch (error) {
+      console.log("Tournament save failed", error);
+      alert(`Не удалось сохранить турнир: ${error?.message || "unknown error"}`);
+    } finally {
+      setIsLoading(false);
     }
-    setChangesMade(false);
-    setIsLoading(false);
-    // "Redirect" to AllTournaments list
-    props.changeCurrentMainContent("tournamentsList");
   };
 
   // TEAM ACTIONS
@@ -304,10 +358,8 @@ const NewTournamentForm = (props) => {
   };
 
   useEffect(() => {
-    setCreateBtnEnabled(
-      Boolean(inputsValid && teamsAreValid && stagesAreValid)
-    );
-  }, [inputsValid, teamsAreValid, stagesAreValid]);
+    setCreateBtnEnabled(true);
+  }, [inputsValid, validTeamsCount, validStagesCount]);
 
   useEffect(() => {
     setInputsValid(
@@ -328,7 +380,12 @@ const NewTournamentForm = (props) => {
   return (
     <Fragment>
       <CircularProgressDialog open={isLoading} />
-      <form method="POST" onSubmit={formSubmitHandler} className="customForm">
+      <form
+        method="POST"
+        autoComplete="off"
+        onSubmit={formSubmitHandler}
+        className="customForm"
+      >
         <section className={classes.settings}>
           <div className={`${classes["settings__options"]}`}>
             <div className={classes.tourInput}>
@@ -410,6 +467,7 @@ const NewTournamentForm = (props) => {
             <EditableDataGrid
               tableHeader="Teams"
               data={teamsList}
+              gridHeight="clamp(500px, calc(100vh - 430px), 700px)"
               setItemsList={setTeamsList}
               deleteItem={deleteTeam}
               updateItem={updateTeam}
@@ -424,6 +482,7 @@ const NewTournamentForm = (props) => {
               editing={props.editing}
               tableHeader="Stages"
               data={stageList}
+              gridHeight="clamp(500px, calc(100vh - 430px), 700px)"
               setItemsList={setStageList}
               deleteItem={deleteStage}
               updateItem={updateStage}

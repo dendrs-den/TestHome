@@ -1,7 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import DeleteTournamentButton from "../../Components/UI/Buttons/DeleteTournamentButton/DeleteTournamentButton";
 import TournamentsTable from "./TournamentsTable/TournamentsTable";
-import TrainingModeButton from "../../Components/InitialPage/AddNewTournamentButton/TrainingModeButton";
 import classes from "./TournamentsList.module.scss";
 import deleteTournamentById from "../../Api_requests/tournaments/deleteTournamentById";
 import setCurrentTournamentById from "../../Api_requests/tournaments/setCurrentTournament";
@@ -10,7 +9,6 @@ import getAllTournaments from "../../Api_requests/tournaments/getAllTournaments"
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import { Button, IconButton, Box } from "@mui/material";
 import CircularProgressDialog from "../../Components/UI/Backdrop/CircularProgressDialog/CircularProgressDialog";
-import setServerTrainingMode from "../../Api_requests/tournaments/setServerTrainingMode";
 import setAdministrationState from "../../Api_requests/roundState/setAdministrationState";
 
 const TournamentsList = (props) => {
@@ -41,13 +39,6 @@ const TournamentsList = (props) => {
     changeContent("tournamentsRounds");
   };
 
-  const trainingSubmitHandler = async () => {
-    setIsLoading(true);
-    await setServerTrainingMode();
-
-    changeContent("trainingRefereePanel");
-  };
-
   // DELETE TOURNAMENT FROM THE LIST AND DATA BASE
   const tourDeleteHandler = async (tour_id) => {
     await deleteTournamentById(tour_id);
@@ -65,23 +56,8 @@ const TournamentsList = (props) => {
     <Fragment>
       <CircularProgressDialog open={isLoading} />
       <Box className={classes.tournaments}>
-        <Box className={classes.upperRow}>
-          <h3 className={classes.header}>Tournament list</h3>
-          <Button
-            className={classes.addTournamentBtn}
-            onClick={() => changeContent("NewTournamentBlock")}
-          >
-            Add tournament
-          </Button>
-          <IconButton
-            className={classes.addTournamentIcon}
-            onClick={() => changeContent("NewTournamentBlock")}
-          >
-            <AddBoxIcon sx={{ fontSize: "40px" }}></AddBoxIcon>
-          </IconButton>
-        </Box>
-
         <Box
+          className={classes.tableWrap}
           sx={{
             mt: "15px",
             position: "relative",
@@ -96,30 +72,31 @@ const TournamentsList = (props) => {
             renderedData={apiData || []}
             tourDataLoading={tourDataLoading}
           />
+          <Button
+            className={classes.addTournamentBtn}
+            onClick={() => changeContent("NewTournamentBlock")}
+          >
+            + ADD
+          </Button>
+          <IconButton
+            className={classes.addTournamentIcon}
+            onClick={() => changeContent("NewTournamentBlock")}
+          >
+            <AddBoxIcon sx={{ fontSize: "32px" }}></AddBoxIcon>
+          </IconButton>
         </Box>
 
-        <Box
-          marginTop="20px"
-          display="flex"
-          flexDirection="row"
-          justifyContent="space-between"
-        >
-          <TrainingModeButton
+        <Box className={classes.actionsRow}>
+          <DeleteTournamentButton
             className={classes["btn"]}
-            clickHandler={trainingSubmitHandler}
+            active={isActivated}
+            deleteHandler={() => tourDeleteHandler(currentSelectedRow)}
           />
-          <Box display="flex" gap="20px">
-            <DeleteTournamentButton
-              className={classes["btn"]}
-              active={isActivated}
-              deleteHandler={() => tourDeleteHandler(currentSelectedRow)}
-            />
-            <SubmitTournamentButton
-              className={classes["btn"]}
-              active={isActivated}
-              clickHandler={tourSubmitHandler}
-            />
-          </Box>
+          <SubmitTournamentButton
+            className={classes["btn"]}
+            active={isActivated}
+            clickHandler={tourSubmitHandler}
+          />
         </Box>
       </Box>
     </Fragment>

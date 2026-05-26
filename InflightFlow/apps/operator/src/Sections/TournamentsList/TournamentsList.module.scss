@@ -6,34 +6,52 @@
 .upperRow {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-end;
+}
+.tableWrap {
+  position: relative;
 }
 .header {
   font-weight: 600;
   font-size: 36px;
   align-self: center;
+  color: #e6ebff;
 }
 
 .addTournamentBtn {
+  min-width: 0 !important;
+  padding: 0 !important;
+  position: absolute !important;
+  right: 14px;
+  bottom: 10px;
+  z-index: 2;
   outline: none;
   border: none;
-  background-color: white;
-  color: #562cff;
-  font-size: 18px;
-  line-height: 21px;
+  background-color: transparent;
+  color: #3c61ff !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.03em;
   text-align: right;
   cursor: pointer;
-  transition: transform 0.3s;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
 }
 
 .addTournamentBtn:hover {
-  text-decoration: underline;
-  transform: scale(1.1);
+  text-decoration: none;
+  color: #5d7dff !important;
+  text-shadow: 0 0 10px rgba(60, 97, 255, 0.45);
 }
 
 .addTournamentIcon {
-  color: #562cff;
+  color: #7f8fff;
   display: none;
+  position: absolute !important;
+  right: 12px;
+  bottom: 8px;
+  z-index: 2;
+  background: transparent !important;
 }
 
 .tournamentTable_block {
@@ -51,6 +69,14 @@
 .btn {
   max-width: 110px;
   padding: 12px 35px;
+}
+
+.actionsRow {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 24px;
 }
 
 @media (max-width: 1500px) {

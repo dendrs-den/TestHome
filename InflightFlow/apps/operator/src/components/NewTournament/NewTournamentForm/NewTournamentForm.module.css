@@ -1,7 +1,7 @@
 .customForm {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .settings__header {
@@ -9,23 +9,25 @@
   font-size: 24px;
   line-height: 43px;
   margin-bottom: 20px;
+  color: #e6ebff;
 }
 
 .settings__options {
   height: 100%;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  border: 1px solid #eaeaea;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #2b3550;
+  background-color: rgba(11, 16, 25, 0.45);
   border-radius: 5px;
   margin-bottom: 30px;
-  padding: 35px 15px;
-  gap: 40px;
+  padding: 14px 15px;
+  gap: 24px;
 }
 .faultsBlock {
   display: flex;
-  gap: 40px;
+  gap: 16px;
 }
 
 .settings__options > * {
@@ -43,47 +45,58 @@
 
 .tourInput {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 280px;
+  flex-direction: row;
+  gap: 14px;
+  width: min(100%, 700px);
 }
+
+.tourInput .option {
+  width: 100%;
+}
+
 .skipInput,
 .bustInput {
-  width: 130px;
+  width: 140px;
 }
 .table-parameters {
   display: flex;
   flex-direction: row;
   gap: 30px;
   justify-content: space-between;
+  align-items: stretch;
 }
 
 .table-parameters > * {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .table-parameters h4 {
   font-size: 20px;
   margin-bottom: 15px;
+  color: #d8e1ff;
 }
 
 .buttonRow {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  width: 100%;
   margin-top: 20px;
+  gap: 24px;
 }
 
 .buttonRow > button {
   width: 110px;
-}
-
-.buttonRow > button:nth-of-type(1) {
-  margin-right: 15px;
+  min-width: 110px;
 }
 
 @media (max-width: 1000px) {
   .settings .settings__options {
     gap: 20px;
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .settings .settings__options .tourInput .option {
@@ -104,6 +117,11 @@
 }
 
 @media (max-width: 630px) {
+  .tourInput {
+    flex-direction: column;
+    width: 100%;
+  }
+
   .faultsBlock {
     width: 100%;
     gap: 10px;
