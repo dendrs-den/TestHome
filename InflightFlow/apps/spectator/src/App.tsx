@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import logo from "./assets/infoscreen_logo3.png";
 
 type RoundState = "idle" | "prepared" | "running" | "completed" | "cancelled";
@@ -13,7 +13,30 @@ type DomainState = {
   Skips?: number;
 };
 
-const CORE_BASE = "http://192.168.0.177:18080";
+const CORE_PORT = 18080;
+const STORAGE_KEY = "inflightflow.core.ip.spectator";
+
+function isIPv4(value: string): boolean {
+  const trimmed = value.trim();
+  const parts = trimmed.split(".");
+  if (parts.length !== 4) return false;
+  return parts.every((p) => /^\d+$/.test(p) && Number(p) >= 0 && Number(p) <= 255);
+}
+
+async function checkCoreHealth(ip: string): Promise<boolean> {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), 2500);
+  try {
+    const res = await fetch(`http://${ip}:${CORE_PORT}/health`, { signal: controller.signal });
+    if (!res.ok) return false;
+    const json = (await res.json()) as { status?: string };
+    return json.status === "ok";
+  } catch {
+    return false;
+  } finally {
+    window.clearTimeout(timer);
+  }
+}
 
 function toWebSocketUrl(baseUrl: string): string {
   const trimmed = baseUrl.replace(/\/+$/, "");
@@ -29,21 +52,63 @@ function fmt(ms: number): string {
   return `${String(sec).padStart(4, "0")}:${String(milli).padStart(3, "0")}`;
 }
 
-function stateTitle(state: RoundState): string {
-  if (state === "prepared") return "PREPARE";
-  if (state === "running") return "PERFORMANCE";
-  if (state === "completed") return "RESULT";
-  if (state === "cancelled") return "CANCELLED";
-  return "WAITING";
-}
-
 export default function App() {
+  const [ctxMenu, setCtxMenu] = React.useState<{ x: number; y: number } | null>(null);
+  const defaultIp = typeof window !== "undefined" ? window.location.hostname : "127.0.0.1";
+  const [serverIp, setServerIp] = React.useState<string>(() => localStorage.getItem(STORAGE_KEY) || defaultIp);
+  const [inputIp, setInputIp] = React.useState<string>(serverIp);
+  const [checkingServer, setCheckingServer] = React.useState(true);
+  const [showServerDialog, setShowServerDialog] = React.useState(false);
+  const [serverDialogError, setServerDialogError] = React.useState("");
+
   const [domain, setDomain] = React.useState<DomainState | null>(null);
   const [error, setError] = React.useState("");
   const [runningSince, setRunningSince] = React.useState<number | null>(null);
   const [tickMs, setTickMs] = React.useState(0);
 
+  const coreBase = `http://${serverIp}:${CORE_PORT}`;
+
   React.useEffect(() => {
+    let active = true;
+    setCheckingServer(true);
+    checkCoreHealth(serverIp).then((ok) => {
+      if (!active) return;
+      setShowServerDialog(!ok);
+      if (ok) {
+        setServerDialogError("");
+        localStorage.setItem(STORAGE_KEY, serverIp);
+      } else {
+        setServerDialogError("Сервер не найден. Укажи IP Raspberry в этой сети.");
+      }
+      setCheckingServer(false);
+    });
+    return () => {
+      active = false;
+    };
+  }, [serverIp]);
+
+  async function submitServerIp() {
+    const candidate = inputIp.trim();
+    if (!isIPv4(candidate)) {
+      setServerDialogError("Введите корректный IP в формате 192.168.0.177");
+      return;
+    }
+    setServerDialogError("");
+    setCheckingServer(true);
+    const ok = await checkCoreHealth(candidate);
+    setCheckingServer(false);
+    if (!ok) {
+      setServerDialogError("По этому IP core недоступен.");
+      return;
+    }
+    localStorage.setItem(STORAGE_KEY, candidate);
+    setServerIp(candidate);
+    setShowServerDialog(false);
+  }
+
+  React.useEffect(() => {
+    if (showServerDialog || checkingServer) return;
+
     let active = true;
     let ws: WebSocket | null = null;
     let reconnectTimer: number | null = null;
@@ -58,7 +123,7 @@ export default function App() {
 
     const connect = () => {
       try {
-        ws = new WebSocket(toWebSocketUrl(CORE_BASE));
+        ws = new WebSocket(toWebSocketUrl(coreBase));
       } catch {
         scheduleReconnect();
         return;
@@ -99,7 +164,7 @@ export default function App() {
       if (reconnectTimer != null) window.clearTimeout(reconnectTimer);
       if (ws && ws.readyState === WebSocket.OPEN) ws.close();
     };
-  }, []);
+  }, [coreBase, showServerDialog, checkingServer]);
 
   React.useEffect(() => {
     if (!runningSince) return;
@@ -115,6 +180,38 @@ export default function App() {
   const pilotLabel = domain?.TournamentID || "-";
   const busts = domain?.Busts ?? 1;
   const skips = domain?.Skips ?? 1;
+
+  React.useEffect(() => {
+    const onContextMenu = (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const menuWidth = 180;
+      const menuHeight = 84;
+      const maxX = Math.max(8, window.innerWidth - menuWidth - 8);
+      const maxY = Math.max(8, window.innerHeight - menuHeight - 8);
+      setCtxMenu({
+        x: Math.min(event.clientX, maxX),
+        y: Math.min(event.clientY, maxY),
+      });
+    };
+    const onCloseMenu = () => setCtxMenu(null);
+    document.addEventListener("contextmenu", onContextMenu, true);
+    window.addEventListener("contextmenu", onContextMenu, true);
+    window.addEventListener("click", onCloseMenu);
+    window.addEventListener("blur", onCloseMenu);
+    window.addEventListener("resize", onCloseMenu);
+    return () => {
+      document.removeEventListener("contextmenu", onContextMenu, true);
+      window.removeEventListener("contextmenu", onContextMenu, true);
+      window.removeEventListener("click", onCloseMenu);
+      window.removeEventListener("blur", onCloseMenu);
+      window.removeEventListener("resize", onCloseMenu);
+    };
+  }, []);
+
+  const closeApp = async () => {
+    window.close();
+  };
 
   return (
     <main className="spectator-screen">
@@ -137,6 +234,57 @@ export default function App() {
       </section>
 
       {error ? <div className="error-banner">core unavailable: {error}</div> : null}
+
+      {(showServerDialog || checkingServer) && (
+        <div className="server-dialog-backdrop">
+          <div className="server-dialog">
+            <h3>Подключение к серверу</h3>
+            <p>Введите IP Raspberry (без порта). Порт используется автоматически: 18080.</p>
+            <input
+              className="server-dialog-input"
+              type="text"
+              inputMode="numeric"
+              placeholder="192.168.0.177"
+              value={inputIp}
+              onChange={(e) => setInputIp(e.target.value)}
+              disabled={checkingServer}
+            />
+            {serverDialogError ? <div className="server-dialog-error">{serverDialogError}</div> : null}
+            <button className="server-dialog-btn" onClick={submitServerIp} disabled={checkingServer}>
+              {checkingServer ? "Проверка..." : "Сохранить"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {ctxMenu && (
+        <div
+          className="app-context-menu"
+          style={{ top: `${ctxMenu.y}px`, left: `${ctxMenu.x}px` }}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <button
+            type="button"
+            className="app-context-menu__item"
+            onClick={() => {
+              setCtxMenu(null);
+              window.location.reload();
+            }}
+          >
+            Обновить
+          </button>
+          <button
+            type="button"
+            className="app-context-menu__item"
+            onClick={() => {
+              setCtxMenu(null);
+              closeApp();
+            }}
+          >
+            Выход
+          </button>
+        </div>
+      )}
     </main>
   );
 }

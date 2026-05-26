@@ -7,95 +7,30 @@ import RefereePanel from "../Sections/RefereePage/RefereePanel/RefereePanel";
 import getAllTournaments from "../Api_requests/tournaments/getAllTournaments";
 import setAdministrationState from "../Api_requests/roundState/setAdministrationState";
 import getCurrentState from "../Api_requests/getCurrentState";
-import main_logo from "../images/main_logo2.png";
+import infoscreenLogo from "../images/infoscreen_logo3.png";
 import { Helmet } from "react-helmet";
 import EditTournament from "../Components/EditTournament/EditTournament";
 import BaseDrawer from "../Components/UI/BaseDrawer/BaseDrawer";
-import BlueToothButton from "../Components/UI/Buttons/BlueToothButton";
-import BluetoothBackDrop from "../Components/UI/Backdrop/BluetoothBackDrop/BluetoothBackDrop";
 import { Box } from "@mui/material";
-import getAllBluetoothConnections from "../Api_requests/bluetooth/getAllConnections";
 import lp from "../Api_requests/longpoll/longpoll";
 import TournamentsList from "../Sections/TournamentsList/TournamentsList";
 import TournamentsRounds from "../Sections/TournamentsRounds/TournamentsRounds";
 import TrainingModePanel from "../Sections/TrainingModePage/TrainingModePanel";
-import LightSwitcher from "../Components/LightSwitcher/LightSwitcher";
 
 const InitialPage = (props) => {
   const { changeBlockTitle } = props;
   const [tournamentsList, setTournamentsList] = useState([]);
   const [tourDataLoading, setTourDataLoading] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
-  const [openBluetooth, setOpenBluetooth] = useState(false);
   const [currentMainContent, setCurrentMainContent] =
     useState("tournamentsList");
   const [changesMade, setChangesMade] = useState(false);
   const [trainingMode, setTrainingMode] = useState(false);
-  const [devicesList, setDevicesList] = useState({
-    bluetoothDevices: [],
-    connectedDevices: [],
-    maps: [],
-  });
-
+  const [footerActions, setFooterActions] = useState(null);
   useEffect(() => {
-    lp.Subscribe(
-      "addDevice",
-      (data) => {
-        setDevicesList((prev) => {
-          // let newList = structuredClone(prev);
-
-          const newList = { ...prev };
-
-          const index = prev.bluetoothDevices?.findIndex(
-            (item) => item.mac === data.mac
-          );
-          if (index === -1) {
-            newList.bluetoothDevices = [...newList.bluetoothDevices, data];
-          }
-
-          return newList;
-        });
-      },
-      "bluetoothTableUpdate"
-    );
-
-    lp.Subscribe(
-      "removeDevice",
-      (data) => {
-        setDevicesList((prev) => {
-          // let newList = structuredClone(prev);
-          const newList = { ...prev };
-          if (newList?.bluetoothDevices) {
-            newList.bluetoothDevices = newList.bluetoothDevices.filter(
-              (item) => item.mac !== data.mac
-            );
-          }
-
-          return newList;
-        });
-      },
-      "bluetoothTableUpdate"
-    );
-
-    lp.Subscribe(
-      "updateDevice",
-      (data) => {
-        setDevicesList((prev) => {
-          // let newList = structuredClone(prev);
-          const newList = { ...prev };
-
-          const index = prev.bluetoothDevices?.findIndex(
-            (item) => item.mac === data.mac
-          );
-          if (index !== -1) {
-            newList.bluetoothDevices[index] = { ...data };
-          }
-
-          return newList;
-        });
-      }
-      // "bluetoothTableUpdate"
-    );
+    lp.Subscribe("addDevice", () => {}, "bluetoothTableUpdate");
+    lp.Subscribe("removeDevice", () => {}, "bluetoothTableUpdate");
+    lp.Subscribe("updateDevice", () => {});
   }, []);
 
   const renderConditions = {
@@ -108,6 +43,22 @@ const InitialPage = (props) => {
     trainingRefereePanel: currentMainContent === "trainingRefereePanel",
   };
 
+  const headerTitleByContent = {
+    tournamentsList: "Tournament list",
+    tournamentsRounds: props.blockTitle,
+    history: "History",
+    NewTournamentBlock: "Adding new tournament",
+    editTournament: "Editing tournament",
+    refereePanel: "Referee panel",
+    trainingRefereePanel: "Training mode",
+  };
+  const currentHeaderTitle =
+    headerTitleByContent[currentMainContent] || props.blockTitle;
+
+  useEffect(() => {
+    setFooterActions(null);
+  }, [currentMainContent]);
+
   const changeCurrentMainContentHandler = async (newContent) => {
     setCurrentMainContent(newContent);
     const state = await getCurrentState();
@@ -117,6 +68,7 @@ const InitialPage = (props) => {
     }
 
     if (newContent === "tournamentsList") {
+      await fetchDataHandler(true);
       if (state !== "Administration") {
         // await setAdministrationState();
       }
@@ -131,25 +83,17 @@ const InitialPage = (props) => {
     setTournamentsList(data);
   };
 
-  const fetchDataHandler = useCallback(async () => {
-    if (!tournamentsList?.length) {
+  const fetchDataHandler = useCallback(async (force = false) => {
+    if (force || !tournamentsList?.length) {
+      setTourDataLoading(true);
       const data = await getAllTournaments();
-
       setTournamentsListHandler(data);
+      setTourDataLoading(false);
     }
-  }, []);
-
-  const fetchBluetoothData = useCallback(async () => {
-    const receivedData = await getAllBluetoothConnections();
-    setDevicesList(receivedData);
-  }, []);
+  }, [tournamentsList?.length]);
 
   useEffect(() => {
-    fetchBluetoothData();
-  }, [fetchBluetoothData]);
-
-  useEffect(() => {
-    fetchDataHandler();
+    fetchDataHandler(true);
   }, [fetchDataHandler, changeBlockTitle]);
 
   // useEffect(() => {
@@ -170,8 +114,7 @@ const InitialPage = (props) => {
               <Box component={"nav"} className={classes.navigation}>
                 <div className={classes.logo}>
                   <React.Fragment>
-                    <img src={main_logo} alt="Main Icon" />
-                    <h1 className={classes.header_text}>Referee system</h1>
+                    <img src={infoscreenLogo} alt="Flow Moscow logo" />
                   </React.Fragment>
                 </div>
                 <NavigationBlock
@@ -180,21 +123,7 @@ const InitialPage = (props) => {
                   changesMade={changesMade}
                   setChangesMade={setChangesMade}
                 />
-                <div className={classes.bluetoothBlock}>
-                  <BlueToothButton setOpenBluetooth={setOpenBluetooth} />
-                  <Box display="inline" ml="20px">
-                    <LightSwitcher />
-                  </Box>
-                </div>
               </Box>
-              {openBluetooth && (
-                <BluetoothBackDrop
-                  devicesList={devicesList}
-                  fetchBluetoothData={fetchBluetoothData}
-                  openBluetooth={openBluetooth}
-                  setOpenBluetooth={setOpenBluetooth}
-                />
-              )}
             </Box>
           )}
 
@@ -215,7 +144,7 @@ const InitialPage = (props) => {
                 classes[`${[props.blockTitle]}`]
               } ${classes[`${[currentMainContent]}`]}`}
             >
-              {props.blockTitle}
+              {currentHeaderTitle}
             </h2>
             <div className={classes.drawer}>
               <BaseDrawer
@@ -223,7 +152,6 @@ const InitialPage = (props) => {
                 changeBlockTitle={changeBlockTitle}
                 changesMade={changesMade}
                 setChangesMade={setChangesMade}
-                setOpenBluetooth={setOpenBluetooth}
               />
             </div>
             {/* <Box position="absolute" right="10px">
@@ -244,6 +172,7 @@ const InitialPage = (props) => {
                   apiData={tournamentsList}
                   setTournamentsListHandler={setTournamentsListHandler}
                   changeContent={changeCurrentMainContentHandler}
+                  setFooterActions={setFooterActions}
                   setSelectedId={setSelectedTourId}
                   selectedId={selectedId}
                 />
@@ -255,6 +184,7 @@ const InitialPage = (props) => {
                 <NewTournamentBlock
                   setChangesMade={setChangesMade}
                   onContentChange={changeCurrentMainContentHandler}
+                  setFooterActions={setFooterActions}
                   changeBlockTitle={changeBlockTitle}
                 />
               )}
@@ -263,6 +193,7 @@ const InitialPage = (props) => {
                 <EditTournament
                   selectedId={selectedId}
                   setChangesMade={setChangesMade}
+                  setFooterActions={setFooterActions}
                   onContentChange={changeCurrentMainContentHandler}
                 />
               )}
@@ -271,6 +202,7 @@ const InitialPage = (props) => {
                 <TournamentsRounds
                   changeBlockTitle={changeBlockTitle}
                   changeContent={changeCurrentMainContentHandler}
+                  setFooterActions={setFooterActions}
                 />
               )}
 
@@ -289,6 +221,13 @@ const InitialPage = (props) => {
               )}
             </section>
           </Box>
+          <footer
+            className={`${classes.footer} ${
+              classes[`${[currentMainContent]}`]
+            }`}
+          >
+            <div className={classes.footerInner}>{footerActions}</div>
+          </footer>
         </Box>
 
         {/* END OF MAIN CONTENT */}

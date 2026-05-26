@@ -24,7 +24,8 @@ const re = /^\d{0,3}$/;
 const reValid = /^\d{0,3}$/;
 
 const NewTournamentForm = (props) => {
-  const { setChangesMade, preFilledData, editing } = props;
+  const { setChangesMade, preFilledData, editing, setFooterActions } = props;
+  const formId = editing ? "edit-tournament-form" : "new-tournament-form";
 
   //Settings
   const [enteredTitle, setEnteredTitle] = useState(preFilledData?.title || "");
@@ -377,10 +378,38 @@ const NewTournamentForm = (props) => {
     tourDisciplineIsValid,
   ]);
 
+  useEffect(() => {
+    setFooterActions(
+      <Box component="section" className={classes.buttonRow}>
+        <BackButton
+          isModified={isModified}
+          changeContent={props.onContentChange}
+          setChangesMade={setChangesMade}
+        />
+        <SubmitButton
+          formId={formId}
+          isEnabled={createBtnEnabled}
+          editing={props.editing}
+        />
+      </Box>
+    );
+
+    return () => setFooterActions(null);
+  }, [
+    createBtnEnabled,
+    formId,
+    isModified,
+    props.editing,
+    props.onContentChange,
+    setChangesMade,
+    setFooterActions,
+  ]);
+
   return (
     <Fragment>
       <CircularProgressDialog open={isLoading} />
       <form
+        id={formId}
         method="POST"
         autoComplete="off"
         onSubmit={formSubmitHandler}
@@ -492,16 +521,6 @@ const NewTournamentForm = (props) => {
             />
           </div>
         </section>
-
-        <Box component="section" className={classes["buttonRow"]}>
-          <BackButton
-            isModified={isModified}
-            changeContent={props.onContentChange}
-            setChangesMade={setChangesMade}
-          />
-
-          <SubmitButton isEnabled={createBtnEnabled} editing={props.editing} />
-        </Box>
       </form>
     </Fragment>
   );

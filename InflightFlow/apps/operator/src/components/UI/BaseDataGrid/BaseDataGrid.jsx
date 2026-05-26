@@ -12,7 +12,14 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
 }));
 
 const BaseDataGrid = (props) => {
-  return <StyledDataGrid {...props} disableColumnFilter disableColumnMenu />;
+  return (
+    <StyledDataGrid
+      {...props}
+      disableColumnFilter
+      disableColumnMenu
+      disableColumnSorting
+    />
+  );
 };
 
 export default BaseDataGrid;

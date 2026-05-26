@@ -19,6 +19,7 @@ const TournamentsList = (props) => {
     apiData,
     changeContent,
     setTournamentsListHandler,
+    setFooterActions,
   } = props;
 
   // const [apiData, setApiData] = useState([]);
@@ -52,6 +53,25 @@ const TournamentsList = (props) => {
     setAdministrationState();
   }, []);
 
+  useEffect(() => {
+    setFooterActions(
+      <Box className={classes.actionsRow}>
+        <DeleteTournamentButton
+          className={classes.btn}
+          active={isActivated}
+          deleteHandler={() => tourDeleteHandler(currentSelectedRow)}
+        />
+        <SubmitTournamentButton
+          className={classes.btn}
+          active={isActivated}
+          clickHandler={tourSubmitHandler}
+        />
+      </Box>
+    );
+
+    return () => setFooterActions(null);
+  }, [isActivated, currentSelectedRow, setFooterActions]);
+
   return (
     <Fragment>
       <CircularProgressDialog open={isLoading} />
@@ -84,19 +104,6 @@ const TournamentsList = (props) => {
           >
             <AddBoxIcon sx={{ fontSize: "32px" }}></AddBoxIcon>
           </IconButton>
-        </Box>
-
-        <Box className={classes.actionsRow}>
-          <DeleteTournamentButton
-            className={classes["btn"]}
-            active={isActivated}
-            deleteHandler={() => tourDeleteHandler(currentSelectedRow)}
-          />
-          <SubmitTournamentButton
-            className={classes["btn"]}
-            active={isActivated}
-            clickHandler={tourSubmitHandler}
-          />
         </Box>
       </Box>
     </Fragment>

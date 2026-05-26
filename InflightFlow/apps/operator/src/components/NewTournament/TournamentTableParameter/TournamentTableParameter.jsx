@@ -115,6 +115,7 @@ const TournamentTableParameter = (props) => {
           disableColumnSelector
           disableColumnFilter
           disableColumnMenu
+          disableColumnSorting
           rowsPerPageOptions={[20]}
         />
       </div>
