@@ -22,6 +22,16 @@ npm install
 npm run dev
 ```
 
+Proxy к Core для `operator`:
+- По умолчанию auto-режим:
+  - локальная машина -> `http://127.0.0.1:8080`
+  - Raspberry Pi (linux arm64) -> `http://127.0.0.1:18080`
+- Можно принудительно задать через `apps/operator/.env`:
+
+```env
+VITE_CORE_PROXY_TARGET=http://127.0.0.1:8080
+```
+
 Tauri desktop (нужны Rust + зависимости Tauri):
 
 ```bash
