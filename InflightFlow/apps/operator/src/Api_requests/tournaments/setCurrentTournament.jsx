@@ -1,6 +1,8 @@
+import coreBaseUrl from "../coreBaseUrl";
+
 const setCurrentTournamentById = async (tourId) => {
   try {
-    const response = await fetch(`/tournaments/current`, {
+    const response = await fetch(`${coreBaseUrl}/tournaments/current`, {
       method: "POST",
       body: JSON.stringify({ id: tourId }),
       headers: {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Input, Button, Container, Stack, Typography, FormLabel, Loader } from "@mui/material";
+import { Box, Input, Button, Container, Stack, Typography, FormLabel } from "@mui/material";
 
 import { useNavigate } from "react-router-dom";
 
@@ -11,9 +11,9 @@ const LoginPage = ({ setUser }) => {
   const [error, setError] = React.useState("");
 
   // eslint-disable-next-line no-undef
-  const loginInfo = process.env.REACT_APP_LOGIN || "test";
+  const loginInfo = import.meta.env.VITE_LOGIN || "test";
   // eslint-disable-next-line no-undef
-  const passwordInfo = process.env.REACT_APP_PASSWORD || "test";
+  const passwordInfo = import.meta.env.VITE_PASSWORD || "test";
 
   let navigate = useNavigate();
 

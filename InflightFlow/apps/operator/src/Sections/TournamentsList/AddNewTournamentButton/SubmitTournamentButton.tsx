@@ -29,8 +29,4 @@ const SubmitTournamentButton = ({ active, clickHandler, className }: Props) => {
   );
 };
 
-SubmitTournamentButton.defaultProps = {
-  disabled: false,
-};
-
 export default SubmitTournamentButton;

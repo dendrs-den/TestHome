@@ -6,8 +6,7 @@ import deleteTournamentById from "../../Api_requests/tournaments/deleteTournamen
 import setCurrentTournamentById from "../../Api_requests/tournaments/setCurrentTournament";
 import SubmitTournamentButton from "./AddNewTournamentButton/SubmitTournamentButton";
 import getAllTournaments from "../../Api_requests/tournaments/getAllTournaments";
-import AddBoxIcon from "@mui/icons-material/AddBox";
-import { Button, IconButton, Box } from "@mui/material";
+import { Button, Box } from "@mui/material";
 import CircularProgressDialog from "../../Components/UI/Backdrop/CircularProgressDialog/CircularProgressDialog";
 import setAdministrationState from "../../Api_requests/roundState/setAdministrationState";
 
@@ -97,17 +96,11 @@ const TournamentsList = (props) => {
             tourDataLoading={tourDataLoading}
           />
           <Button
-            className={classes.addTournamentBtn}
+            className={classes.addTournamentAction}
             onClick={() => changeContent("NewTournamentBlock")}
           >
             + ADD
           </Button>
-          <IconButton
-            className={classes.addTournamentIcon}
-            onClick={() => changeContent("NewTournamentBlock")}
-          >
-            <AddBoxIcon sx={{ fontSize: "32px" }}></AddBoxIcon>
-          </IconButton>
         </Box>
       </Box>
     </Fragment>

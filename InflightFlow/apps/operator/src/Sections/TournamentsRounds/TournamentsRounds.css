@@ -1,0 +1,43 @@
+.rounds_table.MuiDataGrid-root {
+  background-color: #050b1a !important;
+  color: #dbe3ff !important;
+  border: 1px solid #2b3551 !important;
+  --DataGrid-bg: #050b1a !important;
+  --DataGrid-containerBackground: #141c2d !important;
+  --DataGrid-t-header-background-base: #141c2d !important;
+}
+
+.rounds_table .MuiDataGrid-columnHeaders,
+.rounds_table .MuiDataGrid-topContainer {
+  background-color: #141c2d !important;
+  border-bottom: 1px solid #2b3551 !important;
+}
+
+.rounds_table .MuiDataGrid-columnHeader,
+.rounds_table .MuiDataGrid-columnHeaderTitleContainer,
+.rounds_table .MuiDataGrid-columnHeaderTitleContainerContent {
+  background-color: #141c2d !important;
+}
+
+.rounds_table .MuiDataGrid-columnHeaderTitle {
+  color: #dbe3ff !important;
+  font-size: 17px !important;
+  font-weight: 500 !important;
+  text-transform: capitalize !important;
+}
+
+.rounds_table .MuiDataGrid-footerContainer {
+  display: none !important;
+}
+
+.rounds_table .MuiDataGrid-main,
+.rounds_table .MuiDataGrid-virtualScroller,
+.rounds_table .MuiDataGrid-filler,
+.rounds_table .MuiDataGrid-overlay,
+.rounds_table .MuiDataGrid-overlayWrapper {
+  background-color: #050b1a !important;
+}
+
+.rounds_table .MuiDataGrid-row {
+  background-color: #050b1a !important;
+}

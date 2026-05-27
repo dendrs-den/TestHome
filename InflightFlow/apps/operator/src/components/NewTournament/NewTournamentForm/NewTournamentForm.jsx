@@ -30,7 +30,7 @@ const NewTournamentForm = (props) => {
   //Settings
   const [enteredTitle, setEnteredTitle] = useState(preFilledData?.title || "");
   const [enteredDiscipline, setEnteredDiscipline] = useState(
-    editing ? preFilledData?.disciplineList[0] || { name: "" } : [{ name: "" }]
+    editing ? preFilledData?.disciplineList?.[0] || { name: "" } : { name: "" }
   );
   const [enteredMistakeFine, setEnteredMistakeFine] = useState(
     preFilledData?.bustVal !== undefined ? Number(preFilledData?.bustVal) : 5
@@ -76,6 +76,10 @@ const NewTournamentForm = (props) => {
       .toString(36)
       .slice(2, 8)}`;
   };
+  const makeLocalId = (prefix) =>
+    `${prefix}-${Date.now().toString(36)}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
 
   const tourTitleIsValid = enteredTitle.trim() !== "";
   const tourDisciplineIsValid = enteredDiscipline?.name?.trim().length > 0;
@@ -207,7 +211,7 @@ const NewTournamentForm = (props) => {
               typeof createdTeam === "string" ? createdTeam : createdTeam?.id;
 
             teamArr.push({
-              id: createdId,
+              id: createdId || makeLocalId("team"),
               name: team.name,
               number: team.number,
             });
@@ -215,7 +219,11 @@ const NewTournamentForm = (props) => {
             if (team.inDB && team.isEdited) {
               await updateTeamInfo(team);
             }
-            teamArr.push({ id: team.id, name: team.name, number: team.number });
+            teamArr.push({
+              id: team.id ?? `team-local-${team.number ?? team.name ?? Date.now()}`,
+              name: team.name,
+              number: team.number,
+            });
           }
         }
       }
@@ -234,7 +242,7 @@ const NewTournamentForm = (props) => {
                 : createdStage?.id;
 
             stageArr.push({
-              id: createdId,
+              id: createdId || makeLocalId("stage"),
               name,
               battle: battleBoolean,
             });
@@ -243,7 +251,7 @@ const NewTournamentForm = (props) => {
               updateStageInfo({ id, name, battleBoolean });
             }
             stageArr.push({
-              id,
+              id: id ?? `stage-local-${name ?? Date.now()}`,
               name,
               battle: battleBoolean,
             });
@@ -252,11 +260,30 @@ const NewTournamentForm = (props) => {
       }
 
       if (preFilledData) {
-        await updateDisciplineInfo(enteredDiscipline);
-        disciplineArr.push({
-          id: preFilledData.disciplineList[0].id,
-          name: enteredDiscipline.name,
-        });
+        const existingDisciplineId = preFilledData?.disciplineList?.[0]?.id;
+
+        if (existingDisciplineId) {
+          await updateDisciplineInfo({
+            id: existingDisciplineId,
+            name: enteredDiscipline.name,
+          });
+          disciplineArr.push({
+            id: existingDisciplineId,
+            name: enteredDiscipline.name,
+          });
+        } else if (enteredDiscipline?.name?.trim().length > 0) {
+          const createdDiscipline = await createNewDiscipline({
+            name: enteredDiscipline.name,
+          });
+          const createdId =
+            typeof createdDiscipline === "string"
+              ? createdDiscipline
+              : createdDiscipline?.id;
+          disciplineArr.push({
+            id: createdId || makeLocalId("discipline"),
+            name: enteredDiscipline.name,
+          });
+        }
       } else if (
         !enteredDiscipline.inDB &&
         enteredDiscipline.name.trim().length > 0
@@ -266,7 +293,10 @@ const NewTournamentForm = (props) => {
           typeof createdDiscipline === "string"
             ? createdDiscipline
             : createdDiscipline?.id;
-        disciplineArr.push({ id: createdId, name: enteredDiscipline.name });
+        disciplineArr.push({
+          id: createdId || makeLocalId("discipline"),
+          name: enteredDiscipline.name,
+        });
       }
 
       // DELETING EXTRA ENTITIES

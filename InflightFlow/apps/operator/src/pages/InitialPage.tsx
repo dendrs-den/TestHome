@@ -15,7 +15,6 @@ import { Box } from "@mui/material";
 import lp from "../Api_requests/longpoll/longpoll";
 import TournamentsList from "../Sections/TournamentsList/TournamentsList";
 import TournamentsRounds from "../Sections/TournamentsRounds/TournamentsRounds";
-import TrainingModePanel from "../Sections/TrainingModePage/TrainingModePanel";
 
 const InitialPage = (props) => {
   const { changeBlockTitle } = props;
@@ -63,7 +62,9 @@ const InitialPage = (props) => {
     setCurrentMainContent(newContent);
     const state = await getCurrentState();
 
-    if (newContent !== "refereePanel") {
+    if (newContent === "trainingRefereePanel") {
+      setTrainingMode(true);
+    } else if (newContent !== "refereePanel") {
       setTrainingMode(false);
     }
 
@@ -215,9 +216,10 @@ const InitialPage = (props) => {
                 />
               )}
               {renderConditions.trainingRefereePanel && (
-                <TrainingModePanel
+                <RefereePanel
                   changeBlockTitle={changeBlockTitle}
                   changeContent={changeCurrentMainContentHandler}
+                  isTrainingMode={true}
                 />
               )}
             </section>

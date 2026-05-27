@@ -34,6 +34,28 @@
   position: relative;
 }
 
+.settings__options :global(.MuiInputBase-root) {
+  background-color: #0a1226 !important;
+}
+
+.settings__options :global(.MuiInputBase-input) {
+  color: #dbe3ff !important;
+  -webkit-text-fill-color: #dbe3ff !important;
+}
+
+.settings__options :global(.MuiInputLabel-root) {
+  color: #8fa2d4 !important;
+}
+
+.settings__options :global(.MuiInputLabel-root.Mui-focused),
+.settings__options :global(.MuiInputLabel-root.MuiFormLabel-filled) {
+  color: #9bb0ff !important;
+}
+
+.settings__options :global(.MuiOutlinedInput-notchedOutline) {
+  border-color: #2a3552 !important;
+}
+
 .option_hint {
   position: absolute;
   bottom: -30px;

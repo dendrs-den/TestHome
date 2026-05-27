@@ -14,13 +14,13 @@ const TournamentsTable = (props) => {
     },
     {
       field: "title",
-      headerName: "name",
+      headerName: "Name",
       maxWidth: 250,
       flex: 2,
     },
     {
       field: "discipline",
-      headerName: "discipline",
+      headerName: "Discipline",
       flex: 5,
     },
     {
@@ -62,10 +62,6 @@ const TournamentsTable = (props) => {
     props.clickHandler(params.id);
   };
 
-  const rowDoubleClickHandler = () => {
-    props.doubleClickHandler();
-  };
-
   const rowData = props.renderedData.map((tour, i) => {
     return {
       counter: i + 1,
@@ -82,7 +78,6 @@ const TournamentsTable = (props) => {
       rows={props.tourDataLoading ? [] : rowData}
       columns={columns}
       onRowClick={rowClickHandler}
-      onRowDoubleClick={rowDoubleClickHandler}
       disableColumnFilter={true}
       disableColumnMenu={true}
       disableColumnSelector={true}

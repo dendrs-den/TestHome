@@ -2,6 +2,7 @@ import deleteDisciplineById from "../disciplines/deleteDisciplineById";
 import deleteStageById from "../stages/deleteStage";
 import deleteTeamById from "../teams/deleteTeamById";
 import getAllTournaments from "./getAllTournaments";
+import coreBaseUrl from "../coreBaseUrl";
 
 const deleteTournamentById = async (tourId) => {
   try {
@@ -23,7 +24,7 @@ const deleteTournamentById = async (tourId) => {
       console.count("deletedDiscipline");
     }
 
-    const response = await fetch(`/tournaments/delete`, {
+    const response = await fetch(`${coreBaseUrl}/tournaments/delete`, {
       method: "POST",
       body: JSON.stringify({ id: tourId }),
       headers: {

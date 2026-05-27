@@ -378,6 +378,9 @@ export default function EditableDataGrid(props) {
   return (
     <Box
       sx={{
+        "--DataGrid-t-header-background-base": "#141c2d",
+        "--DataGrid-bg": "#050b1a",
+        "--DataGrid-containerBackground": "#141c2d",
         height: props.gridHeight || 350,
         padding: "15px",
         border: "1px solid #d3d3d3",
@@ -427,9 +430,24 @@ export default function EditableDataGrid(props) {
         "& .MuiDataGrid-columnHeaders": {
           position: "relative",
           zIndex: 2,
+          backgroundColor: "#141c2d !important",
+          borderBottom: "1px solid #2b3551 !important",
+        },
+        "& .MuiDataGrid-columnHeader, & .MuiDataGrid-columnHeaderTitleContainer, & .MuiDataGrid-columnHeaderTitleContainerContent":
+          {
+            backgroundColor: "#141c2d !important",
+          },
+        "& .MuiDataGrid-columnHeaderTitle": {
+          color: "#dbe3ff !important",
+          fontWeight: 500,
+          fontSize: "17px",
         },
         "& .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within": {
           outline: "none !important",
+        },
+        "& .MuiDataGrid-columnHeader, & .MuiDataGrid-columnHeaders *": {
+          pointerEvents: "none !important",
+          cursor: "default !important",
         },
         "& .MuiDataGrid-cell--editing": {
           backgroundColor: "#050b1a !important",
@@ -472,6 +490,7 @@ export default function EditableDataGrid(props) {
         disableColumnMenu={true}
         disableColumnSelector={true}
         disableColumnSorting={true}
+        disableColumnReorder={true}
         disableColumnResize={true}
         hideFooterPagination={true}
         hideFooterSelectedRowCount={true}

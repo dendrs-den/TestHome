@@ -1,7 +1,9 @@
 // UPDATE CURRENT TOURNAMENT ROUND ORDER
+import coreBaseUrl from "../coreBaseUrl";
+
 export default async function updateCurrentTournament(tourData) {
   try {
-    const response = await fetch("/tournaments/current/update", {
+    const response = await fetch(`${coreBaseUrl}/tournaments/current/update`, {
       method: "POST",
       headers: {
         "Content-type": "application/json",

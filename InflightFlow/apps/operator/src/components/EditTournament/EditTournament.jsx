@@ -5,6 +5,11 @@ import NewTournamentForm from "../NewTournament/NewTournamentForm/NewTournamentF
 import classes from "./EditTournament.module.css";
 
 export default function EditTournament(props) {
+  const makeLocalId = (prefix) =>
+    `${prefix}-${Date.now().toString(36)}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+
   const [preFilledData, setPrefilledData] = useState({
     id: "",
     title: "Prefilled title",
@@ -40,10 +45,19 @@ export default function EditTournament(props) {
         title: data.title,
         bustVal: data.bust_value,
         skipVal: data.skip_value,
-        teamsList: teamArr.map((el) => ({ ...el, inDB: true })),
-        disciplineList: discArr.map((el) => ({ ...el, inDB: true })),
+        teamsList: teamArr.map((el, index) => ({
+          ...el,
+          id: el?.id ?? `team-${index + 1}-${makeLocalId("tmp")}`,
+          inDB: true,
+        })),
+        disciplineList: discArr.map((el, index) => ({
+          ...el,
+          id: el?.id ?? `discipline-${index + 1}-${makeLocalId("tmp")}`,
+          inDB: true,
+        })),
         stageList: stageArr.map((el) => ({
           ...el,
+          id: el?.id ?? makeLocalId("stage"),
           inDB: true,
           battle:
             el.battle === true ? "Yes" : el.battle === false ? "No" : null,

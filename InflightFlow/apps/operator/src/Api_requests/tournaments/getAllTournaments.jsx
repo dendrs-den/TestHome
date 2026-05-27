@@ -1,6 +1,8 @@
+import coreBaseUrl from "../coreBaseUrl";
+
 const getAllTournaments = async () => {
   try {
-    const response = await fetch(`/tournaments/getall`);
+    const response = await fetch(`${coreBaseUrl}/tournaments/getall`);
     const data = await response.json();
 
     const mappedData = [];

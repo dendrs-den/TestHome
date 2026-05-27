@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"inflightflow/apps/core/internal/config"
@@ -19,6 +20,7 @@ import (
 	"inflightflow/apps/core/internal/journal"
 	"inflightflow/apps/core/internal/preflight"
 	"inflightflow/apps/core/internal/sensor"
+	"inflightflow/apps/core/internal/tournaments"
 )
 
 func Run() error {
@@ -31,6 +33,8 @@ func Run() error {
 	if err := domainRuntime.Restore(); err != nil {
 		return err
 	}
+	tourStore := tournaments.NewStore(filepath.Join(filepath.Dir(cfg.JournalPath), "tournaments.json"))
+	currentTournamentID := ""
 
 	hardware := resolveHardwareMode(cfg.HardwareMode)
 	sensorRuntime := sensor.NewRuntime(sensor.Config{
@@ -125,6 +129,193 @@ func Run() error {
 			HardwareMode: hardware,
 		})
 	})
+	mux.HandleFunc("/tournaments/getall", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		items, err := tourStore.List()
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "tournaments_read_failed"})
+			return
+		}
+		writeJSON(w, http.StatusOK, items)
+	})
+	mux.HandleFunc("/tournaments/add", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		var body tournaments.Tournament
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_json"})
+			return
+		}
+		if body.Name == "" {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "name_required"})
+			return
+		}
+		created, err := tourStore.Add(body)
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "tournament_create_failed"})
+			return
+		}
+		writeJSON(w, http.StatusOK, created)
+	})
+	mux.HandleFunc("/tournaments/delete", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		var body struct {
+			ID string `json:"id"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_json"})
+			return
+		}
+		if body.ID == "" {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "id_required"})
+			return
+		}
+		if err := tourStore.Delete(body.ID); err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "tournament_delete_failed"})
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{
+			"ok": true,
+			"id": body.ID,
+		})
+	})
+	mux.HandleFunc("/tournaments/current", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		var body struct {
+			ID string `json:"id"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_json"})
+			return
+		}
+		if body.ID == "" {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "id_required"})
+			return
+		}
+		currentTournamentID = body.ID
+		writeJSON(w, http.StatusOK, map[string]any{"ok": true, "id": currentTournamentID})
+	})
+	mux.HandleFunc("/tournaments/getcurrent", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		items, err := tourStore.List()
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "tournaments_read_failed"})
+			return
+		}
+		if len(items) == 0 {
+			writeJSON(w, http.StatusOK, map[string]any{
+				"id":          "",
+				"name":        "",
+				"teams":       []any{},
+				"disciplines": []any{},
+				"stages":      []any{},
+				"round":       []any{},
+				"bust_value":  5,
+				"skip_value":  20,
+			})
+			return
+		}
+		current := items[0]
+		if currentTournamentID != "" {
+			for _, it := range items {
+				if it.ID == currentTournamentID {
+					current = it
+					break
+				}
+			}
+		}
+		writeJSON(w, http.StatusOK, map[string]any{
+			"id":          current.ID,
+			"name":        current.Name,
+			"teams":       current.Teams,
+			"disciplines": current.Disciplines,
+			"stages":      current.Stages,
+			"round":       []any{},
+			"bust_value":  current.BustValue,
+			"skip_value":  current.SkipValue,
+		})
+	})
+	mux.HandleFunc("/tournaments/update", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		var body tournaments.Tournament
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_json"})
+			return
+		}
+		if body.ID == "" {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "id_required"})
+			return
+		}
+		updated, err := tourStore.Update(body)
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "tournament_update_failed"})
+			return
+		}
+		writeJSON(w, http.StatusOK, updated)
+	})
+	mux.HandleFunc("/tournaments/current/update", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		var body tournaments.Tournament
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_json"})
+			return
+		}
+		if body.ID == "" {
+			body.ID = currentTournamentID
+		}
+		if body.ID == "" {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "id_required"})
+			return
+		}
+		updated, err := tourStore.Update(body)
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "tournament_update_failed"})
+			return
+		}
+		currentTournamentID = updated.ID
+		writeJSON(w, http.StatusOK, updated)
+	})
+	mux.HandleFunc("/actions/getstate", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{
+			"state": "administration",
+		})
+	})
+	setAdministrationHandler := func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{
+			"ok":    true,
+			"state": "administration",
+		})
+	}
+	mux.HandleFunc("/actions/setadministration", setAdministrationHandler)
+	mux.HandleFunc("/actions/setAdministration", setAdministrationHandler)
 
 	// Placeholder protected route for operator control APIs.
 	mux.HandleFunc("/v1/control/ping", passwordGate(func(w http.ResponseWriter, _ *http.Request) {

@@ -1,0 +1,93 @@
+[
+  {
+    "id": "0404d346-fa20-48cc-9d9e-800005a7156c",
+    "name": "FlowNEW",
+    "teams": [
+      {
+        "id": "team-mpobx05k-xn8v37",
+        "name": "Денисов",
+        "number": "101"
+      },
+      {
+        "id": "team-mpobx06j-q5nokl",
+        "name": "Петро",
+        "number": "102"
+      },
+      {
+        "id": "team-mpobx07k-8ykuue",
+        "name": "Сидоров",
+        "number": "103"
+      },
+      {
+        "id": "team-mpobx08n-1kq4qh",
+        "name": "Горбунов",
+        "number": "104"
+      },
+      {
+        "id": "team-mpobx05k-xn8v37",
+        "name": "Денисов",
+        "number": "101"
+      },
+      {
+        "id": "team-mpobx06j-q5nokl",
+        "name": "Петро",
+        "number": "102"
+      },
+      {
+        "id": "team-mpobx07k-8ykuue",
+        "name": "Сидоров",
+        "number": "103"
+      },
+      {
+        "id": "team-mpobx08n-1kq4qh",
+        "name": "Горбунов",
+        "number": "104"
+      },
+      {
+        "id": "team-mpocqr8b-sjqj5d",
+        "name": "Семенов",
+        "number": "105"
+      }
+    ],
+    "disciplines": [
+      {
+        "id": "discipline-mpobx0cm-6abojv",
+        "name": "DS"
+      }
+    ],
+    "stages": [
+      {
+        "battle": false,
+        "id": "stage-mpobx09o-ezpoe2",
+        "name": "Раунд 1"
+      },
+      {
+        "battle": false,
+        "id": "stage-mpobx0an-mj1hya",
+        "name": "Раунд 2"
+      },
+      {
+        "battle": false,
+        "id": "stage-mpobx0bm-azxtes",
+        "name": "Раунд 3"
+      },
+      {
+        "battle": false,
+        "id": "stage-mpobx09o-ezpoe2",
+        "name": "Раунд 1"
+      },
+      {
+        "battle": false,
+        "id": "stage-mpobx0an-mj1hya",
+        "name": "Раунд 2"
+      },
+      {
+        "battle": false,
+        "id": "stage-mpobx0bm-azxtes",
+        "name": "Раунд 3"
+      }
+    ],
+    "bust_value": 5,
+    "skip_value": 20
+  }
+]

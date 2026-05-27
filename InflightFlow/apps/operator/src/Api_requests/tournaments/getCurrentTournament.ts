@@ -1,11 +1,14 @@
+import coreBaseUrl from "../coreBaseUrl";
+
 const getCurrentTournament = async () => {
   try {
-    const response = await fetch(`/tournaments/getcurrent`);
+    const response = await fetch(`${coreBaseUrl}/tournaments/getcurrent`);
     const data = await response.json();
 
-    return data;
+    return data || {};
   } catch (error) {
     console.log("Log error /tournaments/getcurrent request failed", error);
+    return {};
   }
 };
 

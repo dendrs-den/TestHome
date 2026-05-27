@@ -5,6 +5,7 @@ import ScoreBoard from "./pages/ScoreBoard";
 import SpectatorsScreenPage from "./pages/SpectatorScreen";
 import NotFoundPage from "./pages/NotFoundPage";
 import { LoginPage } from "./pages/LoginPage";
+import LegacyRefPanel from "./pages/LegacyRefPanel";
 
 function App() {
   const [blockTitle, setBlockTitle] = useState("Tournaments");
@@ -79,6 +80,7 @@ function App() {
             )
           }
         />
+        <Route path="/legacy-ref" element={<LegacyRefPanel />} />
         <Route path="/infoboard" element={<SpectatorsScreenPage />} />
         <Route path="/scoreboard" element={<ScoreBoard />} />
         <Route path="*" element={<NotFoundPage />} />

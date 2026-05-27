@@ -206,11 +206,23 @@ const NewTournamentForm = (props) => {
       }
 
       if (preFilledData) {
-        await updateDisciplineInfo(enteredDiscipline);
-        disciplineArr.push({
-          id: preFilledData.disciplineList[0].id,
-          name: enteredDiscipline.name,
-        });
+        const existingDisciplineId = preFilledData?.disciplineList?.[0]?.id;
+
+        if (existingDisciplineId) {
+          await updateDisciplineInfo({
+            id: existingDisciplineId,
+            name: enteredDiscipline.name,
+          });
+          disciplineArr.push({
+            id: existingDisciplineId,
+            name: enteredDiscipline.name,
+          });
+        } else if (enteredDiscipline.name.trim().length > 0) {
+          const returnedId = await createNewDiscipline({
+            name: enteredDiscipline.name,
+          });
+          disciplineArr.push({ id: returnedId, name: enteredDiscipline.name });
+        }
       } else if (
         !enteredDiscipline.inDB &&
         enteredDiscipline.name.trim().length > 0

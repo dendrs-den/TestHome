@@ -21,6 +21,7 @@ import updateCurrentTournament from "../../Api_requests/tournaments/updateCurren
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import setAdministrationState from "../../Api_requests/coreStateManagement/setAdministrationState";
+import "./TournamentsRounds.css";
 
 const defaultTeam = {
   team: null,
@@ -71,7 +72,7 @@ function EditToolbar(props) {
 }
 
 const TournamentsRounds = (props) => {
-  const { changeContent, changeBlockTitle } = props;
+  const { changeContent, changeBlockTitle, setFooterActions } = props;
   const [currentTour, setCurrentTour] = useState({});
   const [rowData, setRowData] = useState([]);
   const [selectedRow, setSelectedRow] = useState(0);
@@ -79,14 +80,12 @@ const TournamentsRounds = (props) => {
 
   const startRound = useCallback(
     async (roundId) => {
-      try {
-        await setCurrentRound(roundId);
-      } catch (error) {
-        console.log("setCurrentRound failed, opening referee panel anyway", error);
-      }
-      changeContent("refereePanel");
+      setCurrentRound(roundId).catch((error) => {
+        console.log("setCurrentRound failed, opening legacy panel anyway", error);
+      });
+      window.location.assign("/legacy-ref");
     },
-    [changeContent]
+    []
   );
 
   const handleRowModelChange = async (params) => {
@@ -101,12 +100,54 @@ const TournamentsRounds = (props) => {
     }
   };
 
+  const buildDefaultRounds = useCallback((tour) => {
+    const stages = Array.isArray(tour?.stages) ? tour.stages : [];
+    const teams = Array.isArray(tour?.teams) ? tour.teams : [];
+    const rounds = [];
+
+    stages.forEach((stage) => {
+      teams.forEach((team) => {
+        rounds.push({
+          ...defaultTeam,
+          stage,
+          team,
+        });
+      });
+    });
+
+    return rounds;
+  }, []);
+
   const fetchCurrentTournament = useCallback(async () => {
-    const currentTour = await getCurrentTournament();
-    setCurrentTour(currentTour);
-    setRowData(currentTour?.round);
-    changeBlockTitle(currentTour?.name);
-  }, [changeBlockTitle]);
+    const loadedTour = await getCurrentTournament();
+    if (!loadedTour || typeof loadedTour !== "object") {
+      setCurrentTour({});
+      setRowData([]);
+      changeBlockTitle("Tournament");
+      return;
+    }
+
+    const hasRounds = Array.isArray(loadedTour.round) && loadedTour.round.length > 0;
+    const hasStages = Array.isArray(loadedTour.stages) && loadedTour.stages.length > 0;
+    const hasTeams = Array.isArray(loadedTour.teams) && loadedTour.teams.length > 0;
+
+    let normalizedTour = loadedTour;
+    if (!hasRounds && hasStages && hasTeams) {
+      normalizedTour = {
+        ...loadedTour,
+        round: buildDefaultRounds(loadedTour),
+      };
+      try {
+        await updateCurrentTournament(normalizedTour);
+      } catch (error) {
+        console.log("failed to persist generated rounds", error);
+      }
+    }
+
+    setCurrentTour(normalizedTour);
+    setRowData(Array.isArray(normalizedTour?.round) ? normalizedTour.round : []);
+    changeBlockTitle(normalizedTour?.name || "Tournament");
+  }, [buildDefaultRounds, changeBlockTitle]);
 
   const showBackDrop = useCallback(async (roundId) => {
     await setCurrentRound(roundId);
@@ -141,25 +182,25 @@ const TournamentsRounds = (props) => {
     },
     {
       field: "name",
-      headerName: "name",
+      headerName: "Name",
       maxWidth: 250,
       flex: 2,
     },
     {
       field: "time",
-      headerName: "time",
+      headerName: "Time",
       maxWidth: 100,
       flex: 1,
     },
     {
       field: "number",
-      headerName: "number",
+      headerName: "Number",
       maxWidth: 100,
       flex: 1,
     },
     {
       field: "rank",
-      headerName: "rank",
+      headerName: "Rank",
       maxWidth: 100,
       flex: 2,
     },
@@ -167,7 +208,7 @@ const TournamentsRounds = (props) => {
       field: "actions",
       sortable: false,
       type: "actions",
-      headerName: "actions",
+      headerName: "Actions",
       maxWidth: 340,
       flex: 3,
       cellClassName: "actions",
@@ -320,6 +361,38 @@ const TournamentsRounds = (props) => {
   );
 
   const { stages = null } = currentTour;
+  const roundsGridSx = {
+    height: "320px",
+    "--DataGrid-bg": "#050b1a",
+    "--DataGrid-containerBackground": "#141c2d",
+    "--DataGrid-t-header-background-base": "#141c2d",
+    "& .MuiDataGrid-columnHeaders": {
+      backgroundColor: "#141c2d !important",
+      borderBottom: "1px solid #2b3551 !important",
+    },
+    "& .MuiDataGrid-columnHeaderTitle": {
+      color: "#dbe3ff !important",
+      fontWeight: 500,
+      fontSize: "17px",
+      textTransform: "capitalize",
+    },
+    "& .MuiDataGrid-row.Mui-selected": {
+      backgroundColor: "#1a2742 !important",
+    },
+    "& .MuiDataGrid-row.Mui-selected:hover": {
+      backgroundColor: "#213155 !important",
+    },
+    "& .MuiDataGrid-row.selected-true": {
+      fontWeight: "bold",
+      backgroundColor: "rgba(86, 44, 255, 0.1) !important",
+    },
+    "& .MuiDataGrid-virtualScroller": {
+      overflowY: "auto !important",
+    },
+    "& .MuiDataGrid-footerContainer": {
+      display: "none !important",
+    },
+  };
 
   useEffect(() => {
     setAdministrationState();
@@ -344,6 +417,29 @@ const TournamentsRounds = (props) => {
     changeBlockTitle("Tournaments");
     changeContent("tournamentsList");
   }, [changeBlockTitle, changeContent]);
+
+  useEffect(() => {
+    setFooterActions(
+      <Box sx={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
+        <Button
+          variant="outlined"
+          color="error"
+          sx={{
+            maxWidth: "110px",
+            minWidth: "110px",
+            padding: "12px 35px",
+            fontWeight: 700,
+            fontSize: "14px",
+            lineHeight: "17px",
+          }}
+          onClick={goToTourList}
+        >
+          Back
+        </Button>
+      </Box>
+    );
+    return () => setFooterActions(null);
+  }, [goToTourList, setFooterActions]);
 
   return (
     <Container
@@ -400,19 +496,14 @@ const TournamentsRounds = (props) => {
                   </h5>
                   {battle === false && (
                     <BaseDataGrid
-                      sx={{
-                        height: "320px",
-                        "& .MuiDataGrid-row.Mui-selected": {
-                          backgroundColor: "#FFF !important",
-                        },
-                        "& .MuiDataGrid-row.selected-true": {
-                          fontWeight: "bold",
-                          backgroundColor: "rgba(86, 44, 255, 0.1) !important",
-                        },
-                      }}
+                      className="rounds_table"
+                      sx={roundsGridSx}
                       columns={columns}
                       rows={countedRows}
                       onRowClick={rowClickHandler}
+                      hideFooter={true}
+                      hideFooterPagination={true}
+                      hideFooterSelectedRowCount={true}
                       getRowClassName={({ row }) => {
                         return `selected-${
                           row.id === selectedRow.teamId &&
@@ -423,20 +514,13 @@ const TournamentsRounds = (props) => {
                   )}
                   {battle === true && (
                     <BaseDataGrid
-                      sx={{
-                        height: "320px",
-                        "& .MuiDataGrid-row.Mui-selected": {
-                          backgroundColor: "#FFF !important",
-                        },
-                        "& .MuiDataGrid-row.selected-true": {
-                          fontWeight: "bold",
-                          backgroundColor: "rgba(86, 44, 255, 0.1) !important",
-                        },
-                      }}
+                      className="rounds_table"
+                      sx={roundsGridSx}
                       editMode="cell"
                       columns={battleDataGridColumns}
                       rows={countedRows}
                       onRowClick={rowClickHandler}
+                      hideFooter={true}
                       disableColumnFilter={true}
                       disableColumnMenu={true}
                       disableColumnSelector={true}
@@ -469,21 +553,6 @@ const TournamentsRounds = (props) => {
             })}
           </Grid>
 
-          <Button
-            variant="outlined"
-            color="error"
-            sx={{
-              marginTop: "30px",
-              alignSelf: "flex-end",
-              padding: "12px 30px",
-              fontWeight: "500",
-              fontSize: "14px",
-              lineHeight: "17px",
-            }}
-            onClick={goToTourList}
-          >
-            Back
-          </Button>
         </Fragment>
       )}
       {!stages && (

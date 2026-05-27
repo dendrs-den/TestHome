@@ -2,7 +2,7 @@ import { io } from "socket.io-client";
 
 const WEBSOCKET_URL =
   // eslint-disable-next-line no-undef
-  process.env.REACT_APP_SOCKET_URL || `http://${window.location.hostname}:3002`;
+  import.meta.env.VITE_SOCKET_URL || `http://${window.location.hostname}:3002`;
 
 export default class SpectatorSocket {
   static socket = null;
