@@ -64,11 +64,11 @@ export default function EditTournament(props) {
   return (
     <div className={classes.editTournament_Block}>
       <div className={classes.newTournament}>
-        <h3 className={classes.newTournament__header}>Editing tournament</h3>
         {preFilledData.isLoaded > 0 && (
           <NewTournamentForm
             editing={true}
             setChangesMade={props.setChangesMade}
+            setFooterActions={props.setFooterActions}
             preFilledData={preFilledData}
             changeCurrentMainContent={props.onContentChange}
             onContentChange={props.onContentChange}

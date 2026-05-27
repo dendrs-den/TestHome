@@ -8,7 +8,7 @@
   display: none !important;
 }
 
-.MuiDataGrid-footerContainer {
+.tournament_table .MuiDataGrid-footerContainer {
   /* border-top: 1px solid rgb(109, 109, 109); */
   display: none !important;
 }

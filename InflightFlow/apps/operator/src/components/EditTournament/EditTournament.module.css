@@ -3,6 +3,9 @@
   max-width: 1110px;
   margin: auto;
   padding: 10px;
+  background: linear-gradient(180deg, #131a2a 0%, #0e1422 100%);
+  border: 1px solid #242d44;
+  border-radius: 10px;
 }
 
 .newTournament__header {
@@ -10,4 +13,5 @@
   line-height: 43px;
   font-weight: 600px;
   margin: 0 0 30px 0;
+  color: #e6ebff;
 }

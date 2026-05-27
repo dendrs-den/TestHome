@@ -11,9 +11,9 @@ async function addTournamentHandler(item) {
 const NewTournamentBlock = (props) => {
   return (
     <div className={classes.newTournament}>
-      <h3 className={classes.newTournament__header}>Adding new tournament</h3>
       <NewTournamentForm
         setChangesMade={props.setChangesMade}
+        setFooterActions={props.setFooterActions}
         preFilledData={null}
         changeCurrentMainContent={props.onContentChange}
         createTournamentHandler={addTournamentHandler}

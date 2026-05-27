@@ -71,7 +71,7 @@ function EditToolbar(props) {
 }
 
 const TournamentsRounds = (props) => {
-  const { changeContent, changeBlockTitle, setFooterActions } = props;
+  const { changeContent, changeBlockTitle } = props;
   const [currentTour, setCurrentTour] = useState({});
   const [rowData, setRowData] = useState([]);
   const [selectedRow, setSelectedRow] = useState(0);
@@ -79,7 +79,11 @@ const TournamentsRounds = (props) => {
 
   const startRound = useCallback(
     async (roundId) => {
-      await setCurrentRound(roundId);
+      try {
+        await setCurrentRound(roundId);
+      } catch (error) {
+        console.log("setCurrentRound failed, opening referee panel anyway", error);
+      }
       changeContent("refereePanel");
     },
     [changeContent]
@@ -315,7 +319,7 @@ const TournamentsRounds = (props) => {
       : col
   );
 
-  const { stages = null } = currentTour || {};
+  const { stages = null } = currentTour;
 
   useEffect(() => {
     setAdministrationState();
@@ -340,26 +344,6 @@ const TournamentsRounds = (props) => {
     changeBlockTitle("Tournaments");
     changeContent("tournamentsList");
   }, [changeBlockTitle, changeContent]);
-
-  useEffect(() => {
-    setFooterActions(
-      <Button
-        variant="outlined"
-        color="error"
-        sx={{
-          padding: "12px 30px",
-          fontWeight: "500",
-          fontSize: "14px",
-          lineHeight: "17px",
-        }}
-        onClick={goToTourList}
-      >
-        Back
-      </Button>
-    );
-
-    return () => setFooterActions(null);
-  }, [goToTourList, setFooterActions]);
 
   return (
     <Container
@@ -417,7 +401,7 @@ const TournamentsRounds = (props) => {
                   {battle === false && (
                     <BaseDataGrid
                       sx={{
-                        height: "576px",
+                        height: "320px",
                         "& .MuiDataGrid-row.Mui-selected": {
                           backgroundColor: "#FFF !important",
                         },
@@ -429,9 +413,6 @@ const TournamentsRounds = (props) => {
                       columns={columns}
                       rows={countedRows}
                       onRowClick={rowClickHandler}
-                      hideFooterPagination={true}
-                      hideFooterSelectedRowCount={true}
-                      hideFooter={true}
                       getRowClassName={({ row }) => {
                         return `selected-${
                           row.id === selectedRow.teamId &&
@@ -443,7 +424,7 @@ const TournamentsRounds = (props) => {
                   {battle === true && (
                     <BaseDataGrid
                       sx={{
-                        height: "576px",
+                        height: "320px",
                         "& .MuiDataGrid-row.Mui-selected": {
                           backgroundColor: "#FFF !important",
                         },
@@ -487,7 +468,37 @@ const TournamentsRounds = (props) => {
               );
             })}
           </Grid>
+
+          <Button
+            variant="outlined"
+            color="error"
+            sx={{
+              marginTop: "30px",
+              alignSelf: "flex-end",
+              padding: "12px 30px",
+              fontWeight: "500",
+              fontSize: "14px",
+              lineHeight: "17px",
+            }}
+            onClick={goToTourList}
+          >
+            Back
+          </Button>
         </Fragment>
+      )}
+      {!stages && (
+        <Box
+          sx={{
+            minHeight: "320px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#8e9ab8",
+            fontSize: "18px",
+          }}
+        >
+          Tournament data is not loaded yet
+        </Box>
       )}
       <EditResultsBackDrop open={open} setOpen={setOpen} />
     </Container>

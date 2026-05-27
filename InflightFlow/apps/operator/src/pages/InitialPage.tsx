@@ -49,7 +49,7 @@ const InitialPage = (props) => {
     history: "History",
     NewTournamentBlock: "Adding new tournament",
     editTournament: "Editing tournament",
-    refereePanel: "Referee panel",
+    refereePanel: "",
     trainingRefereePanel: "Training mode",
   };
   const currentHeaderTitle =
@@ -94,7 +94,7 @@ const InitialPage = (props) => {
 
   useEffect(() => {
     fetchDataHandler(true);
-  }, [fetchDataHandler, changeBlockTitle]);
+  }, [fetchDataHandler]);
 
   // useEffect(() => {
   //   if (!tournamentsList?.length) {
@@ -211,6 +211,7 @@ const InitialPage = (props) => {
                   changeBlockTitle={changeBlockTitle}
                   changeContent={changeCurrentMainContentHandler}
                   isTrainingMode={trainingMode}
+                  setFooterActions={setFooterActions}
                 />
               )}
               {renderConditions.trainingRefereePanel && (

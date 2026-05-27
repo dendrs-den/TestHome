@@ -5,7 +5,7 @@
   justify-content: space-between;
   max-width: 340px;
   height: calc(100vh - 100px);
-  background-color: white;
+  background: linear-gradient(180deg, #131a2a 0%, #0e1422 100%);
 }
 
 .navigationBlock h3 {
@@ -14,8 +14,8 @@
   font-weight: 600;
   margin-top: 20px;
   padding: 2px 25px;
-  color: #562cff;
-  border-left: 5px solid #562cff;
+  color: #9aa7ff;
+  border-left: 5px solid #5a67ff;
 }
 
 .navigationBlock__switcher {
@@ -28,8 +28,8 @@
 
 .navBtn {
   width: 100%;
-  background-color: #fff;
-  color: #000;
+  background-color: transparent;
+  color: #dbe3ff;
   font-size: 14px;
   padding: 5px 48px;
   display: flex;
@@ -40,10 +40,10 @@
 
 .navBtn_selected {
   font-weight: bold;
-  color: #562cff;
-  background-color: rgba(86, 44, 255, 0.1) !important;
+  color: #a5b1ff;
+  background-color: rgba(90, 103, 255, 0.18) !important;
 }
 
 .navBtn:hover {
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: rgba(90, 103, 255, 0.12);
 }

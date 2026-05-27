@@ -35,8 +35,12 @@ const TournamentsList = (props) => {
 
   // SET SELECTED TOUR AS CURRENT AND NAVIGATE ITS ROUNDS SECTION
   const tourSubmitHandler = async () => {
+    const fallbackId = selectedId ?? apiData?.[0]?.id;
+    if (!fallbackId) {
+      return;
+    }
     setIsLoading(true);
-    await setCurrentTournamentById(selectedId);
+    await setCurrentTournamentById(fallbackId);
     changeContent("tournamentsRounds");
   };
 

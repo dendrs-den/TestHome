@@ -29,11 +29,22 @@ function EditToolbar(props) {
         variant="text"
         onClick={handleClick}
         sx={{
+          minWidth: "0 !important",
+          minHeight: "0 !important",
+          padding: "10px 20px !important",
+          borderRadius: "8px",
+          backgroundColor: "transparent",
           color: "#7f8fff !important",
+          fontSize: "14px",
           fontWeight: 700,
           letterSpacing: "0.04em",
           textTransform: "uppercase",
           "&:hover": {
+            backgroundColor: "rgba(90, 103, 255, 0.12)",
+          },
+          "&:focus, &:focus-visible, &:active": {
+            outline: "none",
+            boxShadow: "none",
             backgroundColor: "rgba(90, 103, 255, 0.12)",
           },
         }}
@@ -327,8 +338,8 @@ export default function EditableDataGrid(props) {
       field: "actions",
       headerName: "Actions",
       type: "actions",
-      headerAlign: "right",
-      align: "right",
+      headerAlign: "center",
+      align: "center",
       sortable: false,
       maxWidth: 120,
       flex: 0.7,
@@ -347,6 +358,22 @@ export default function EditableDataGrid(props) {
       },
     },
   ];
+
+  const suppressNativeTitle = React.useCallback((event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    const titled = target.closest("[title]");
+    if (titled instanceof HTMLElement) {
+      titled.removeAttribute("title");
+    }
+
+    target.querySelectorAll?.("[title]").forEach((el) => {
+      if (el instanceof HTMLElement) {
+        el.removeAttribute("title");
+      }
+    });
+  }, []);
 
   return (
     <Box
@@ -378,9 +405,11 @@ export default function EditableDataGrid(props) {
         },
         "& .MuiDataGrid-main": {
           backgroundColor: "#050b1a !important",
+          overflow: "hidden",
         },
         "& .MuiDataGrid-virtualScroller": {
           backgroundColor: "#050b1a !important",
+          marginTop: "0 !important",
         },
         "& .MuiDataGrid-filler": {
           backgroundColor: "#050b1a !important",
@@ -394,6 +423,10 @@ export default function EditableDataGrid(props) {
         },
         "& .MuiDataGrid-toolbarContainer": {
           backgroundColor: "#050b1a !important",
+        },
+        "& .MuiDataGrid-columnHeaders": {
+          position: "relative",
+          zIndex: 2,
         },
         "& .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within": {
           outline: "none !important",
@@ -410,6 +443,17 @@ export default function EditableDataGrid(props) {
         },
         "& .MuiDataGrid-overlayWrapper": {
           backgroundColor: "transparent !important",
+        },
+        "& .MuiDataGrid-actionsCell .MuiButtonBase-root": {
+          minWidth: "0 !important",
+          minHeight: "0 !important",
+          width: "24px !important",
+          height: "24px !important",
+          padding: "0 !important",
+          borderRadius: "4px !important",
+        },
+        "& .MuiDataGrid-actionsCell .MuiButtonBase-root:hover": {
+          backgroundColor: "rgba(255, 71, 71, 0.12)",
         },
       }}
     >
@@ -428,6 +472,7 @@ export default function EditableDataGrid(props) {
         disableColumnMenu={true}
         disableColumnSelector={true}
         disableColumnSorting={true}
+        disableColumnResize={true}
         hideFooterPagination={true}
         hideFooterSelectedRowCount={true}
         editMode="cell"
@@ -466,6 +511,7 @@ export default function EditableDataGrid(props) {
           setChangesMade(true);
           setIsModified(true);
         }}
+        onMouseOverCapture={suppressNativeTitle}
         // getCellClassName={({ value, field, row }) => {
         //   if (field === "name" && (value.length < 1 || value.length > 20)) {
         //     return "invalid";

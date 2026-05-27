@@ -84,6 +84,22 @@ const TournamentTableParameter = (props) => {
     };
   });
 
+  const suppressNativeTitle = (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    const titled = target.closest("[title]");
+    if (titled instanceof HTMLElement) {
+      titled.removeAttribute("title");
+    }
+
+    target.querySelectorAll?.("[title]").forEach((el) => {
+      if (el instanceof HTMLElement) {
+        el.removeAttribute("title");
+      }
+    });
+  };
+
   return (
     <div className={classes["table-parameter"]}>
       <div className={classes["table-parameter__upper-row"]}>
@@ -116,7 +132,9 @@ const TournamentTableParameter = (props) => {
           disableColumnFilter
           disableColumnMenu
           disableColumnSorting
+          disableColumnResize
           rowsPerPageOptions={[20]}
+          onMouseOverCapture={suppressNativeTitle}
         />
       </div>
     </div>

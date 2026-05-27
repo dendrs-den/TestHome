@@ -1,10 +1,14 @@
 .newTournament {
   position: relative;
+  width: 100%;
   max-width: 1100px;
   margin: auto;
+  margin-bottom: 0;
   min-height: 700px;
-  background-color: #fff;
-  padding: 10px;
+  background: linear-gradient(180deg, #131a2a 0%, #0e1422 100%);
+  border: 1px solid #242d44;
+  border-radius: 10px;
+  padding: 12px;
 }
 
 .newTournament__header {
@@ -12,6 +16,7 @@
   line-height: 43px;
   font-weight: 600px;
   margin: 0 0 30px 0;
+  color: #e6ebff;
 }
 
 @media (max-width: 1400px) {

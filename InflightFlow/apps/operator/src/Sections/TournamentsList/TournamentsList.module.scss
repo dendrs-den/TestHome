@@ -20,28 +20,39 @@
 
 .addTournamentBtn {
   min-width: 0 !important;
-  padding: 0 !important;
+  min-height: 0 !important;
+  padding: 10px 20px !important;
   position: absolute !important;
-  right: 14px;
-  bottom: 10px;
+  right: 10px;
+  bottom: 8px;
   z-index: 2;
   outline: none;
   border: none;
   background-color: transparent;
-  color: #3c61ff !important;
-  font-size: 18px !important;
+  color: #7f8fff !important;
+  font-size: 14px !important;
   font-weight: 700 !important;
-  line-height: 1 !important;
-  letter-spacing: 0.03em;
+  line-height: 1.2 !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   text-align: right;
   cursor: pointer;
-  transition: color 0.2s ease, text-shadow 0.2s ease;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .addTournamentBtn:hover {
-  text-decoration: none;
-  color: #5d7dff !important;
-  text-shadow: 0 0 10px rgba(60, 97, 255, 0.45);
+  background-color: rgba(90, 103, 255, 0.12) !important;
+  color: #7f8fff !important;
+}
+
+.addTournamentBtn:focus,
+.addTournamentBtn:focus-visible,
+.addTournamentBtn:active {
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: rgba(90, 103, 255, 0.12) !important;
+  color: #7f8fff !important;
 }
 
 .addTournamentIcon {

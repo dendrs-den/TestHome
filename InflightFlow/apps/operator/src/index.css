@@ -6,6 +6,16 @@
   list-style: none;
 }
 
+:root {
+  --if-font-family: "Rubik", "Segoe UI", sans-serif;
+  --if-btn-height: 42px;
+  --if-btn-min-width: 120px;
+  --if-btn-radius: 10px;
+  --if-btn-font-size: 14px;
+  --if-btn-line-height: 17px;
+  --if-btn-padding: 10px 24px;
+}
+
 html,
 body,
 #root {
@@ -28,6 +38,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: radial-gradient(1200px 600px at 20% -10%, #1d2333 0%, #080a0f 45%, #050608 100%);
   color: #e6ebff;
+}
+
+button {
+  min-height: var(--if-btn-height);
+  min-width: var(--if-btn-min-width);
+  border-radius: var(--if-btn-radius);
+  font-size: var(--if-btn-font-size);
+  line-height: var(--if-btn-line-height);
+  font-weight: 700;
+  padding: var(--if-btn-padding);
+  text-transform: none;
+  font-family: var(--if-font-family);
 }
 
 code {
@@ -91,8 +113,60 @@ code {
   color: #dbe3ff !important;
 }
 
+.MuiDataGrid-columnHeaderTitle {
+  text-transform: capitalize !important;
+}
+
 .MuiDataGrid-columnHeader,
 .MuiDataGrid-columnHeaderTitleContainer,
 .MuiDataGrid-columnHeaderTitleContainerContent {
   cursor: default !important;
+}
+
+.MuiDataGrid-columnSeparator {
+  pointer-events: none !important;
+  cursor: default !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: #3b4662 !important;
+}
+
+.MuiDataGrid-columnHeader:hover .MuiDataGrid-columnSeparator,
+.MuiDataGrid-columnHeader:focus .MuiDataGrid-columnSeparator,
+.MuiDataGrid-columnHeader:focus-within .MuiDataGrid-columnSeparator,
+.MuiDataGrid-columnHeader.MuiDataGrid-columnHeader--moving
+  .MuiDataGrid-columnSeparator,
+.MuiDataGrid-columnHeader.MuiDataGrid-columnHeader--sorted
+  .MuiDataGrid-columnSeparator {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.app-context-menu {
+  position: fixed;
+  z-index: 10001;
+  min-width: 170px;
+  padding: 6px;
+  border: 1px solid #2a3552;
+  border-radius: 8px;
+  background: #0f1626;
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.45);
+}
+
+.app-context-menu__item {
+  width: 100%;
+  height: 36px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #d8e2ff;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.app-context-menu__item:hover {
+  background: rgba(84, 111, 214, 0.25);
 }

@@ -12,15 +12,17 @@
 .table-parameter__header {
   font-weight: 600;
   font-size: 24px;
+  color: #d8e1ff;
 }
 .deleteBtn {
-  color: rgb(112, 112, 112);
+  color: #9aa7c7;
 }
 
 .table-parameter__table-container {
   height: 214px;
   width: 100%;
-  border: 1px solid #d3d3d3;
+  border: 1px solid #2b3550;
+  background-color: rgba(11, 16, 25, 0.45);
   box-sizing: border-box;
   border-radius: 5px;
 }
