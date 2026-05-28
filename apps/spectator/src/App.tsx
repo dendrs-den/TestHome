@@ -279,7 +279,7 @@ export default function App() {
   const liveMs = state === "running" ? tickMs : (domain?.RoundResultMs ?? 0);
   const roundLabel = deriveRoundLabel(domain?.RoundID || "", currentTournament);
   const pilotLabel = derivePilotLabel(domain?.RoundID || "", currentTournament);
-  const tournamentLabel = currentTournament?.name || "FlowCUP";
+  const tournamentLabel = currentTournament?.name || "Flow CUP";
 
   React.useEffect(() => {
     const onContextMenu = (event: MouseEvent) => {
