@@ -1,6 +1,15 @@
-﻿import React from "react";
+import React from "react";
+import { invoke } from "@tauri-apps/api/core";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import logo from "./assets/infoscreen_logo3.png";
-import { authHeaders, buildCoreBaseUrl, checkCoreHealth, DEFAULT_CORE_PORT, isIPv4, toRealtimeUrl } from "../../../packages/lan-client/src/runtime";
+import {
+  authHeaders,
+  buildCoreBaseUrl,
+  checkCoreHealth,
+  DEFAULT_CORE_PORT,
+  isIPv4,
+  toRealtimeUrl,
+} from "../../../packages/lan-client/src/runtime";
 
 type RoundState = "idle" | "prepared" | "running" | "completed" | "cancelled";
 
@@ -16,6 +25,7 @@ type TournamentRound = {
   id?: string;
   team?: { id?: string; name?: string; number?: string | number };
   stage?: { id?: string; name?: string };
+  faults?: Array<{ type?: string; valid?: boolean }>;
 };
 
 type Tournament = {
@@ -34,16 +44,21 @@ function fmt(ms: number): string {
   return `${String(sec).padStart(4, "0")}:${String(milli).padStart(3, "0")}`;
 }
 
+function findCurrentRound(roundId: string, tournament: Tournament | null): TournamentRound | null {
+  const rounds = Array.isArray(tournament?.round) ? tournament.round : [];
+  return rounds.find((round) => String(round.id || "") === roundId) || null;
+}
+
 function deriveRoundLabel(roundId: string, tournament: Tournament | null): string {
-  const rounds = Array.isArray(tournament?.round) ? tournament?.round : [];
-  const matched = rounds.find((round) => String(round.id || "") === roundId);
-  if (!matched) {
-    return roundId?.replace(/^round-?/i, "Round ") || "Round -";
-  }
-  const stage = matched.stage?.name || "Stage";
-  const team = matched.team?.name || "Team";
-  const number = matched.team?.number ? ` #${matched.team.number}` : "";
-  return `${stage} - ${team}${number}`;
+  const matched = findCurrentRound(roundId, tournament);
+  if (!matched) return roundId?.replace(/^round-?/i, "Round ") || "Round -";
+  return matched.stage?.name || "Round";
+}
+
+function derivePilotLabel(roundId: string, tournament: Tournament | null): string {
+  const matched = findCurrentRound(roundId, tournament);
+  if (!matched) return tournament?.name || "-";
+  return matched.team?.name || tournament?.name || "-";
 }
 
 export default function App() {
@@ -60,6 +75,7 @@ export default function App() {
   const [domain, setDomain] = React.useState<DomainState | null>(null);
   const [currentTournament, setCurrentTournament] = React.useState<Tournament | null>(null);
   const [error, setError] = React.useState("");
+  const [closingApp, setClosingApp] = React.useState(false);
   const [runningSince, setRunningSince] = React.useState<number | null>(null);
   const [tickMs, setTickMs] = React.useState(0);
   const receivedInitialRealtimeRef = React.useRef(false);
@@ -93,14 +109,17 @@ export default function App() {
       setServerDialogError("Введите корректный IP в формате 192.168.0.177");
       return;
     }
+
     setServerDialogError("");
     setCheckingServer(true);
     const ok = await checkCoreHealth(buildCoreBaseUrl(candidate, DEFAULT_CORE_PORT), password);
     setCheckingServer(false);
+
     if (!ok) {
       setServerDialogError("По этому IP core недоступен или отклонил пароль.");
       return;
     }
+
     localStorage.setItem(STORAGE_KEY, candidate);
     localStorage.setItem(PASSWORD_KEY, password);
     setServerIp(candidate);
@@ -108,10 +127,36 @@ export default function App() {
     setShowServerDialog(false);
   }
 
+  async function handleExit() {
+    setCtxMenu(null);
+    setClosingApp(true);
+
+    try {
+      await invoke("exit_app");
+      return;
+    } catch {
+      try {
+        await getCurrentWindow().destroy();
+        return;
+      } catch {
+        window.open("", "_self");
+        window.close();
+      }
+    }
+
+    window.setTimeout(() => {
+      if (!document.hidden) {
+        setError("???????????? ??????????. ?????? ???? ???????.");
+        setClosingApp(false);
+      }
+    }, 160);
+  }
+
   React.useEffect(() => {
     if (showServerDialog || checkingServer) return;
 
     let active = true;
+    let allowRealtimeError = true;
     let ws: WebSocket | null = null;
     let reconnectTimer: number | null = null;
 
@@ -145,25 +190,25 @@ export default function App() {
         scheduleReconnect();
         return;
       }
+
       ws.onopen = () => {
         setError("");
         void refreshTournament();
       };
+
       ws.onmessage = (evt) => {
         if (!active) return;
         try {
           const msg = JSON.parse(String(evt.data)) as { domain?: DomainState };
           const next = msg.domain;
           if (!next) return;
+
           setDomain((prev) => {
             const isInitialRealtimeFrame = !receivedInitialRealtimeRef.current;
             receivedInitialRealtimeRef.current = true;
 
             if (next.RoundState === "running") {
-              const becameRunning =
-                !!prev &&
-                (prev.RoundState !== "running" || prev.RoundID !== next.RoundID);
-
+              const becameRunning = !!prev && (prev.RoundState !== "running" || prev.RoundID !== next.RoundID);
               if (becameRunning && !isInitialRealtimeFrame) {
                 setRunningSince(Date.now());
                 setTickMs(0);
@@ -174,6 +219,7 @@ export default function App() {
             }
             return next;
           });
+
           if (next.TournamentID !== currentTournament?.id) {
             void refreshTournament();
           }
@@ -182,18 +228,24 @@ export default function App() {
           // Ignore malformed frame.
         }
       };
+
       ws.onclose = () => {
+        if (!allowRealtimeError) return;
         setError("realtime disconnected");
         scheduleReconnect();
       };
+
       ws.onerror = () => {
+        if (!allowRealtimeError) return;
         setError("realtime unavailable");
       };
     };
 
     connect();
+
     return () => {
       active = false;
+      allowRealtimeError = false;
       if (reconnectTimer != null) window.clearTimeout(reconnectTimer);
       if (ws && ws.readyState === WebSocket.OPEN) ws.close();
     };
@@ -208,17 +260,33 @@ export default function App() {
   }, [runningSince]);
 
   const state = domain?.RoundState ?? "idle";
+  const currentRound = React.useMemo(
+    () => findCurrentRound(domain?.RoundID || "", currentTournament),
+    [currentTournament, domain?.RoundID]
+  );
+  const validFaults = React.useMemo(
+    () => (Array.isArray(currentRound?.faults) ? currentRound.faults.filter((fault) => fault?.valid === true) : []),
+    [currentRound]
+  );
+  const bustCount = React.useMemo(
+    () => validFaults.filter((fault) => String(fault?.type || "").toLowerCase() === "bust").length,
+    [validFaults]
+  );
+  const skipCount = React.useMemo(
+    () => validFaults.filter((fault) => String(fault?.type || "").toLowerCase() === "skip").length,
+    [validFaults]
+  );
   const liveMs = state === "running" ? tickMs : (domain?.RoundResultMs ?? 0);
   const roundLabel = deriveRoundLabel(domain?.RoundID || "", currentTournament);
-  const pilotLabel = currentTournament?.name || domain?.TournamentID || "-";
-  const crossings = domain?.Crossings ?? 0;
+  const pilotLabel = derivePilotLabel(domain?.RoundID || "", currentTournament);
+  const tournamentLabel = currentTournament?.name || "FlowCUP";
 
   React.useEffect(() => {
     const onContextMenu = (event: MouseEvent) => {
       event.preventDefault();
       event.stopPropagation();
       const menuWidth = 180;
-      const menuHeight = 84;
+      const menuHeight = 120;
       const maxX = Math.max(8, window.innerWidth - menuWidth - 8);
       const maxY = Math.max(8, window.innerHeight - menuHeight - 8);
       setCtxMenu({
@@ -243,26 +311,31 @@ export default function App() {
 
   return (
     <main className="spectator-screen">
-      <section className="left-panel">
-        <img className="flow-logo-image" src={logo} alt="Flow Moscow" />
-        <div className="round-label">{roundLabel}</div>
-        <div className="pilot-label">{pilotLabel}</div>
-        <div className={`timer-main state-${state}`}>{fmt(liveMs)}</div>
-      </section>
+      <img className="flow-logo-image" src={logo} alt="Flow Moscow" />
+      <div className="brand-mark">{tournamentLabel}</div>
 
-      <section className="right-panel">
-        <div className="stats-line">
-          <span>Crossings: {crossings}</span>
-          <span>State: {state}</span>
-        </div>
-        <div className="dots-line">
-          {Array.from({ length: Math.min(crossings, 8) }).map((_, index) => (
-            <span className="dot" key={index} />
-          ))}
-        </div>
+      <section className="spectator-content">
+        <section className="left-panel">
+          <div className="round-label">{roundLabel}</div>
+          <div className="pilot-label">{pilotLabel}</div>
+          <div className={`timer-main state-${state}`}>{fmt(liveMs)}</div>
+        </section>
+
+        <section className="right-panel" aria-label="Штрафы">
+          <div className="stats-line">
+            <span>Busts: {bustCount}</span>
+            <span>Skips: {skipCount}</span>
+          </div>
+          <div className="dots-line">
+            {Array.from({ length: Math.min(validFaults.length, 8) }).map((_, index) => (
+              <span className="dot" key={index} />
+            ))}
+          </div>
+        </section>
       </section>
 
       {error ? <div className="error-banner">core unavailable: {error}</div> : null}
+      {closingApp ? <div className="error-banner">Закрытие окна...</div> : null}
 
       {(showServerDialog || checkingServer) && (
         <div className="server-dialog-backdrop">
@@ -315,7 +388,20 @@ export default function App() {
             className="app-context-menu__item"
             onClick={() => {
               setCtxMenu(null);
-              window.close();
+              setInputIp(serverIp);
+              setInputPassword(serverPassword);
+              setError("");
+              setServerDialogError("");
+              setShowServerDialog(true);
+            }}
+          >
+            Сервер
+          </button>
+          <button
+            type="button"
+            className="app-context-menu__item"
+            onClick={() => {
+              void handleExit();
             }}
           >
             Выход

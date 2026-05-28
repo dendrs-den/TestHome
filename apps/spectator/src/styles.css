@@ -1,67 +1,121 @@
-﻿:root {
+:root {
   color-scheme: dark;
+  --screen-bg: #050505;
+  --screen-text: #f7f7f7;
+  --screen-muted: rgba(255, 255, 255, 0.82);
+  --accent-green: #31f67b;
+  --accent-red: #ff5252;
+  --frame-border: rgba(255, 255, 255, 0.08);
 }
 
 * {
   box-sizing: border-box;
 }
 
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
+
 body {
   margin: 0;
   font-family: "Segoe UI", "Arial", sans-serif;
-  background: #000;
-  color: #f3f3f3;
+  background: #1f1f1f;
+  color: var(--screen-text);
 }
 
 .spectator-screen {
   width: 100vw;
   height: 100vh;
-  background: #000;
-  display: grid;
-  grid-template-columns: 1.7fr 1fr;
-  align-items: center;
-  padding: 44px 60px;
+  background: var(--screen-bg);
+  display: flex;
+  flex-direction: column;
   position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(31, 31, 31, 0.9);
+}
+
+.spectator-screen::before {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border: 1px solid var(--frame-border);
+  pointer-events: none;
+}
+
+.spectator-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  align-items: start;
+  gap: 24px;
+  padding: 134px 48px 40px 47px;
 }
 
 .left-panel {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 28px;
+  gap: 26px;
   align-self: start;
-  margin-top: 8px;
+  min-width: 0;
 }
 
 .flow-logo-image {
-  width: 280px;
+  position: absolute;
+  top: 27px;
+  left: 47px;
+  width: 161px;
   height: auto;
   object-fit: contain;
+  z-index: 1;
+}
+
+.brand-mark {
+  position: absolute;
+  top: 27px;
+  right: 78px;
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--screen-text);
+  white-space: nowrap;
 }
 
 .round-label {
-  font-size: 64px;
-  font-weight: 500;
-  margin-top: 10px;
+  font-size: 58px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--screen-text);
 }
 
 .pilot-label {
-  margin-top: 120px;
-  font-size: 118px;
-  font-weight: 800;
-  line-height: 1;
+  margin-top: 8px;
+  max-width: none;
+  font-size: 66px;
+  font-weight: 700;
+  line-height: 70px;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
 }
 
 .timer-main {
-  margin-top: 38px;
-  font-size: 156px;
+  margin-top: 34px;
+  font-size: 118px;
   font-family: "DSEG7 Classic", "Consolas", monospace;
   font-weight: 400;
   font-variant-numeric: tabular-nums lining-nums;
-  line-height: 0.95;
-  letter-spacing: 1px;
-  color: #33e06f;
-  text-shadow: 0 0 10px rgba(51, 224, 111, 0.45), 0 0 24px rgba(51, 224, 111, 0.2);
+  line-height: 118px;
+  letter-spacing: -0.02em;
+  color: var(--accent-green);
+  text-shadow:
+    0 0 8px rgba(48, 245, 122, 0.55),
+    0 0 20px rgba(48, 245, 122, 0.2);
+  white-space: nowrap;
 }
 
 .timer-main.state-running,
@@ -69,34 +123,45 @@ body {
 .timer-main.state-completed,
 .timer-main.state-cancelled,
 .timer-main.state-idle {
-  color: #33e06f;
+  color: var(--accent-green);
 }
 
 .right-panel {
-  align-self: center;
-  justify-self: center;
-  margin-top: 210px;
+  align-self: start;
+  justify-self: end;
+  width: 400px;
+  padding-top: 219px;
 }
 
 .stats-line {
   display: flex;
-  gap: 64px;
-  font-size: 84px;
+  gap: 0;
+  justify-content: flex-start;
+  font-size: 54px;
   font-weight: 700;
+  letter-spacing: -0.04em;
   white-space: nowrap;
+  color: var(--screen-text);
+}
+
+.stats-line span + span {
+  margin-left: 34px;
 }
 
 .dots-line {
   margin-top: 22px;
   display: flex;
-  gap: 28px;
+  gap: 14px;
+  min-height: 24px;
+  padding-left: 10px;
 }
 
 .dot {
-  width: 36px;
-  height: 36px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: #ff4f4f;
+  background: var(--accent-red);
+  box-shadow: 0 0 18px rgba(255, 82, 82, 0.18);
 }
 
 .error-banner {
@@ -204,34 +269,116 @@ body {
 }
 
 @media (max-width: 1600px) {
-  .spectator-screen {
-    padding: 28px 36px;
+  .spectator-screen::before {
+    inset: 18px;
   }
 
-  .flow-logo-image {
-    width: 220px;
+  .spectator-content {
+    padding: 116px 42px 40px 42px;
+    grid-template-columns: minmax(0, 1fr) 360px;
+  }
+
+  .brand-mark {
+    right: 54px;
+    font-size: 48px;
   }
 
   .round-label {
-    font-size: 44px;
+    font-size: 48px;
   }
 
   .pilot-label {
-    margin-top: 72px;
-    font-size: 82px;
+    font-size: 56px;
+    line-height: 60px;
   }
 
   .timer-main {
-    font-size: 118px;
+    font-size: 98px;
+    line-height: 98px;
+  }
+
+  .right-panel {
+    width: 360px;
+    padding-top: 184px;
   }
 
   .stats-line {
-    font-size: 54px;
-    gap: 38px;
+    font-size: 44px;
+  }
+}
+
+@media (max-width: 1180px) {
+  .spectator-content {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 112px 28px 34px;
+  }
+
+  .left-panel {
+    gap: 18px;
+  }
+
+  .pilot-label {
+    max-width: none;
+    white-space: normal;
+  }
+
+  .right-panel {
+    align-self: start;
+    justify-self: start;
+    min-width: 0;
+    padding-top: 10px;
+  }
+
+  .stats-line {
+    justify-content: flex-start;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 780px) {
+  .flow-logo-image {
+    top: 28px;
+    left: 28px;
+    width: 112px;
+  }
+
+  .brand-mark {
+    top: 28px;
+    right: 30px;
+    font-size: 34px;
+  }
+
+  .spectator-content {
+    padding: 88px 24px 28px;
+  }
+
+  .round-label {
+    font-size: 34px;
+  }
+
+  .pilot-label {
+    font-size: 44px;
+    line-height: 46px;
+    white-space: normal;
+  }
+
+  .timer-main {
+    font-size: 84px;
+    line-height: 84px;
+  }
+
+  .stats-line {
+    font-size: 32px;
+    flex-wrap: wrap;
+  }
+
+  .stats-line span + span {
+    margin-left: 24px;
   }
 
   .dot {
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
   }
 }
