@@ -1,0 +1,11 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HealthResponse",
+  "type": "object",
+  "required": ["status", "service", "hardwareMode"],
+  "properties": {
+    "status": { "type": "string" },
+    "service": { "type": "string" },
+    "hardwareMode": { "type": "string", "enum": ["real", "mock"] }
+  }
+}

@@ -1,0 +1,1168 @@
+[
+  {
+    "id": "0404d346-fa20-48cc-9d9e-800005a7156c",
+    "name": "FlowNEW",
+    "teams": [
+      {
+        "id": "team-mpobx05k-xn8v37",
+        "name": "Денисов",
+        "number": "101"
+      },
+      {
+        "id": "team-mpobx06j-q5nokl",
+        "name": "Петро",
+        "number": "102"
+      },
+      {
+        "id": "team-mpobx07k-8ykuue",
+        "name": "Сидоров",
+        "number": "103"
+      },
+      {
+        "id": "team-mpobx08n-1kq4qh",
+        "name": "Горбунов",
+        "number": "104"
+      },
+      {
+        "id": "team-mpobx05k-xn8v37",
+        "name": "Денисов",
+        "number": "101"
+      },
+      {
+        "id": "team-mpobx06j-q5nokl",
+        "name": "Петро",
+        "number": "102"
+      },
+      {
+        "id": "team-mpobx07k-8ykuue",
+        "name": "Сидоров",
+        "number": "103"
+      },
+      {
+        "id": "team-mpobx08n-1kq4qh",
+        "name": "Горбунов",
+        "number": "104"
+      },
+      {
+        "id": "team-mpocqr8b-sjqj5d",
+        "name": "Семенов",
+        "number": "105"
+      }
+    ],
+    "disciplines": [
+      {
+        "id": "discipline-mpobx0cm-6abojv",
+        "name": "DS"
+      }
+    ],
+    "stages": [
+      {
+        "battle": false,
+        "id": "stage-mpobx09o-ezpoe2",
+        "name": "Раунд 1"
+      },
+      {
+        "battle": false,
+        "id": "stage-mpobx0an-mj1hya",
+        "name": "Раунд 2"
+      },
+      {
+        "battle": false,
+        "id": "stage-mpobx0bm-azxtes",
+        "name": "Раунд 3"
+      },
+      {
+        "battle": false,
+        "id": "stage-mpobx09o-ezpoe2",
+        "name": "Раунд 1"
+      },
+      {
+        "battle": false,
+        "id": "stage-mpobx0an-mj1hya",
+        "name": "Раунд 2"
+      },
+      {
+        "battle": false,
+        "id": "stage-mpobx0bm-azxtes",
+        "name": "Раунд 3"
+      }
+    ],
+    "round": [
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx05k-xn8v37",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx05k-xn8v37",
+          "name": "Денисов",
+          "number": "101"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx06j-q5nokl",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx06j-q5nokl",
+          "name": "Петро",
+          "number": "102"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx07k-8ykuue",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx07k-8ykuue",
+          "name": "Сидоров",
+          "number": "103"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx08n-1kq4qh",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx08n-1kq4qh",
+          "name": "Горбунов",
+          "number": "104"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx05k-xn8v37",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx05k-xn8v37",
+          "name": "Денисов",
+          "number": "101"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx06j-q5nokl",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx06j-q5nokl",
+          "name": "Петро",
+          "number": "102"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx07k-8ykuue",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx07k-8ykuue",
+          "name": "Сидоров",
+          "number": "103"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx08n-1kq4qh",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx08n-1kq4qh",
+          "name": "Горбунов",
+          "number": "104"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpocqr8b-sjqj5d",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpocqr8b-sjqj5d",
+          "name": "Семенов",
+          "number": "105"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx05k-xn8v37",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx05k-xn8v37",
+          "name": "Денисов",
+          "number": "101"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx06j-q5nokl",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx06j-q5nokl",
+          "name": "Петро",
+          "number": "102"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx07k-8ykuue",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx07k-8ykuue",
+          "name": "Сидоров",
+          "number": "103"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx08n-1kq4qh",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx08n-1kq4qh",
+          "name": "Горбунов",
+          "number": "104"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx05k-xn8v37",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx05k-xn8v37",
+          "name": "Денисов",
+          "number": "101"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx06j-q5nokl",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx06j-q5nokl",
+          "name": "Петро",
+          "number": "102"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx07k-8ykuue",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx07k-8ykuue",
+          "name": "Сидоров",
+          "number": "103"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx08n-1kq4qh",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx08n-1kq4qh",
+          "name": "Горбунов",
+          "number": "104"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpocqr8b-sjqj5d",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpocqr8b-sjqj5d",
+          "name": "Семенов",
+          "number": "105"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx05k-xn8v37",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx05k-xn8v37",
+          "name": "Денисов",
+          "number": "101"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx06j-q5nokl",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx06j-q5nokl",
+          "name": "Петро",
+          "number": "102"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx07k-8ykuue",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx07k-8ykuue",
+          "name": "Сидоров",
+          "number": "103"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx08n-1kq4qh",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx08n-1kq4qh",
+          "name": "Горбунов",
+          "number": "104"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx05k-xn8v37",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx05k-xn8v37",
+          "name": "Денисов",
+          "number": "101"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx06j-q5nokl",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx06j-q5nokl",
+          "name": "Петро",
+          "number": "102"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx07k-8ykuue",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx07k-8ykuue",
+          "name": "Сидоров",
+          "number": "103"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx08n-1kq4qh",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx08n-1kq4qh",
+          "name": "Горбунов",
+          "number": "104"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpocqr8b-sjqj5d",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpocqr8b-sjqj5d",
+          "name": "Семенов",
+          "number": "105"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx05k-xn8v37",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx05k-xn8v37",
+          "name": "Денисов",
+          "number": "101"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx06j-q5nokl",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx06j-q5nokl",
+          "name": "Петро",
+          "number": "102"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx07k-8ykuue",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx07k-8ykuue",
+          "name": "Сидоров",
+          "number": "103"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx08n-1kq4qh",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx08n-1kq4qh",
+          "name": "Горбунов",
+          "number": "104"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx05k-xn8v37",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx05k-xn8v37",
+          "name": "Денисов",
+          "number": "101"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx06j-q5nokl",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx06j-q5nokl",
+          "name": "Петро",
+          "number": "102"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx07k-8ykuue",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx07k-8ykuue",
+          "name": "Сидоров",
+          "number": "103"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpobx08n-1kq4qh",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx08n-1kq4qh",
+          "name": "Горбунов",
+          "number": "104"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx09o-ezpoe2-team-mpocqr8b-sjqj5d",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx09o-ezpoe2",
+          "name": "Раунд 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpocqr8b-sjqj5d",
+          "name": "Семенов",
+          "number": "105"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx05k-xn8v37",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx05k-xn8v37",
+          "name": "Денисов",
+          "number": "101"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx06j-q5nokl",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx06j-q5nokl",
+          "name": "Петро",
+          "number": "102"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx07k-8ykuue",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx07k-8ykuue",
+          "name": "Сидоров",
+          "number": "103"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx08n-1kq4qh",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx08n-1kq4qh",
+          "name": "Горбунов",
+          "number": "104"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx05k-xn8v37",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx05k-xn8v37",
+          "name": "Денисов",
+          "number": "101"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx06j-q5nokl",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx06j-q5nokl",
+          "name": "Петро",
+          "number": "102"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx07k-8ykuue",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx07k-8ykuue",
+          "name": "Сидоров",
+          "number": "103"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpobx08n-1kq4qh",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx08n-1kq4qh",
+          "name": "Горбунов",
+          "number": "104"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0an-mj1hya-team-mpocqr8b-sjqj5d",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0an-mj1hya",
+          "name": "Раунд 2"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpocqr8b-sjqj5d",
+          "name": "Семенов",
+          "number": "105"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx05k-xn8v37",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx05k-xn8v37",
+          "name": "Денисов",
+          "number": "101"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx06j-q5nokl",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx06j-q5nokl",
+          "name": "Петро",
+          "number": "102"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx07k-8ykuue",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx07k-8ykuue",
+          "name": "Сидоров",
+          "number": "103"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx08n-1kq4qh",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx08n-1kq4qh",
+          "name": "Горбунов",
+          "number": "104"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx05k-xn8v37",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx05k-xn8v37",
+          "name": "Денисов",
+          "number": "101"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx06j-q5nokl",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx06j-q5nokl",
+          "name": "Петро",
+          "number": "102"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx07k-8ykuue",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx07k-8ykuue",
+          "name": "Сидоров",
+          "number": "103"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpobx08n-1kq4qh",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpobx08n-1kq4qh",
+          "name": "Горбунов",
+          "number": "104"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      },
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mpobx0bm-azxtes-team-mpocqr8b-sjqj5d",
+        "stage": {
+          "battle": false,
+          "id": "stage-mpobx0bm-azxtes",
+          "name": "Раунд 3"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mpocqr8b-sjqj5d",
+          "name": "Семенов",
+          "number": "105"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      }
+    ],
+    "bust_value": 5,
+    "skip_value": 20
+  },
+  {
+    "id": "8c2f8b95-4905-4cff-b58b-bd2387510070",
+    "name": "QA Cup",
+    "teams": [
+      {
+        "id": "team-mppui124-rhoils",
+        "name": "Team QA",
+        "number": "101"
+      }
+    ],
+    "disciplines": [
+      {
+        "id": "discipline-mppui141-6rycu4",
+        "name": "DS"
+      }
+    ],
+    "stages": [
+      {
+        "battle": false,
+        "id": "stage-mppui133-w3a5y5",
+        "name": "Round 1"
+      }
+    ],
+    "round": [
+      {
+        "crossings": [],
+        "faults": [],
+        "id": "round-stage-mppui133-w3a5y5-team-mppui124-rhoils",
+        "stage": {
+          "battle": false,
+          "id": "stage-mppui133-w3a5y5",
+          "name": "Round 1"
+        },
+        "stage_rank": 0,
+        "team": {
+          "id": "team-mppui124-rhoils",
+          "name": "Team QA",
+          "number": "101"
+        },
+        "time_real": null,
+        "time_result": null,
+        "tournament_rank": 0
+      }
+    ],
+    "bust_value": 5,
+    "skip_value": 20
+  }
+]

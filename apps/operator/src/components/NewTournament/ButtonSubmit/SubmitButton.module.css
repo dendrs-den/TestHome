@@ -1,0 +1,9 @@
+.submit-btn{
+  width: 110px;
+  min-width: 110px;
+  padding: 12px 35px;
+  background: #3C2BFE;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+}

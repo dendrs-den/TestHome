@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "InflightFlow Spectator",
+  "version": "0.1.0",
+  "identifier": "com.inflightflow.spectator",
+  "build": {
+    "beforeDevCommand": "npm run dev:tauri",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://127.0.0.1:5190",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "InflightFlow Spectator",
+        "width": 1920,
+        "height": 1080,
+        "minWidth": 1280,
+        "minHeight": 720,
+        "maximized": true,
+        "fullscreen": true,
+        "resizable": true
+      }
+    ]
+  },
+  "bundle": {
+    "active": true,
+    "targets": "msi",
+    "icon": [
+      "icons/icon.ico"
+    ]
+  }
+}

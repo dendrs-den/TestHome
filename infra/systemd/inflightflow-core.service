@@ -1,0 +1,23 @@
+[Unit]
+Description=InflightFlow Core Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=inflightflow
+Group=inflightflow
+WorkingDirectory=/opt/inflightflow/core
+EnvironmentFile=/etc/inflightflow/inflightflow-core.env
+ExecStart=/opt/inflightflow/bin/inflightflow-core
+Restart=always
+RestartSec=2
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/var/lib/inflightflow /var/log/inflightflow
+StandardOutput=append:/var/log/inflightflow/core.log
+StandardError=append:/var/log/inflightflow/core.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,49 @@
+.navigationBlock {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  max-width: 340px;
+  height: calc(100vh - 100px);
+  background: linear-gradient(180deg, #131a2a 0%, #0e1422 100%);
+}
+
+.navigationBlock h3 {
+  font-size: 24px;
+  line-height: 28.4px;
+  font-weight: 600;
+  margin-top: 20px;
+  padding: 2px 25px;
+  color: #9aa7ff;
+  border-left: 5px solid #5a67ff;
+}
+
+.navigationBlock__switcher {
+  display: flex;
+}
+
+.navBlock {
+  margin-top: 10px;
+}
+
+.navBtn {
+  width: 100%;
+  background-color: transparent;
+  color: #dbe3ff;
+  font-size: 14px;
+  padding: 5px 48px;
+  display: flex;
+  justify-content: flex-start;
+  border: none;
+  cursor: pointer;
+}
+
+.navBtn_selected {
+  font-weight: bold;
+  color: #a5b1ff;
+  background-color: rgba(90, 103, 255, 0.18) !important;
+}
+
+.navBtn:hover {
+  background-color: rgba(90, 103, 255, 0.12);
+}

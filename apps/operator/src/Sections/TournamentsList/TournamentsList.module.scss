@@ -1,0 +1,140 @@
+.tournaments {
+  max-width: 1120px;
+  margin: auto;
+}
+
+.topRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 28px;
+}
+.tableWrap {
+  position: relative;
+  border: 1px solid #aab3c7;
+  background: #060d21;
+  height: 640px;
+  min-height: 640px;
+}
+.header {
+  font-weight: 600;
+  font-size: 36px;
+  align-self: center;
+  color: #e6ebff;
+}
+
+.addTournamentBtn {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  position: static !important;
+  z-index: 2;
+  outline: none;
+  border: none;
+  background-color: transparent;
+  color: #7f8fff !important;
+  font-size: 34px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  text-align: right;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color 0.2s ease;
+}
+
+.addTournamentBtn:hover {
+  background-color: transparent !important;
+  color: #9ba8ff !important;
+}
+
+.addTournamentBtn:focus,
+.addTournamentBtn:focus-visible,
+.addTournamentBtn:active {
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  color: #7f8fff !important;
+}
+
+.addTournamentAction {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 10px 20px !important;
+  position: absolute !important;
+  right: 12px;
+  bottom: 8px;
+  z-index: 3;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: #7f8fff !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase !important;
+}
+
+.addTournamentAction:hover {
+  background: rgba(90, 103, 255, 0.12) !important;
+}
+
+.tournamentTable_block {
+  margin-top: 15px;
+  position: relative;
+  height: 640px;
+  display: flex;
+  min-width: 1000px;
+
+  box-sizing: border-box;
+  border-radius: 2px;
+}
+
+.btn {
+  max-width: 110px;
+  padding: 12px 35px;
+}
+
+.actionsRow {
+  margin-top: 12px;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+@media (max-width: 1500px) {
+  .tournaments {
+    max-width: 1000px;
+    padding: 0 20px;
+  }
+
+  .tournamentTable_block {
+    min-width: 100%;
+    max-width: 800px;
+    height: 560px;
+  }
+}
+
+@media (max-width: 1250px) {
+  .tournaments {
+    margin: 0 20px;
+  }
+
+  .header {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 850px) {
+  .header {
+    font-size: 24px;
+  }
+}
+@media (max-width: 690px) {
+  .tournamentTable_block {
+    min-height: 350px;
+    height: 350px;
+  }
+}

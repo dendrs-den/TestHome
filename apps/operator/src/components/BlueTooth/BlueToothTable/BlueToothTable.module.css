@@ -1,0 +1,32 @@
+.btn-row {
+  width: 100%;
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+}
+
+.btn-row button {
+  font-weight: 400;
+  text-transform: capitalize;
+}
+
+.rebind-btn {
+  color: #ddcd3a;
+  border-color: #ddcd3a;
+}
+
+.rebind-btn:hover {
+  background-color: rgba(221, 205, 58, 0.1);
+  color: #ddcd3a;
+  border-color: #ddcd3a;
+}
+
+.disconnect-btn {
+  color: #dd403a;
+  border-color: #dd403a;
+}
+.disconnect-btn:hover {
+  color: #dd403a;
+  border-color: #dd403a;
+  background-color: rgba(221, 64, 58, 0.1);
+}

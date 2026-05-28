@@ -1,0 +1,267 @@
+:root {
+  --header-height: 80px;
+  --color-main: #0b1019;
+  --color-primary: #101522;
+  --color-border: #242d44;
+  --color-text-main: #e6ebff;
+  --color-text-muted: #aeb7d1;
+  --navigation-width: 300px;
+  --navigation-width_thin: 200px;
+  --main-content-width: calc(100% - var(--navigation-width));
+  --main-content-width-thinner: calc(100% - var(--navigation-width_thin));
+  --main-content-width-full: 100%;
+}
+.container {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+  min-height: 100vh;
+}
+.logo {
+  height: var(--header-height);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: var(--header-height);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.logo img {
+  max-width: 160px;
+  max-height: 56px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.logo .header_text {
+  align-self: center;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 21px;
+  color: var(--color-text-main);
+}
+
+.dynamic_content {
+  padding: 20px 0 0 0;
+  min-width: 1000px;
+  max-width: 100%;
+  margin: auto;
+}
+
+.rightSideWrapper {
+  width: var(--main-content-width);
+  background: linear-gradient(180deg, #0f1524 0%, #0b1019 100%);
+  min-height: 100vh;
+  float: right;
+}
+
+/* When round controls or training panel are shown remove navigation
+and spread width to full */
+.rightSideWrapper.refereePanel,
+.rightSideWrapper.trainingRefereePanel {
+  width: var(--main-content-width-full);
+}
+
+header.refereePanel,
+header.trainingRefereePanel {
+  width: 100%;
+}
+
+.navigation {
+  z-index: 100;
+  position: fixed;
+  width: var(--navigation-width);
+  background: linear-gradient(180deg, #131a2a 0%, #0e1422 100%);
+  min-height: 100%;
+  border-right: 1px solid var(--color-border);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  z-index: 2;
+  position: fixed;
+  display: flex;
+  width: var(--main-content-width);
+  height: var(--header-height);
+  border-bottom: 1px solid var(--color-border);
+  border-right: none;
+  background-color: rgba(12, 18, 30, 0.95);
+}
+
+.main {
+  margin-top: var(--header-height);
+  min-height: calc(100vh - var(--header-height));
+  padding-bottom: 92px;
+}
+
+.content_header {
+  width: 1100px;
+  margin: auto;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 28px;
+  color: var(--color-text-main);
+}
+
+.header.NewTournamentBlock .content_header {
+  padding: 0 10px;
+}
+
+h2.History {
+  width: 1500px;
+}
+
+.bluetoothBlock {
+  z-index: 100;
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  margin-left: 0;
+}
+
+.drawer {
+  z-index: 10;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 10px;
+  height: 10px;
+  display: none;
+}
+
+.footer {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: var(--main-content-width);
+  min-height: 96px;
+  display: flex;
+  align-items: center;
+  z-index: 5;
+  background: #0b1019;
+  border-top: 1px solid var(--color-border);
+}
+
+.footer.refereePanel,
+.footer.trainingRefereePanel {
+  width: var(--main-content-width-full);
+}
+
+.footerInner {
+  width: min(1100px, calc(100% - 40px));
+  margin: 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 12px;
+}
+
+.footerInner :global(button) {
+  min-width: 120px;
+  height: 42px;
+  padding: 10px 24px;
+}
+
+@media (max-width: 1500px) {
+  .dynamic_content {
+    min-width: 100%;
+  }
+
+  .main {
+    width: 100%;
+  }
+
+  header.tournamentsList h2 {
+    max-width: 1000px;
+    padding: 0 20px;
+  }
+
+  header.refereePanel h2 {
+    padding: 0;
+  }
+}
+
+@media (max-width: 1400px) {
+  .header.NewTournamentBlock .content_header {
+    margin: 0 20px;
+  }
+}
+
+@media (max-width: 1250px) {
+  .navigation {
+    width: var(--navigation-width_thin);
+  }
+
+  .rightSideWrapper,
+  .header,
+  .footer {
+    width: var(--main-content-width-thinner);
+  }
+
+  .logo {
+    justify-content: start;
+  }
+
+  .logo img {
+    padding: 0 25px;
+  }
+
+  .logo .header_text {
+    display: none;
+    white-space: pre;
+  }
+
+  header.tournamentsList h2 {
+    max-width: 980px;
+    margin: 20px;
+  }
+
+  header.refereePanel h2 {
+    margin: 0 75px;
+  }
+}
+
+@media (max-width: 900px) {
+  .navigation {
+    display: none;
+  }
+
+  .rightSideWrapper,
+  .header,
+  .footer {
+    width: var(--main-content-width-full);
+  }
+
+  .content_header.History {
+    padding-left: 40px;
+  }
+
+  .drawer {
+    display: block;
+  }
+
+  .bluetoothBlock > button {
+    display: none;
+  }
+}
+
+@media (max-width: 681px) {
+  .header.refereePanel {
+    display: none;
+  }
+
+  .header.refereePanel + main {
+    margin: 0;
+  }
+
+  .header.refereePanel h2 {
+    text-align: center;
+    display: none;
+  }
+}

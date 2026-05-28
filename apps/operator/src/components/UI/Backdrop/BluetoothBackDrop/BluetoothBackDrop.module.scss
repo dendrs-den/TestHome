@@ -1,0 +1,91 @@
+.bluetooth__window {
+  background: #fcfcfc;
+  box-shadow: 0px 4px 8px 3px rgba(0, 0, 0, 0.15),
+    0px 1px 3px rgba(0, 0, 0, 0.3);
+  border-radius: 28px;
+  max-width: 800px;
+  width: 70%;
+  min-height: 660px;
+  padding: 30px 25px 25px 25px;
+}
+.bluetooth__header-row {
+  display: flex;
+  justify-content: space-between;
+}
+.bluetooth__header {
+  margin-bottom: 15px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 28px;
+  color: #1d192b;
+}
+
+.bluetooth__datagrid {
+  border-radius: 5px;
+  margin-top: 14px;
+  margin-top: 0;
+  height: 70%;
+  min-height: 490px;
+  border: 1px solid #d3d3d3;
+}
+.bluetooth__btnRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 26px;
+}
+.bluetooth__confirmBtn {
+  padding: 8px 23px;
+  font-weight: 400;
+  background-color: #562cff;
+}
+.BlueToothBtn {
+  transition: transform 0.3s;
+  border-style: dashed;
+  text-transform: capitalize;
+  font-size: 18px;
+  font-weight: 300;
+}
+.BlueToothBtn:hover {
+  transform: scale(1.1);
+}
+.buttonManage__backdrop {
+  width: 320px;
+  height: 161px;
+  padding: 27px 25px;
+  color: #1d192b;
+  background-color: #fcfcfc;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3),
+    0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+  border-radius: 28px;
+}
+.buttonManage__header {
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 28px;
+  letter-spacing: 0em;
+  text-align: left;
+}
+.buttonManage__text {
+  margin-top: 16px;
+}
+.buttonManage__btn {
+  text-transform: capitalize;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 17px;
+  letter-spacing: 0em;
+  text-align: left;
+}
+
+@media (max-width: 700px) {
+  .bluetooth__window {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .bluetooth__btnRow {
+    justify-content: center;
+  }
+}

@@ -1,0 +1,123 @@
+.tournament_table {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  --DataGrid-bg: #050b1a !important;
+  --DataGrid-containerBackground: #141c2d !important;
+  --DataGrid-t-header-background-base: #141c2d !important;
+}
+
+.tournament_table .MuiDataGrid-panelFooter {
+  display: none !important;
+}
+
+.tournament_table .MuiDataGrid-footerContainer {
+  /* border-top: 1px solid rgb(109, 109, 109); */
+  display: none !important;
+}
+
+.MuiDataGrid-root {
+  border: none !important;
+  background-color: #060d21 !important;
+  color: #e8eeff !important;
+}
+
+.tournament_table.MuiDataGrid-root {
+  background-color: #050b1a !important;
+  color: #dbe3ff !important;
+  border: none !important;
+}
+
+.tournament_table .MuiDataGrid-columnHeaders {
+  background-color: #141c2d !important;
+  border-bottom: 1px solid #2b3551 !important;
+}
+
+.tournament_table .MuiDataGrid-columnHeader,
+.tournament_table .MuiDataGrid-columnHeaderTitleContainer,
+.tournament_table .MuiDataGrid-columnHeaderTitleContainerContent {
+  background-color: #141c2d !important;
+}
+
+.tournament_table .MuiDataGrid-cell,
+.tournament_table .MuiDataGrid-columnHeaderTitle {
+  color: #e8eeff !important;
+}
+
+.tournament_table .MuiDataGrid-columnHeaderTitle {
+  font-weight: 500 !important;
+  font-size: 18px !important;
+  letter-spacing: 0.01em;
+}
+
+.tournament_table .MuiDataGrid-row.Mui-selected {
+  background-color: #1a2742 !important;
+}
+
+.tournament_table .MuiDataGrid-row:hover {
+  background-color: #182742 !important;
+}
+
+.tournament_table .MuiDataGrid-row:hover .MuiDataGrid-cell {
+  color: #e8eeff !important;
+}
+
+.tournament_table .MuiDataGrid-row.Mui-selected:hover {
+  background-color: #213155 !important;
+}
+
+.tournament_table .MuiDataGrid-row.Mui-selected .MuiDataGrid-cell {
+  color: #e8eeff !important;
+}
+
+.tournament_table .MuiDataGrid-cell:focus,
+.tournament_table .MuiDataGrid-cell:focus-within {
+  outline: 1px solid #5a67ff !important;
+  outline-offset: -1px;
+}
+
+.tournament_table .MuiDataGrid-row.Mui-selected .MuiDataGrid-cell:focus,
+.tournament_table .MuiDataGrid-row.Mui-selected .MuiDataGrid-cell:focus-within {
+  outline: 1px solid #7f8fff !important;
+  background-color: #263b64 !important;
+}
+
+.tournament_table .MuiDataGrid-main,
+.tournament_table .MuiDataGrid-virtualScroller,
+.tournament_table .MuiDataGrid-filler,
+.tournament_table .MuiDataGrid-overlay,
+.tournament_table .MuiDataGrid-overlayWrapper {
+  background-color: #050b1a !important;
+}
+
+.editBtn {
+  color: #7f8fff;
+  border-color: #7f8fff;
+}
+.editBtn:hover {
+  text-decoration: underline;
+}
+
+.editBtn_small {
+  display: none;
+}
+
+@media (max-width: 1500px) {
+  .tournament_table {
+    min-height: 100%;
+    height: 100%;
+  }
+}
+@media (max-width: 690px) {
+  .editBtn {
+    display: none;
+  }
+  .editBtn_small {
+    display: block;
+  }
+
+  .tournament_table {
+    width: 100%;
+    height: 350px;
+  }
+}

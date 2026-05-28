@@ -1,0 +1,45 @@
+﻿node_modules/
+dist/
+build/
+coverage/
+.env
+.env.local
+.DS_Store
+*.log
+
+# Go
+bin/
+*.test
+
+# Tauri
+apps/operator/src-tauri/target/
+apps/spectator/src-tauri/target/
+
+# agentplane: ignore runtime/transient workspace artifacts
+.agentplane/worktrees
+.agentplane/local-backups
+.agentplane/cache
+.agentplane/cache.sqlite
+.agentplane/cache.sqlite-wal
+.agentplane/cache.sqlite-shm
+.agentplane/recipes-cache
+.agentplane/generated/obsidian
+.agentplane/.upgrade
+.agentplane/.release
+.agentplane/upgrade
+.agentplane/tasks.json
+.agentplane/index.md
+.agentplane/tasks.md
+.agentplane/by-status
+.agentplane/by-tag
+.agentplane/by-owner
+.agentplane/tasks/*/handoff
+AGENTS.md.bak-*
+CLAUDE.md.bak-*
+.agentplane/agents/*.bak-*
+.agentplane/policy/**/*.bak-*
+
+# Local runtime bundles
+.runtime/
+.playwright-mcp/
+.tmp-code-reviewer.html
