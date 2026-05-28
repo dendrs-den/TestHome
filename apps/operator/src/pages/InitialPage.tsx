@@ -9,7 +9,6 @@ import getAllTournaments from "../Api_requests/tournaments/getAllTournaments";
 import setAdministrationState from "../Api_requests/roundState/setAdministrationState";
 import getCurrentState from "../Api_requests/getCurrentState";
 import infoscreenLogo from "../images/infoscreen_logo3.png";
-import { Helmet } from "react-helmet";
 import EditTournament from "../Components/EditTournament/EditTournament";
 import BaseDrawer from "../Components/UI/BaseDrawer/BaseDrawer";
 import { Box, Button } from "@mui/material";
@@ -26,6 +25,10 @@ const InitialPage = (props) => {
   const [changesMade, setChangesMade] = useState(false);
   const [trainingMode, setTrainingMode] = useState(false);
   const [footerActions, setFooterActions] = useState(null);
+
+  useEffect(() => {
+    document.title = "InFlight terminal";
+  }, []);
 
   useEffect(() => {
     const needReturnToRounds = sessionStorage.getItem("legacyRefReturn") === "1";
@@ -108,9 +111,6 @@ const InitialPage = (props) => {
 
   return (
     <React.Fragment>
-      <Helmet>
-        <title>InFlight terminal</title>
-      </Helmet>
       <Box className={classes.container}>
         {!renderConditions.refereePanel &&
           !renderConditions.trainingRefereePanel && (

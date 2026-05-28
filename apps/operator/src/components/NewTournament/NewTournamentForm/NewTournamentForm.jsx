@@ -300,7 +300,7 @@ const NewTournamentForm = (props) => {
                 error={tourTitleInputIsInValid}
                 name="title"
                 required
-                inputProps={{ maxLength: 20 }}
+                slotProps={{ htmlInput: { maxLength: 20 } }}
                 className={classes.option}
                 variant="outlined"
                 label="Tournament Name"
@@ -314,7 +314,7 @@ const NewTournamentForm = (props) => {
                 error={tourDisciplineIsInValid}
                 name="discipline"
                 required
-                inputProps={{ maxLength: 20 }}
+                slotProps={{ htmlInput: { maxLength: 20 } }}
                 className={classes.option}
                 variant="outlined"
                 label="Disciplines Name"

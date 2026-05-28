@@ -11,6 +11,40 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: "modern",
+        },
+        sass: {
+          api: "modern",
+        },
+      },
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes("node_modules")) return;
+            if (id.includes("@mui/x-data-grid")) return "mui-data-grid";
+            if (id.includes("@mui/icons-material")) return "mui-icons";
+            if (id.includes("@mui/material") || id.includes("@emotion")) return "mui-core";
+            if (id.includes("react-router")) return "router";
+            if (id.includes("socket.io-client")) return "socket-io";
+            if (
+              id.includes("/react/") ||
+              id.includes("\\react\\") ||
+              id.includes("/react-dom/") ||
+              id.includes("\\react-dom\\") ||
+              id.includes("/scheduler/") ||
+              id.includes("\\scheduler\\")
+            ) {
+              return "react-vendor";
+            }
+          },
+        },
+      },
+    },
     server: {
       port: 5173,
       proxy: {

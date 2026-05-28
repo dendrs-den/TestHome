@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { Suspense, lazy, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import InitialPage from "./pages/InitialPage";
-import ScoreBoard from "./pages/ScoreBoard";
-import SpectatorsScreenPage from "./pages/SpectatorScreen";
-import NotFoundPage from "./pages/NotFoundPage";
-import { LoginPage } from "./pages/LoginPage";
-import LegacyRefPanel from "./pages/LegacyRefPanel";
 import ServerConnectionDialog from "./components/ServerConnection/ServerConnectionDialog";
+
+const InitialPage = lazy(() => import("./pages/InitialPage"));
+const ScoreBoard = lazy(() => import("./pages/ScoreBoard"));
+const SpectatorsScreenPage = lazy(() => import("./pages/SpectatorScreen"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
+const LegacyRefPanel = lazy(() => import("./pages/LegacyRefPanel"));
+const LoginPage = lazy(() =>
+  import("./pages/LoginPage").then((module) => ({ default: module.LoginPage }))
+);
 
 function App() {
   const [blockTitle, setBlockTitle] = useState("Tournaments");
@@ -69,38 +72,40 @@ function App() {
 
   return (
     <React.Fragment>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            loginRequired ? (user ? <Navigate to="/terminal" replace /> : <Navigate to="/login" replace />) : <Navigate to="/terminal" replace />
-          }
-        />
-        <Route
-          path="/terminal"
-          element={
-            !loginRequired || user ? (
-              <InitialPage
-                blockTitle={blockTitle}
-                changeBlockTitle={changeBlockTitle}
-                onOpenServerSettings={openServerSettings}
-              />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-        <Route path="/legacy-ref" element={<LegacyRefPanel />} />
-        <Route path="/infoboard" element={<SpectatorsScreenPage />} />
-        <Route path="/scoreboard" element={<ScoreBoard />} />
-        <Route path="*" element={<NotFoundPage />} />
-        <Route
-          path="/login"
-          element={
-            loginRequired ? (!user ? <LoginPage setUser={setUser} /> : <Navigate to="/terminal" replace />) : <Navigate to="/terminal" replace />
-          }
-        />
-      </Routes>
+      <Suspense fallback={<div style={{ padding: "24px", color: "#e6ebff" }}>Loading...</div>}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              loginRequired ? (user ? <Navigate to="/terminal" replace /> : <Navigate to="/login" replace />) : <Navigate to="/terminal" replace />
+            }
+          />
+          <Route
+            path="/terminal"
+            element={
+              !loginRequired || user ? (
+                <InitialPage
+                  blockTitle={blockTitle}
+                  changeBlockTitle={changeBlockTitle}
+                  onOpenServerSettings={openServerSettings}
+                />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+          <Route path="/legacy-ref" element={<LegacyRefPanel />} />
+          <Route path="/infoboard" element={<SpectatorsScreenPage />} />
+          <Route path="/scoreboard" element={<ScoreBoard />} />
+          <Route path="*" element={<NotFoundPage />} />
+          <Route
+            path="/login"
+            element={
+              loginRequired ? (!user ? <LoginPage setUser={setUser} /> : <Navigate to="/terminal" replace />) : <Navigate to="/terminal" replace />
+            }
+          />
+        </Routes>
+      </Suspense>
 
       <ServerConnectionDialog open={serverDialogOpen} onClose={() => setServerDialogOpen(false)} />
 

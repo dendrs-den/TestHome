@@ -68,7 +68,7 @@ const AddRowForm = (props) => {
       <div className={classes["input-container"]}>
         <TextField
           autoComplete="off"
-          inputProps={{ maxLength: 20 }}
+          slotProps={{ htmlInput: { maxLength: 20 } }}
           className={classes["text-input"]}
           error={!valueIsValid}
           value={textValue}
@@ -81,7 +81,7 @@ const AddRowForm = (props) => {
         {props.type === "Teams" && (
           <TextField
             autoComplete="off"
-            inputProps={{ maxLength: 3 }}
+            slotProps={{ htmlInput: { maxLength: 3 } }}
             className={classes["text-input"]}
             // error={!numberIsValid}
             value={numberValue}

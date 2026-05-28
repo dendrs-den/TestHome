@@ -10,7 +10,6 @@ import {
   TableRow,
 } from "@mui/material";
 import React, { Fragment } from "react";
-import { Helmet } from "react-helmet";
 import classes from "./ScoreBoard.module.scss";
 
 type ApiData = {
@@ -133,11 +132,12 @@ const createdRows = receivedData.teams.map((team) => createRow(team));
 // console.log(createdRows);
 
 const ScoreBoard = () => {
+  React.useEffect(() => {
+    document.title = "InFlight scoreboard";
+  }, []);
+
   return (
     <Fragment>
-      <Helmet>
-        <title>InFlight scoreboard</title>
-      </Helmet>
       <Box className={classes.center}>
         <Box alignSelf="start" marginBottom="15px">
           {receivedData.tourName}

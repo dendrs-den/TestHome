@@ -5,7 +5,6 @@ import StopWatch from "../Components/SpectatorScreen/Timer/StopWatch";
 import classes from "./SpectatorScreen.module.scss";
 import formatTime from "../utils/formatTime";
 import getInfo from "../Api_requests/roundState/getInfo";
-import { Helmet } from "react-helmet";
 import ico from "../images/infoscreen_logo3.png";
 import { Box, Stack } from "@mui/material";
 import CircularProgressDialog from "../Components/UI/Backdrop/CircularProgressDialog/CircularProgressDialog";
@@ -33,6 +32,10 @@ const SpectatorsScreenPage = () => {
   const [firstCrossTime, setFirstCrossTime] = useState(0);
   const [showLongCrossNote, setLongCrossNote] = useState(false);
   const [ipList, setIpList] = useState([]);
+
+  useEffect(() => {
+    document.title = "InFlight infoboard";
+  }, []);
   const onFirstLoad = async () => {
     const fetchedData = await getInfo();
     console.log(fetchedData);
@@ -168,9 +171,6 @@ const SpectatorsScreenPage = () => {
   }, [currentState]);
   return (
     <React.Fragment>
-      <Helmet>
-        <title>InFlight infoboard</title>
-      </Helmet>
       <Fragment>
         {!dataLoading && (
           <Box
