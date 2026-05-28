@@ -401,6 +401,11 @@ func Run() error {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 			return
 		}
+		if err := syncTournamentRoundAfterCommand(tourStore, domainRuntime.State(), commands.Type(body.Type)); err != nil {
+			log.Printf("tournament round sync failed after %s: %v", body.Type, err)
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "tournament_round_sync_failed"})
+			return
+		}
 		writeJSON(w, http.StatusOK, map[string]any{
 			"state":  domainRuntime.State(),
 			"events": evs,
@@ -676,6 +681,39 @@ func validateCommandPayload(cmdType string, data map[string]any) error {
 		return fmt.Errorf("unsupported command type: %s", cmdType)
 	}
 	return nil
+}
+
+func syncTournamentRoundAfterCommand(store *tournaments.Store, state engine.State, cmdType commands.Type) error {
+	if store == nil {
+		return nil
+	}
+
+	switch cmdType {
+	case commands.CmdFinishRound:
+		if state.RoundID == "" {
+			return nil
+		}
+		current, ok, err := store.Current()
+		if err != nil || !ok {
+			return err
+		}
+		updated, changed, err := current.UpdateRound(state.RoundID, func(round map[string]any) {
+			round["time_result"] = state.RoundResultMs
+			if _, exists := round["time_real"]; exists {
+				round["time_real"] = state.RoundResultMs
+			}
+			if state.RoundStartedAt > 0 {
+				round["round_start"] = state.RoundStartedAt
+			}
+		})
+		if err != nil || !changed {
+			return err
+		}
+		_, err = store.Update(updated)
+		return err
+	default:
+		return nil
+	}
 }
 
 const sensorDebugHTML = `<!doctype html>

@@ -29,6 +29,33 @@ type Tournament struct {
 	SkipValue   any    `json:"skip_value,omitempty"`
 }
 
+func (t Tournament) UpdateRound(roundID string, mutate func(map[string]any)) (Tournament, bool, error) {
+	if roundID == "" {
+		return t, false, errors.New("roundID is required")
+	}
+
+	rounds, err := normalizeRounds(t.Round)
+	if err != nil {
+		return t, false, err
+	}
+
+	updated := false
+	for _, round := range rounds {
+		if fmt.Sprint(round["id"]) != roundID {
+			continue
+		}
+		mutate(round)
+		updated = true
+		break
+	}
+	if !updated {
+		return t, false, nil
+	}
+
+	t.Round = rounds
+	return t, true, nil
+}
+
 type Store struct {
 	db *sql.DB
 }
@@ -283,4 +310,21 @@ func (s *Store) setMetadata(key, value string) error {
 		value,
 	)
 	return err
+}
+
+func normalizeRounds(value any) ([]map[string]any, error) {
+	if value == nil {
+		return []map[string]any{}, nil
+	}
+
+	raw, err := json.Marshal(value)
+	if err != nil {
+		return nil, err
+	}
+
+	var rounds []map[string]any
+	if err := json.Unmarshal(raw, &rounds); err != nil {
+		return nil, err
+	}
+	return rounds, nil
 }

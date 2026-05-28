@@ -89,3 +89,52 @@ func TestStorePersistsCurrentTournament(t *testing.T) {
 		t.Fatalf("expected current tournament t-2, got %s", current.ID)
 	}
 }
+
+func TestTournamentUpdateRoundPersistsResultFields(t *testing.T) {
+	tour := Tournament{
+		ID:   "t-1",
+		Name: "Cup One",
+		Round: []map[string]any{
+			{
+				"id":          "r-1",
+				"time_result": nil,
+				"time_real":   nil,
+				"round_start": nil,
+			},
+		},
+	}
+
+	updated, ok, err := tour.UpdateRound("r-1", func(round map[string]any) {
+		round["time_result"] = int64(5137)
+		round["time_real"] = int64(5137)
+		round["round_start"] = int64(1710000000000)
+	})
+	if err != nil {
+		t.Fatalf("update round: %v", err)
+	}
+	if !ok {
+		t.Fatalf("expected round update to succeed")
+	}
+
+	raw, err := json.Marshal(updated.Round)
+	if err != nil {
+		t.Fatalf("marshal updated rounds: %v", err)
+	}
+
+	var rounds []map[string]any
+	if err := json.Unmarshal(raw, &rounds); err != nil {
+		t.Fatalf("unmarshal updated rounds: %v", err)
+	}
+	if len(rounds) != 1 {
+		t.Fatalf("expected 1 round, got %d", len(rounds))
+	}
+	if got := int64(rounds[0]["time_result"].(float64)); got != 5137 {
+		t.Fatalf("expected time_result 5137, got %d", got)
+	}
+	if got := int64(rounds[0]["time_real"].(float64)); got != 5137 {
+		t.Fatalf("expected time_real 5137, got %d", got)
+	}
+	if got := int64(rounds[0]["round_start"].(float64)); got != 1710000000000 {
+		t.Fatalf("expected round_start 1710000000000, got %d", got)
+	}
+}
