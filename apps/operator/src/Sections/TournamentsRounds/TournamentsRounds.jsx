@@ -36,6 +36,10 @@ const defaultTeam = {
 const makeRoundId = (stageId, teamId, index = 0) =>
   `round-${String(stageId || "stage")}-${String(teamId || `team-${index}`)}`;
 
+const hasSavedResult = (round) =>
+  ![null, undefined].includes(round?.time_result) ||
+  ![null, undefined].includes(round?.time_real);
+
 function EditToolbar(props) {
   const { currentTour, stageId, fetchCurrentTournament } = props;
 
@@ -328,12 +332,9 @@ const TournamentsRounds = (props) => {
                   color="primary"
                   onClick={() => startRound(roundsArrId, row)}
                 >
-                  {!row.crossings ||
-                  (row.crossings && row.crossings.length === 0)
-                    ? "Play"
-                    : "Replay"}
+                  {hasSavedResult(row) ? "Replay" : "Play"}
                 </Button>
-                {row.crossings && row.crossings.length > 0 && (
+                {hasSavedResult(row) && (
                   <Button
                     onClick={() => showBackDrop(roundsArrId)}
                     variant="outlined"
