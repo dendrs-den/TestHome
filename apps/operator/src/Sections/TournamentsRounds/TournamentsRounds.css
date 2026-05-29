@@ -41,3 +41,75 @@
 .rounds_table .MuiDataGrid-row {
   background-color: #050b1a !important;
 }
+
+.rounds_table .MuiDataGrid-cell.actions {
+  overflow: visible !important;
+}
+
+.round-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 18px;
+  width: 100%;
+  min-height: 32px;
+  min-width: 0;
+}
+
+.round-actions--idle {
+  cursor: pointer;
+}
+
+.round-actions__move {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.round-actions__icon-btn {
+  width: 20px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 4px !important;
+  flex: 0 0 20px !important;
+}
+
+.round-actions__icon-btn .MuiSvgIcon-root {
+  font-size: 18px !important;
+}
+
+.round-actions__icon-btn:hover,
+.round-actions__icon-btn.Mui-focusVisible {
+  background-color: rgba(86, 44, 255, 0.08) !important;
+}
+
+.round-actions__buttons {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1 1 auto;
+  justify-content: flex-start;
+}
+
+.round-actions__action-btn {
+  min-width: 88px !important;
+  padding: 5px 12px !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+.round-actions__action-btn--play:hover,
+.round-actions__action-btn--play.Mui-focusVisible {
+  color: #ffd7d7 !important;
+  border-color: #ff3b3b !important;
+  background-color: rgba(255, 59, 59, 0.14) !important;
+}
+
+.round-actions__action-btn--edit {
+  min-width: 122px !important;
+}

@@ -6,7 +6,7 @@ import {
   Grid,
   IconButton,
 } from "@mui/material";
-import { GridActionsCellItem, GridToolbarContainer } from "@mui/x-data-grid";
+import { GridToolbarContainer } from "@mui/x-data-grid";
 import { Fragment, useState, useCallback, useEffect } from "react";
 import getCurrentTournament from "../../Api_requests/tournaments/getCurrentTournament";
 import BaseDataGrid from "../../Components/UI/BaseDataGrid/BaseDataGrid";
@@ -17,7 +17,6 @@ import swapTeamPositions from "../../Api_requests/rounds/roundSwapCommands";
 import formatTime from "../../utils/formatTime";
 import EditResultsBackDrop from "../RefereePage/RoundUtilitiesBlock/EditResultsBackDrop/EditResultsBackDrop";
 import updateCurrentTournament from "../../Api_requests/tournaments/updateCurrentTournament";
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import setAdministrationState from "../../Api_requests/coreStateManagement/setAdministrationState";
 import "./TournamentsRounds.css";
@@ -98,6 +97,10 @@ const TournamentsRounds = (props) => {
     return 0;
   });
   const [open, setOpen] = useState(false);
+
+  const focusRow = useCallback((row) => {
+    setSelectedRow({ teamId: row.id, stageId: row.stageId });
+  }, []);
 
   const startRound = useCallback(
     async (roundId, row) => {
@@ -229,54 +232,65 @@ const TournamentsRounds = (props) => {
     {
       field: "name",
       headerName: "Name",
-      maxWidth: 250,
-      flex: 2,
+      minWidth: 300,
+      maxWidth: 320,
+      flex: 2.4,
     },
     {
       field: "time",
       headerName: "Time",
       maxWidth: 100,
       flex: 1,
+      align: "center",
+      headerAlign: "center",
     },
     {
       field: "number",
       headerName: "Number",
       maxWidth: 100,
       flex: 1,
+      align: "center",
+      headerAlign: "center",
     },
     {
       field: "rank",
       headerName: "Rank",
       maxWidth: 100,
       flex: 2,
+      align: "center",
+      headerAlign: "center",
     },
     {
       field: "actions",
       sortable: false,
       type: "actions",
       headerName: "Actions",
-      maxWidth: 340,
-      flex: 3,
+      minWidth: 410,
+      maxWidth: 430,
+      flex: 3.2,
       cellClassName: "actions",
+      align: "center",
+      headerAlign: "center",
       renderCell: ({ row }) => {
         const { roundsArrId } = row;
+        const isSelected =
+          row.id === selectedRow.teamId && row.stageId === selectedRow.stageId;
 
         return (
-          // roundsArrId === selectedRow &&
-          row.id === selectedRow.teamId &&
-          row.stageId === selectedRow.stageId && (
-            <Box
-              width={"100%"}
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: "10px",
-              }}
-            >
-              <Box>
+          <Box
+            className={`round-actions ${isSelected ? "" : "round-actions--idle"}`}
+            width={"100%"}
+            onClick={() => focusRow(row)}
+          >
+            {isSelected ? (
+              <>
+              <Box className="round-actions__move">
                 <IconButton
+                  size="small"
+                  className="round-actions__icon-btn"
                   disabled={row.index === row.totalCount - 1}
                   onClick={async () => {
+                    focusRow(row);
                     let newRowData = [...rowData];
 
                     const index = row.id;
@@ -299,8 +313,11 @@ const TournamentsRounds = (props) => {
                   <ArrowDropDownIcon />
                 </IconButton>
                 <IconButton
+                  size="small"
+                  className="round-actions__icon-btn"
                   disabled={row.index === 0}
                   onClick={async () => {
+                    focusRow(row);
                     let newRowData = [...rowData];
 
                     const index = row.id;
@@ -324,60 +341,39 @@ const TournamentsRounds = (props) => {
                   <ArrowDropUpIcon />
                 </IconButton>
               </Box>
-              <Box display="flex" gap="8px">
+              <Box className="round-actions__buttons">
                 <Button
                   // disabled={row.name?.length > 20 || !row.name}
                   disabled={!row.name}
                   variant="outlined"
                   color="primary"
-                  onClick={() => startRound(roundsArrId, row)}
+                  size="small"
+                  className="round-actions__action-btn round-actions__action-btn--play"
+                  onClick={() => {
+                    focusRow(row);
+                    startRound(roundsArrId, row);
+                  }}
                 >
                   {hasSavedResult(row) ? "Replay" : "Play"}
                 </Button>
                 {hasSavedResult(row) && (
                   <Button
-                    onClick={() => showBackDrop(roundsArrId)}
+                    onClick={() => {
+                      focusRow(row);
+                      showBackDrop(roundsArrId);
+                    }}
                     variant="outlined"
                     color="primary"
+                    size="small"
+                    className="round-actions__action-btn round-actions__action-btn--edit"
                   >
                     Edit results
                   </Button>
                 )}
               </Box>
-            </Box>
-          )
-        );
-      },
-    },
-    {
-      field: "deleteField",
-      sortable: false,
-      type: "actions",
-      headerName: "",
-      maxWidth: 200,
-      align: "right",
-      flex: 0.7,
-      renderCell: ({ row }) => {
-        return (
-          row.id === selectedRow.teamId &&
-          row.stageId === selectedRow.stageId &&
-          row.stage.battle && (
-            <GridActionsCellItem
-              icon={
-                <DeleteIcon
-                  sx={{
-                    color: "#ff0000",
-                  }}
-                />
-              }
-              label="Delete"
-              className="textPrimary"
-              onClick={() => {
-                deleteSelectedRound(row);
-              }}
-              color="inherit"
-            />
-          )
+              </>
+            ) : null}
+          </Box>
         );
       },
     },
@@ -419,11 +415,8 @@ const TournamentsRounds = (props) => {
       fontSize: "17px",
       textTransform: "capitalize",
     },
-    "& .MuiDataGrid-row.Mui-selected": {
-      backgroundColor: "#1a2742 !important",
-    },
-    "& .MuiDataGrid-row.Mui-selected:hover": {
-      backgroundColor: "#213155 !important",
+    "& .MuiDataGrid-cell.actions": {
+      justifyContent: "center",
     },
     "& .MuiDataGrid-row.selected-true": {
       fontWeight: "bold",
@@ -452,7 +445,7 @@ const TournamentsRounds = (props) => {
   }, [open, fetchCurrentTournament]);
 
   const rowClickHandler = ({ row }) => {
-    setSelectedRow({ teamId: row.id, stageId: row.stageId });
+    focusRow(row);
   };
 
   const goToTourList = useCallback(() => {
