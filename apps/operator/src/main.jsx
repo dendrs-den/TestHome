@@ -1,4 +1,5 @@
-﻿import React from "react";
+// Deprecated bootstrap. Active operator entrypoint is src/main.tsx via Vite index.html.
+import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
@@ -19,3 +20,4 @@ ReactDOM.createRoot(root).render(
     )
   )
 );
+

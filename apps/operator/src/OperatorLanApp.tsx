@@ -1,3 +1,4 @@
+// Deprecated standalone prototype. Current production operator flow goes through App.jsx -> /terminal.
 import React from "react";
 import { authHeaders, buildCoreBaseUrl, checkCoreHealth, DEFAULT_CORE_PORT, isIPv4 } from "../../../packages/lan-client/src/runtime";
 import { useOperatorState } from "./hooks/useOperatorState";
@@ -845,3 +846,4 @@ const miniSummaryStyle: React.CSSProperties = {
   alignContent: "center",
   color: "#dbe5ff",
 };
+

@@ -4,10 +4,7 @@ import HistoryBlock from "../Components/InitialPage/History/HistoryBlock";
 import NewTournamentBlock from "../Components/NewTournament/NewTournamentBlock/NewTournamentBlock";
 import classes from "./InitialPage.module.scss";
 import NavigationBlock from "../Components/InitialPage/NavigationBlock/NavigationBlock";
-import RefereePanel from "../Sections/RefereePage/RefereePanel/RefereePanel";
 import getAllTournaments from "../Api_requests/tournaments/getAllTournaments";
-import setAdministrationState from "../Api_requests/roundState/setAdministrationState";
-import getCurrentState from "../Api_requests/getCurrentState";
 import infoscreenLogo from "../images/infoscreen_logo3.png";
 import EditTournament from "../Components/EditTournament/EditTournament";
 import BaseDrawer from "../Components/UI/BaseDrawer/BaseDrawer";
@@ -23,7 +20,6 @@ const InitialPage = (props) => {
   const [currentMainContent, setCurrentMainContent] =
     useState("tournamentsList");
   const [changesMade, setChangesMade] = useState(false);
-  const [trainingMode, setTrainingMode] = useState(false);
   const [footerActions, setFooterActions] = useState(null);
 
   useEffect(() => {
@@ -43,9 +39,7 @@ const InitialPage = (props) => {
     tournamentsRounds: currentMainContent === "tournamentsRounds",
     historyList: currentMainContent === "history",
     newTournamentForm: currentMainContent === "NewTournamentBlock",
-    refereePanel: currentMainContent === "refereePanel",
     editTournament: currentMainContent === "editTournament",
-    trainingRefereePanel: currentMainContent === "trainingRefereePanel",
   };
 
   const headerTitleByContent = {
@@ -54,8 +48,6 @@ const InitialPage = (props) => {
     history: "History",
     NewTournamentBlock: "Adding new tournament",
     editTournament: "Editing tournament",
-    refereePanel: "",
-    trainingRefereePanel: "Training mode",
   };
   const currentHeaderTitle =
     headerTitleByContent[currentMainContent] || props.blockTitle;
@@ -66,19 +58,9 @@ const InitialPage = (props) => {
 
   const changeCurrentMainContentHandler = async (newContent) => {
     setCurrentMainContent(newContent);
-    const state = await getCurrentState();
-
-    if (newContent === "trainingRefereePanel") {
-      setTrainingMode(true);
-    } else if (newContent !== "refereePanel") {
-      setTrainingMode(false);
-    }
 
     if (newContent === "tournamentsList") {
       await fetchDataHandler(true);
-      if (state !== "Administration") {
-        // await setAdministrationState();
-      }
     }
   };
 
@@ -112,24 +94,21 @@ const InitialPage = (props) => {
   return (
     <React.Fragment>
       <Box className={classes.container}>
-        {!renderConditions.refereePanel &&
-          !renderConditions.trainingRefereePanel && (
-            <Box>
-              <Box component={"nav"} className={classes.navigation}>
-                <div className={classes.logo}>
-                  <React.Fragment>
-                    <img src={infoscreenLogo} alt="Flow Moscow logo" />
-                  </React.Fragment>
-                </div>
-                <NavigationBlock
-                  onChangeContent={changeCurrentMainContentHandler}
-                  changeBlockTitle={changeBlockTitle}
-                  changesMade={changesMade}
-                  setChangesMade={setChangesMade}
-                />
-              </Box>
-            </Box>
-          )}
+        <Box>
+          <Box component={"nav"} className={classes.navigation}>
+            <div className={classes.logo}>
+              <React.Fragment>
+                <img src={infoscreenLogo} alt="Flow Moscow logo" />
+              </React.Fragment>
+            </div>
+            <NavigationBlock
+              onChangeContent={changeCurrentMainContentHandler}
+              changeBlockTitle={changeBlockTitle}
+              changesMade={changesMade}
+              setChangesMade={setChangesMade}
+            />
+          </Box>
+        </Box>
 
         {/* MAIN CONTENT */}
         <Box
@@ -225,22 +204,6 @@ const InitialPage = (props) => {
                   changeBlockTitle={changeBlockTitle}
                   changeContent={changeCurrentMainContentHandler}
                   setFooterActions={setFooterActions}
-                />
-              )}
-
-              {renderConditions.refereePanel && (
-                <RefereePanel
-                  changeBlockTitle={changeBlockTitle}
-                  changeContent={changeCurrentMainContentHandler}
-                  isTrainingMode={trainingMode}
-                  setFooterActions={setFooterActions}
-                />
-              )}
-              {renderConditions.trainingRefereePanel && (
-                <RefereePanel
-                  changeBlockTitle={changeBlockTitle}
-                  changeContent={changeCurrentMainContentHandler}
-                  isTrainingMode={true}
                 />
               )}
             </section>
