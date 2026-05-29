@@ -44,6 +44,8 @@ const BaseDataGrid = (props) => {
   return (
     <StyledDataGrid
       {...props}
+      rowSelection={false}
+      disableRowSelectionOnClick
       disableColumnFilter
       disableColumnMenu
       disableColumnSorting

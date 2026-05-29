@@ -13,6 +13,22 @@
   - `/var/log/inflightflow/core.log`
 - `Operator` и `Spectator` работают на других машинах в LAN и подключаются к `http://<pi-ip>:18080`
 
+## Подтвержденный runtime на стенде
+- Raspberry: `192.168.0.177`
+- systemd service: `inflightflow-core.service`
+- binary path: `/opt/inflightflow/bin/inflightflow-core`
+- hardware mode: `real`
+- sensor source: `gpio`
+- sensor line: `gpiochip0:17`
+- sensor power line: `gpiochip0:27`
+
+На текущем стенде подтверждено:
+- `health` отвечает штатно
+- `sensor-health` и `readiness` работают
+- физические crossing-события доходят до `core`
+- `Operator` и `Spectator` получают realtime-обновления от Raspberry
+- `STOP` сохраняет результат заезда в SQLite
+
 ## Core env (режим real)
 Используй эти значения в `/etc/inflightflow/inflightflow-core.env`:
 
@@ -59,6 +75,15 @@ sudo systemctl status inflightflow-core.service --no-pager
 journalctl -u inflightflow-core.service -n 200 --no-pager
 ```
 
+Примечание по текущей автоматизации:
+- обновление `core` со стороны рабочей машины можно выполнять через:
+
+```powershell
+.\scripts\deploy_core_to_pi.ps1 -Upload -Install
+```
+
+- на Raspberry для этого настроен helper deploy-сценарий, поэтому ручной `go run` больше не используется
+
 ## Быстрая диагностика
 Проверка сырых событий датчика в GPIO:
 
@@ -81,3 +106,14 @@ curl -H "X-Operator-Password: <pass>" http://<pi-ip>:18080/v1/instructor/preflig
 - проверить, что датчик получает питание
 - проверить `SENSOR_POWER_ENABLED=true` и линию `27`
 - проверить, что сервис стартовал именно из бинарника, а не из старого `go run`
+
+## Операторский сценарий, подтвержденный на 2026-05-29
+1. Открыть `Operator` и выбрать турнир/заезд.
+2. `ACTIVATE` переводит заезд в подготовленное состояние и ожидает crossing.
+3. Первый физический crossing переводит заезд в `running`.
+4. `STOP` завершает заезд и сохраняет результат в SQLite.
+5. `NEXT ROUND`:
+   - берёт следующего участника в текущем этапе
+   - пропускает заезды, где уже сохранён `time_result` или `time_real`
+   - если участников больше нет, показывает `Раунд завершен`
+6. Повторный запуск уже завершённого заезда допускается только через `Replay` в таблице управления турниром.

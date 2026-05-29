@@ -59,6 +59,26 @@ npm run dev
 
 Сервис на Raspberry должен публиковаться на `18080` и читать env из `/etc/inflightflow/inflightflow-core.env`.
 
+Подтвержденный production layout на стенде:
+- бинарник: `/opt/inflightflow/bin/inflightflow-core`
+- unit: `/etc/systemd/system/inflightflow-core.service`
+- env: `/etc/inflightflow/inflightflow-core.env`
+- БД турниров: `/var/lib/inflightflow/tournaments.db`
+- journal: `/var/lib/inflightflow/journal.log`
+- лог сервиса: `/var/log/inflightflow/core.log`
+
+Текущий рабочий deploy flow:
+
+```powershell
+.\scripts\deploy_core_to_pi.ps1 -Upload -Install
+```
+
+Этот сценарий:
+- собирает свежий бинарник `core`
+- выгружает bundle на Raspberry
+- выполняет обновление сервиса через helper на Pi
+- перезапускает `inflightflow-core.service`
+
 ### Клиенты в LAN
 Собрать клиентские приложения:
 
@@ -69,6 +89,22 @@ npm run dev
 При первом запуске `Operator` и `Spectator` просят:
 - IP Raspberry
 - пароль оператора, если на core включен `OPERATOR_PASSWORD`
+
+Локальные launcher-скрипты для разработки:
+
+```powershell
+.\scripts\run_operator.ps1
+.\scripts\run_spectator.ps1
+.\scripts\run_operator_and_spectator.ps1
+```
+
+Для запуска Tauri-окон:
+
+```powershell
+.\scripts\run_operator.ps1 -Tauri
+.\scripts\run_spectator.ps1 -Tauri
+.\scripts\run_operator_and_spectator.ps1 -Tauri
+```
 
 ## Хранилище Core
 - Основной каталог турниров хранится в SQLite:
@@ -100,3 +136,13 @@ export SENSOR_POWER_ACTIVE=true
 ```
 
 Операционные детали и systemd-путь см. в [SENSOR_RUNBOOK.md](./SENSOR_RUNBOOK.md).
+
+## Подтверждено на 2026-05-29
+- `Operator` и `Spectator` подключаются напрямую к Raspberry `core` по LAN.
+- `Spectator` собран как Tauri desktop app и штатно закрывается через пункт `Выход`.
+- `STOP` на судейской панели теперь сохраняет результат заезда в SQLite (`time_result`, `time_real`, `round_start`).
+- `NEXT ROUND` в судейской панели:
+  - переводит на следующего участника в пределах текущего этапа
+  - пропускает уже завершенные заезды с сохраненным результатом
+  - показывает сообщение `Раунд завершен`, если участников больше нет
+- В списке заездов `Replay` показывается по факту сохраненного результата, а не по `crossings`.
