@@ -121,8 +121,8 @@ func TestRuntime_BootstrapIdempotent(t *testing.T) {
 	if st2.RoundState != RoundRunning {
 		t.Fatalf("expected running after second bootstrap, got %s", st2.RoundState)
 	}
-	if len(evs2) != 3 {
-		t.Fatalf("expected 3 cached events on second call, got %d", len(evs2))
+	if len(evs2) != 2 {
+		t.Fatalf("expected cached prepare+start events on second call, got %d", len(evs2))
 	}
 
 	replayed, err := journal.Replay(jpath)
@@ -132,6 +132,45 @@ func TestRuntime_BootstrapIdempotent(t *testing.T) {
 	// Exactly one create, one prepare, one start should be persisted.
 	if len(replayed) != 3 {
 		t.Fatalf("expected 3 persisted events, got %d", len(replayed))
+	}
+}
+
+func TestRuntime_BootstrapSecondRoundSameTournament(t *testing.T) {
+	dir := t.TempDir()
+	jpath := filepath.Join(dir, "journal.log")
+	if err := journal.EnsurePath(jpath); err != nil {
+		t.Fatalf("ensure path: %v", err)
+	}
+	rt := NewRuntime(jpath)
+
+	st1, _, err := rt.Bootstrap("t-flow", "r-1", "k-r1")
+	if err != nil {
+		t.Fatalf("bootstrap first round: %v", err)
+	}
+	if st1.TournamentID != "t-flow" || st1.RoundID != "r-1" || st1.RoundState != RoundRunning {
+		t.Fatalf("unexpected first bootstrap state: %+v", st1)
+	}
+
+	_, err = rt.Handle(commands.Command{Type: commands.CmdCancelRound, Data: map[string]any{}})
+	if err != nil {
+		t.Fatalf("cancel first round: %v", err)
+	}
+
+	st2, evs2, err := rt.Bootstrap("t-flow", "r-2", "k-r2")
+	if err != nil {
+		t.Fatalf("bootstrap second round in same tournament: %v", err)
+	}
+	if st2.TournamentID != "t-flow" {
+		t.Fatalf("expected tournament id t-flow, got %s", st2.TournamentID)
+	}
+	if st2.RoundID != "r-2" {
+		t.Fatalf("expected round id r-2, got %s", st2.RoundID)
+	}
+	if st2.RoundState != RoundRunning {
+		t.Fatalf("expected running after second bootstrap, got %s", st2.RoundState)
+	}
+	if len(evs2) != 2 {
+		t.Fatalf("expected prepare+start events on second bootstrap, got %d", len(evs2))
 	}
 }
 

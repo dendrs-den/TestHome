@@ -87,19 +87,22 @@ func (r *Runtime) State() State {
 func (r *Runtime) Bootstrap(tournamentID, roundID, keyPrefix string) (State, []events.Event, error) {
 	all := make([]events.Event, 0, 3)
 
-	evs, err := r.Handle(commands.Command{
-		Type:           commands.CmdCreateTournament,
-		Data:           map[string]any{"tournamentId": tournamentID},
-		IdempotencyKey: keyPrefix + ":create",
-	})
-	if err != nil {
-		return r.State(), all, err
+	st := r.State()
+	if st.TournamentID == "" {
+		evs, err := r.Handle(commands.Command{
+			Type:           commands.CmdCreateTournament,
+			Data:           map[string]any{"tournamentId": tournamentID},
+			IdempotencyKey: keyPrefix + ":create",
+		})
+		if err != nil {
+			return r.State(), all, err
+		}
+		all = append(all, evs...)
 	}
-	all = append(all, evs...)
 
-	evs, err = r.Handle(commands.Command{
+	evs, err := r.Handle(commands.Command{
 		Type:           commands.CmdPrepareRound,
-		Data:           map[string]any{"roundId": roundID},
+		Data:           map[string]any{"tournamentId": tournamentID, "roundId": roundID},
 		IdempotencyKey: keyPrefix + ":prepare",
 	})
 	if err != nil {
