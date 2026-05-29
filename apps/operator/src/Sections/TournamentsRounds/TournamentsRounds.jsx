@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  Container,
   Grid,
   IconButton,
 } from "@mui/material";
@@ -77,7 +76,15 @@ function EditToolbar(props) {
 }
 
 const TournamentsRounds = (props) => {
-  const { changeContent, changeBlockTitle, setFooterActions } = props;
+  const {
+    changeContent,
+    changeBlockTitle,
+    setFooterActions,
+    stageTabs = [],
+    activeStageId,
+    onActiveStageChange,
+    onStageTabsChange,
+  } = props;
   const [currentTour, setCurrentTour] = useState({});
   const [rowData, setRowData] = useState([]);
   const [selectedRow, setSelectedRow] = useState(() => {
@@ -97,6 +104,37 @@ const TournamentsRounds = (props) => {
     return 0;
   });
   const [open, setOpen] = useState(false);
+
+  const syncActiveStage = useCallback(
+    (stagesToSync, explicitActiveStageId) => {
+      if (!Array.isArray(stagesToSync) || stagesToSync.length === 0) {
+        onActiveStageChange?.(null);
+        return null;
+      }
+
+      const existingIds = new Set(stagesToSync.map((stage) => stage?.id));
+      if (explicitActiveStageId && existingIds.has(explicitActiveStageId)) {
+        return explicitActiveStageId;
+      }
+
+      try {
+        const raw = sessionStorage.getItem("legacyRefContext");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const focusedStageId = parsed?.returnFocus?.stageId;
+          if (focusedStageId && existingIds.has(focusedStageId)) {
+            onActiveStageChange?.(focusedStageId);
+            return focusedStageId;
+          }
+        }
+      } catch {}
+
+      const fallbackStageId = stagesToSync[0]?.id ?? null;
+      onActiveStageChange?.(fallbackStageId);
+      return fallbackStageId;
+    },
+    [onActiveStageChange]
+  );
 
   const focusRow = useCallback((row) => {
     setSelectedRow({ teamId: row.id, stageId: row.stageId });
@@ -198,8 +236,19 @@ const TournamentsRounds = (props) => {
 
     setCurrentTour(normalizedTour);
     setRowData(Array.isArray(normalizedTour?.round) ? normalizedTour.round : []);
+    const normalizedStages = Array.isArray(normalizedTour?.stages)
+      ? normalizedTour.stages
+      : [];
+    onStageTabsChange?.(normalizedStages);
+    syncActiveStage(normalizedStages, activeStageId);
     changeBlockTitle(normalizedTour?.name || "Tournament");
-  }, [buildDefaultRounds, changeBlockTitle]);
+  }, [
+    buildDefaultRounds,
+    changeBlockTitle,
+    onStageTabsChange,
+    syncActiveStage,
+    activeStageId,
+  ]);
 
   const showBackDrop = useCallback(async () => {
     await setAdministrationState();
@@ -243,6 +292,7 @@ const TournamentsRounds = (props) => {
       flex: 1,
       align: "center",
       headerAlign: "center",
+      cellClassName: "roundsCellMono",
     },
     {
       field: "number",
@@ -251,6 +301,7 @@ const TournamentsRounds = (props) => {
       flex: 1,
       align: "center",
       headerAlign: "center",
+      cellClassName: "roundsCellMono",
     },
     {
       field: "rank",
@@ -259,6 +310,7 @@ const TournamentsRounds = (props) => {
       flex: 2,
       align: "center",
       headerAlign: "center",
+      cellClassName: "roundsCellMono",
     },
     {
       field: "actions",
@@ -400,8 +452,14 @@ const TournamentsRounds = (props) => {
   );
 
   const { stages = null } = currentTour;
+  const activeStage =
+    (Array.isArray(stageTabs) &&
+      stageTabs.find((stage) => stage?.id === activeStageId)) ||
+    (Array.isArray(stages) &&
+      stages.find((stage) => stage?.id === activeStageId)) ||
+    (Array.isArray(stages) && stages.length ? stages[0] : null);
   const roundsGridSx = {
-    height: "320px",
+    height: "100%",
     "--DataGrid-bg": "#050b1a",
     "--DataGrid-containerBackground": "#141c2d",
     "--DataGrid-t-header-background-base": "#141c2d",
@@ -411,9 +469,9 @@ const TournamentsRounds = (props) => {
     },
     "& .MuiDataGrid-columnHeaderTitle": {
       color: "#dbe3ff !important",
-      fontWeight: 500,
-      fontSize: "17px",
-      textTransform: "capitalize",
+      fontWeight: 700,
+      fontSize: "16px",
+      textTransform: "none",
     },
     "& .MuiDataGrid-cell.actions": {
       justifyContent: "center",
@@ -433,6 +491,14 @@ const TournamentsRounds = (props) => {
   useEffect(() => {
     setAdministrationState();
   }, []);
+
+  useEffect(() => {
+    if (!stageTabs?.length) return;
+    if (activeStageId && stageTabs.some((stage) => stage?.id === activeStageId)) {
+      return;
+    }
+    syncActiveStage(stageTabs, activeStageId);
+  }, [stageTabs, activeStageId, syncActiveStage]);
 
   useEffect(() => {
     fetchCurrentTournament();
@@ -455,158 +521,139 @@ const TournamentsRounds = (props) => {
   }, [changeBlockTitle, changeContent]);
 
   useEffect(() => {
-    setFooterActions(
-      <Box sx={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
-        <Button
-          variant="outlined"
-          color="error"
-          sx={{
-            maxWidth: "110px",
-            minWidth: "110px",
-            padding: "12px 35px",
-            fontWeight: 700,
-            fontSize: "14px",
-            lineHeight: "17px",
-          }}
-          onClick={goToTourList}
-        >
-          Back
-        </Button>
-      </Box>
-    );
+    setFooterActions(null);
     return () => setFooterActions(null);
-  }, [goToTourList, setFooterActions]);
+  }, [setFooterActions]);
 
   return (
-    <Container
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        margin: "auto",
-        "& h5": {
-          paddingLeft: "10px",
-          paddingBottom: "10px",
-          marginTop: "30px",
-          fontSize: "16px",
-          color: "#3c2bfe",
-        },
-      }}
-    >
-      {stages && (
-        <Fragment>
-          <Grid>
-            {stages.map(({ id: stageId, name: stageName, battle }) => {
-              const filteredRows = rowData
-                ?.map((item2, i) => ({ ...item2, id: i, roundsArrId: i, roundId: item2.id || `round-${i}` }))
-                .filter((item) => item.stage.id === stageId);
+    <Box className="rounds-page-shell">
+      <Box className="rounds-page-card">
+        <Box className="rounds-page-scroll">
+          {activeStage && (
+            <Fragment>
+              <Grid className="rounds-stage-grid">
+                {(() => {
+                  const { id: stageId, name: stageName, battle } = activeStage;
+                  const filteredRows = rowData
+                    ?.map((item2, i) => ({ ...item2, id: i, roundsArrId: i, roundId: item2.id || `round-${i}` }))
+                    .filter((item) => item.stage.id === stageId);
 
-              const countedRows = filteredRows.map(
-                ({ team, time_result, stage_rank, ...rest }, j) => ({
-                  ...rest,
-                  index: j,
-                  counter: j + 1,
-                  totalCount: filteredRows?.length,
-                  name: team?.name,
-                  number: [null, undefined].includes(team?.number)
-                    ? "-"
-                    : team?.number,
-                  time: [null, undefined].includes(time_result)
-                    ? "-"
-                    : formatTime(time_result).fullTime(),
-                  rank: [null, undefined].includes(stage_rank)
-                    ? "-"
-                    : stage_rank,
-                  stageId,
-                })
-              );
-              return (
-                <Box
-                  key={stageId}
-                  mt="15px"
-                  border=" 1px solid rgba(224, 224, 224, 1)"
-                  sx={{ paddingBottom: "10px" }}
-                >
-                  <h5>
-                    {stageName.toUpperCase()} ({battle ? "BATTLE" : "NO-BATTLE"}
-                    )
-                  </h5>
-                  {battle === false && (
-                    <BaseDataGrid
-                      className="rounds_table"
-                      sx={roundsGridSx}
-                      columns={columns}
-                      rows={countedRows}
-                      onRowClick={rowClickHandler}
-                      hideFooter={true}
-                      hideFooterPagination={true}
-                      hideFooterSelectedRowCount={true}
-                      getRowClassName={({ row }) => {
-                        return `selected-${
-                          row.id === selectedRow.teamId &&
-                          row.stageId === selectedRow.stageId
-                        }`;
-                      }}
-                    />
-                  )}
-                  {battle === true && (
-                    <BaseDataGrid
-                      className="rounds_table"
-                      sx={roundsGridSx}
-                      editMode="cell"
-                      columns={battleDataGridColumns}
-                      rows={countedRows}
-                      onRowClick={rowClickHandler}
-                      hideFooter={true}
-                      disableColumnFilter={true}
-                      disableColumnMenu={true}
-                      disableColumnSelector={true}
-                      hideFooterPagination={true}
-                      hideFooterSelectedRowCount={true}
-                      onEditRowsModelChange={handleRowModelChange}
-                      isCellEditable={(params) => {
-                        return !params.row.name;
-                      }}
-                      components={{
-                        Footer: EditToolbar,
-                      }}
-                      componentsProps={{
-                        footer: {
-                          stageId,
-                          currentTour,
-                          fetchCurrentTournament,
-                        },
-                      }}
-                      getRowClassName={({ row }) => {
-                        return `selected-${
-                          row.id === selectedRow.teamId &&
-                          row.stageId === selectedRow.stageId
-                        }`;
-                      }}
-                    />
-                  )}
-                </Box>
-              );
-            })}
-          </Grid>
-
-        </Fragment>
-      )}
-      {!stages && (
-        <Box
-          sx={{
-            minHeight: "320px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#8e9ab8",
-            fontSize: "18px",
-          }}
-        >
-          Tournament data is not loaded yet
+                  const countedRows = filteredRows.map(
+                    ({ team, time_result, stage_rank, ...rest }, j) => ({
+                      ...rest,
+                      index: j,
+                      counter: j + 1,
+                      totalCount: filteredRows?.length,
+                      name: team?.name,
+                      number: [null, undefined].includes(team?.number)
+                        ? "-"
+                        : team?.number,
+                      time: [null, undefined].includes(time_result)
+                        ? "-"
+                        : formatTime(time_result).fullTime(),
+                      rank: [null, undefined].includes(stage_rank)
+                        ? "-"
+                        : stage_rank,
+                      stageId,
+                    })
+                  );
+                  return (
+                    <Box key={stageId} className="rounds-stage-card">
+                      <h5 className="rounds-stage-title">
+                        {stageName} ({battle ? "BATTLE" : "NO-BATTLE"})
+                      </h5>
+                      {battle === false && (
+                        <BaseDataGrid
+                          className="rounds_table"
+                          sx={roundsGridSx}
+                          rowHeight={72}
+                          columnHeaderHeight={56}
+                          columns={columns}
+                          rows={countedRows}
+                          onRowClick={rowClickHandler}
+                          hideFooter={true}
+                          hideFooterPagination={true}
+                          hideFooterSelectedRowCount={true}
+                          getRowClassName={({ row }) => {
+                            return `selected-${
+                              row.id === selectedRow.teamId &&
+                              row.stageId === selectedRow.stageId
+                            }`;
+                          }}
+                        />
+                      )}
+                      {battle === true && (
+                        <BaseDataGrid
+                          className="rounds_table"
+                          sx={roundsGridSx}
+                          rowHeight={72}
+                          columnHeaderHeight={56}
+                          editMode="cell"
+                          columns={battleDataGridColumns}
+                          rows={countedRows}
+                          onRowClick={rowClickHandler}
+                          hideFooter={true}
+                          disableColumnFilter={true}
+                          disableColumnMenu={true}
+                          disableColumnSelector={true}
+                          hideFooterPagination={true}
+                          hideFooterSelectedRowCount={true}
+                          onEditRowsModelChange={handleRowModelChange}
+                          isCellEditable={(params) => {
+                            return !params.row.name;
+                          }}
+                          components={{
+                            Footer: EditToolbar,
+                          }}
+                          componentsProps={{
+                            footer: {
+                              stageId,
+                              currentTour,
+                              fetchCurrentTournament,
+                            },
+                          }}
+                          getRowClassName={({ row }) => {
+                            return `selected-${
+                              row.id === selectedRow.teamId &&
+                              row.stageId === selectedRow.stageId
+                            }`;
+                          }}
+                        />
+                      )}
+                    </Box>
+                  );
+                })()}
+              </Grid>
+            </Fragment>
+          )}
+          {!activeStage && (
+            <Box
+              sx={{
+                minHeight: "320px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#8e9ab8",
+                fontSize: "18px",
+              }}
+            >
+              Tournament data is not loaded yet
+            </Box>
+          )}
         </Box>
-      )}
+        <Box className="rounds-page-footer">
+          <Button
+            className="rounds-footer-btn"
+            variant="outlined"
+            color="inherit"
+            onClick={goToTourList}
+          >
+            Back
+          </Button>
+        </Box>
+      </Box>
       <EditResultsBackDrop open={open} setOpen={setOpen} />
-    </Container>
+    </Box>
   );
 };
 

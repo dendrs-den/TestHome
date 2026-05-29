@@ -1,8 +1,7 @@
 import React from "react";
 import "./TournamentTable.css";
-import { Button, IconButton } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import BaseDataGrid from "../../../Components/UI/BaseDataGrid/BaseDataGrid";
-import EditIcon from "@mui/icons-material/Edit";
 
 const TournamentsTable = (props) => {
   const columns = [
@@ -15,43 +14,69 @@ const TournamentsTable = (props) => {
     {
       field: "title",
       headerName: "Name",
-      maxWidth: 250,
-      flex: 2,
+      minWidth: 240,
+      flex: 2.1,
     },
     {
       field: "discipline",
       headerName: "Discipline",
-      flex: 5,
+      minWidth: 170,
+      flex: 1.3,
     },
     {
-      headerName: "",
-      align: "right",
-      field: "edit",
+      field: "bustValue",
+      headerName: "Bust value",
+      minWidth: 120,
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+      cellClassName: "tableCellMono",
+    },
+    {
+      field: "skipValue",
+      headerName: "Skip value",
+      minWidth: 120,
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+      cellClassName: "tableCellMono",
+    },
+    {
+      headerName: "Actions",
+      align: "center",
+      headerAlign: "center",
+      field: "actions",
       sortable: false,
-      maxWidth: 100,
-      flex: 2,
+      minWidth: 180,
+      flex: 1.25,
       renderCell: (params) => {
         return (
-          <React.Fragment>
+          <Box className="actionsCell">
             <Button
-              className="editBtn"
-              variant="text"
-              color="info"
-              onClick={() => {
+              className="actionBtn actionBtnPrimary"
+              variant="outlined"
+              size="small"
+              onClick={async (event) => {
+                event.stopPropagation();
+                props.setSelectedId?.(params.row.id);
+                await props.openTournament?.(params.row.id);
+              }}
+            >
+              Open
+            </Button>
+            <Button
+              className="actionBtn actionBtnSecondary"
+              variant="outlined"
+              size="small"
+              onClick={(event) => {
+                event.stopPropagation();
+                props.setSelectedId?.(params.row.id);
                 props.changeContent("editTournament");
               }}
             >
               Edit
             </Button>
-            <IconButton
-              className="editBtn_small"
-              onClick={() => {
-                props.changeContent("editTournament");
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-          </React.Fragment>
+          </Box>
         );
       },
     },
@@ -68,6 +93,14 @@ const TournamentsTable = (props) => {
       id: tour.id,
       title: tour.title,
       discipline: tour?.disciplines?.[0]?.name || "",
+      bustValue:
+        tour?.bust_value !== null && tour?.bust_value !== undefined
+          ? `${tour.bust_value}`
+          : "-",
+      skipValue:
+        tour?.skip_value !== null && tour?.skip_value !== undefined
+          ? `${tour.skip_value}`
+          : "-",
     };
   });
 
@@ -77,7 +110,12 @@ const TournamentsTable = (props) => {
       className={"tournament_table"}
       rows={props.tourDataLoading ? [] : rowData}
       columns={columns}
+      rowHeight={72}
+      columnHeaderHeight={56}
       onRowClick={rowClickHandler}
+      getRowClassName={(params) =>
+        params.id === props.selectedId ? "tournamentRow tournamentRow--active" : "tournamentRow"
+      }
       disableColumnFilter={true}
       disableColumnMenu={true}
       disableColumnSelector={true}

@@ -1,0 +1,131 @@
+﻿<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Concept B — Professional</title>
+  <link rel="stylesheet" href="./preview.css" />
+</head>
+<body>
+  <div class="preview-shell">
+    <div class="top-meta">
+      <div>
+        <h1>Концепция B — Профессиональный cockpit</h1>
+        <p>Главная рекомендация: целостная рабочая станция соревнования, где данные и действия живут в одном operational workspace.</p>
+      </div>
+      <div class="chip-row">
+        <span class="chip">Рекомендованный вариант</span>
+        <span class="chip">Operations cockpit</span>
+        <span class="chip">Средняя сложность внедрения</span>
+      </div>
+    </div>
+
+    <div class="board" style="padding:24px;">
+      <header class="header-bar">
+        <div class="header-main">
+          <h2>Race Control Workspace</h2>
+          <p>Оператор работает в одном месте: контекст турнира, очередь, активный раунд, системный статус и spectator handoff.</p>
+        </div>
+        <div class="status-strip">
+          <span class="status-pill ok">Core 192.168.0.177</span>
+          <span class="status-pill ok">Sensor ready</span>
+          <span class="status-pill accent">Tournament: FlowCUP</span>
+          <span class="status-pill accent">Stage: Battle</span>
+          <span class="status-pill warn">Preflight passed</span>
+        </div>
+      </header>
+
+      <section class="main-grid" style="grid-template-columns: 360px 1fr 420px; padding-top:20px;">
+        <section class="card">
+          <h3>Главный экран / Queue</h3>
+          <p>Слева всегда видны турнир, этапы и очередь заездов. Это заменяет слабую навигацию и лишние переходы.</p>
+          <div class="nav-stack" style="margin-top:14px;">
+            <div class="nav-item active">Round 1 / No-battle</div>
+            <div class="nav-item">Battle</div>
+            <div class="nav-item">Final</div>
+          </div>
+          <div class="workflow" style="margin-top:16px;">
+            <div class="workflow-step"><strong>Now</strong><span>Alpha / #11 / Ready to activate</span></div>
+            <div class="workflow-step"><strong>Next</strong><span>Bravo / #22 / Waiting</span></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3>Рабочий экран раундов</h3>
+          <p>Таблица остаётся, но становится частью более крупного control workspace. Строка даёт не только кнопки, а связь с detail panel.</p>
+          <div class="table-mock">
+            <div class="table-head">
+              <div>#</div><div>Pilot</div><div>Time</div><div>No.</div><div>Rank</div><div>State</div>
+            </div>
+            <div class="table-row done"><div>1</div><div>Bravo</div><div>005.261</div><div>22</div><div>1</div><div>Completed</div></div>
+            <div class="table-row active"><div>2</div><div>Alpha</div><div>-</div><div>11</div><div>-</div><div>Prepared</div></div>
+            <div class="table-row"><div>3</div><div>Denisov</div><div>-</div><div>23</div><div>-</div><div>Queued</div></div>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi"><div class="label">Ready</div><div class="value">Yes</div></div>
+            <div class="kpi"><div class="label">Crossings</div><div class="value">2</div></div>
+            <div class="kpi"><div class="label">Result</div><div class="value">5.261</div></div>
+            <div class="kpi"><div class="label">Replay</div><div class="value">1</div></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3>Detail workspace</h3>
+          <p>Справа живёт панель выбранного заезда: все детали и все действия в одной зоне принятия решений.</p>
+          <div class="workflow">
+            <div class="workflow-step"><strong>Selected run</strong><span>Alpha / #11 / Battle stage / Prepared</span></div>
+            <div class="workflow-step"><strong>Health</strong><span>Sensor OK. Ready to start. No warnings.</span></div>
+            <div class="workflow-step"><strong>Previous</strong><span>Bravo finished with 005.261, no penalties.</span></div>
+          </div>
+          <div class="actions-inline" style="margin-top:16px;">
+            <span class="btn primary">Activate</span>
+            <span class="btn warning">Stop</span>
+            <span class="btn">Next round</span>
+            <span class="btn">Replay</span>
+          </div>
+          <div class="note" style="margin-top:16px;"><h4>UX идея</h4><p>Пользователь не прыгает между “страницами”, а работает в едином пространстве управления событием.</p></div>
+        </section>
+      </section>
+
+      <section class="main-grid two-col">
+        <section class="card">
+          <h3>Компоненты и типографика</h3>
+          <div class="palette-row">
+            <div class="swatch"><div class="swatch-color" style="background:#0E1320"></div><div class="swatch-meta"><strong>Base</strong><span>#0E1320</span></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#3E7BFA"></div><div class="swatch-meta"><strong>Primary</strong><span>#3E7BFA</span></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#27D17F"></div><div class="swatch-meta"><strong>Success</strong><span>#27D17F</span></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#F45B69"></div><div class="swatch-meta"><strong>Danger</strong><span>#F45B69</span></div></div>
+          </div>
+          <div class="type-scale">
+            <div class="type-sample"><small>Heading / Sora</small><div style="font:700 30px/1.1 Sora, Inter, sans-serif;">Race Control Workspace</div></div>
+            <div class="type-sample"><small>Body / Manrope</small><div style="font:500 16px/1.5 Manrope, Inter, sans-serif;">Operational copy, labels and contextual explanations.</div></div>
+            <div class="type-sample"><small>Data / IBM Plex Mono</small><div style="font:700 22px/1 IBM Plex Mono, monospace;">005.261 / 192.168.0.177</div></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3>Spectator / handoff</h3>
+          <div class="spectator-mock">
+            <img src="./assets/flow-logo.png" alt="Flow Moscow" style="width:160px;height:auto;" />
+            <div class="spectator-brand">Flow CUP</div>
+            <div class="spectator-stage">Battle</div>
+            <div class="spectator-pilot">Alpha</div>
+            <div class="spectator-timer">0005:261</div>
+            <div class="spectator-faults">Busts: 0&nbsp;&nbsp;Skips: 0</div>
+          </div>
+          <div class="legend">
+            <span class="chip">Consistent status language</span>
+            <span class="chip">Strong read-from-distance mode</span>
+            <span class="chip">Fewer ambiguous states</span>
+          </div>
+        </section>
+      </section>
+
+      <div class="note-grid">
+        <div class="note"><h4>Плюсы</h4><p>Лучше всего ускоряет работу оператора, делает продукт зрелым и структурирует систему как реальный боевой инструмент.</p></div>
+        <div class="note"><h4>Риски</h4><p>Потребует более глубокого обновления layout и объединения некоторых старых потоков интерфейса.</p></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

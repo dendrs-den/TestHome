@@ -1,10 +1,8 @@
 import React, { Fragment, useEffect, useState } from "react";
-import DeleteTournamentButton from "../../Components/UI/Buttons/DeleteTournamentButton/DeleteTournamentButton";
 import TournamentsTable from "./TournamentsTable/TournamentsTable";
 import classes from "./TournamentsList.module.scss";
 import deleteTournamentById from "../../Api_requests/tournaments/deleteTournamentById";
 import setCurrentTournamentById from "../../Api_requests/tournaments/setCurrentTournament";
-import SubmitTournamentButton from "./AddNewTournamentButton/SubmitTournamentButton";
 import getAllTournaments from "../../Api_requests/tournaments/getAllTournaments";
 import { Button, Box } from "@mui/material";
 import CircularProgressDialog from "../../Components/UI/Backdrop/CircularProgressDialog/CircularProgressDialog";
@@ -19,6 +17,7 @@ const TournamentsList = (props) => {
     changeContent,
     setTournamentsListHandler,
     setFooterActions,
+    changeBlockTitle,
   } = props;
 
   // const [apiData, setApiData] = useState([]);
@@ -33,8 +32,8 @@ const TournamentsList = (props) => {
   };
 
   // SET SELECTED TOUR AS CURRENT AND NAVIGATE ITS ROUNDS SECTION
-  const tourSubmitHandler = async () => {
-    const fallbackId = selectedId ?? apiData?.[0]?.id;
+  const tourSubmitHandler = async (forcedId = null) => {
+    const fallbackId = forcedId ?? selectedId ?? apiData?.[0]?.id;
     if (!fallbackId) {
       return;
     }
@@ -57,50 +56,44 @@ const TournamentsList = (props) => {
   }, []);
 
   useEffect(() => {
-    setFooterActions(
-      <Box className={classes.actionsRow}>
-        <DeleteTournamentButton
-          className={classes.btn}
-          active={isActivated}
-          deleteHandler={() => tourDeleteHandler(currentSelectedRow)}
-        />
-        <SubmitTournamentButton
-          className={classes.btn}
-          active={isActivated}
-          clickHandler={tourSubmitHandler}
-        />
-      </Box>
-    );
-
+    setFooterActions(null);
     return () => setFooterActions(null);
-  }, [isActivated, currentSelectedRow, setFooterActions]);
+  }, [setFooterActions]);
 
   return (
     <Fragment>
       <CircularProgressDialog open={isLoading} />
       <Box className={classes.tournaments}>
-        <Box
-          className={classes.tableWrap}
-          sx={{
-            mt: "15px",
-            position: "relative",
-            width: "100%",
-            border: "1px solid #d3d3d3",
-          }}
-        >
+        <Box className={classes.tableWrap}>
+          <h3 className={classes.sectionTitle}>Tournaments</h3>
           <TournamentsTable
             changeContent={changeContent}
             clickHandler={listItemSelectHandler}
             doubleClickHandler={tourSubmitHandler}
+            openTournament={tourSubmitHandler}
             renderedData={apiData || []}
             tourDataLoading={tourDataLoading}
+            selectedId={selectedId}
+            setSelectedId={setSelectedId}
           />
-          <Button
-            className={classes.addTournamentAction}
-            onClick={() => changeContent("NewTournamentBlock")}
-          >
-            + ADD
-          </Button>
+          <Box className={classes.tableFooter}>
+            <Button
+              className={`${classes.footerBtn} ${classes.footerBtnPrimary}`}
+              onClick={() => {
+                changeBlockTitle?.("Add tournament");
+                changeContent("NewTournamentBlock");
+              }}
+            >
+              Create tournament
+            </Button>
+            <Button
+              className={classes.footerBtn}
+              disabled={!isActivated}
+              onClick={() => tourDeleteHandler(currentSelectedRow)}
+            >
+              Delete tournament
+            </Button>
+          </Box>
         </Box>
       </Box>
     </Fragment>

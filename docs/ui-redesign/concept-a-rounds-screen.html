@@ -1,0 +1,97 @@
+﻿<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Concept A — Экран раундов</title>
+  <link rel="stylesheet" href="./preview.css" />
+</head>
+<body>
+  <div class="preview-shell">
+    <div class="top-meta">
+      <div>
+        <h1>Concept A — Экран раундов</h1>
+        <p>Текущая логика заездов сохраняется, но визуальная система и actionable focus подтянуты к Professional-концепции.</p>
+      </div>
+      <div class="chip-row">
+        <span class="chip">Sora / Manrope / IBM Plex Mono</span>
+        <span class="chip">Rounds view</span>
+        <span class="chip">Concept A</span>
+      </div>
+    </div>
+
+    <div class="board" style="padding:24px;">
+      <header class="header-bar">
+        <div class="header-main">
+          <h2 style="font-family:Sora, Inter, sans-serif;">FlowCUP Moscow — Rounds</h2>
+          <p>Эволюционный экран с улучшенной типографикой, более спокойной action-структурой и ясным контекстом выбранного заезда.</p>
+        </div>
+        <div class="status-strip">
+          <span class="status-pill ok">Server online</span>
+          <span class="status-pill accent">Battle stage</span>
+          <span class="status-pill warn">1 replay available</span>
+          <span class="status-pill ok">Current queue healthy</span>
+        </div>
+      </header>
+
+      <section class="main-grid" style="grid-template-columns: 1.1fr 0.9fr;">
+        <section class="card">
+          <h3 style="font-family:Sora, Inter, sans-serif;">Round 1 (Battle)</h3>
+          <p>Таблица остаётся привычной, но selected row получает более ясный visual focus и не теряется среди других строк.</p>
+          <div class="table-mock">
+            <div class="table-head">
+              <div>#</div><div>Name</div><div>Time</div><div>Number</div><div>Rank</div><div>Actions</div>
+            </div>
+            <div class="table-row done"><div>1</div><div>Bravo</div><div style="font-family:'IBM Plex Mono', monospace;">005.261</div><div>22</div><div>1</div><div><div class="actions-inline"><span class="btn success">Replay</span><span class="btn">Edit results</span></div></div></div>
+            <div class="table-row active"><div>2</div><div>Alpha</div><div style="font-family:'IBM Plex Mono', monospace;">-</div><div>11</div><div>-</div><div><div class="actions-inline"><span class="btn primary">Play</span><span class="btn">Move</span></div></div></div>
+            <div class="table-row"><div>3</div><div>Denisov</div><div style="font-family:'IBM Plex Mono', monospace;">-</div><div>23</div><div>-</div><div><div class="actions-inline"><span class="btn">Select</span></div></div></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3 style="font-family:Sora, Inter, sans-serif;">Selected run</h3>
+          <p>Справа остаётся ясная contextual panel, но без полной перестройки в cockpit.</p>
+          <div class="workflow">
+            <div class="workflow-step"><strong>Pilot</strong><span>Alpha · #11 · Battle stage</span></div>
+            <div class="workflow-step"><strong>Status</strong><span>Prepared. Ready to activate. Replay not needed.</span></div>
+            <div class="workflow-step"><strong>Next</strong><span>Bravo is available as next competitor if current run completes.</span></div>
+          </div>
+          <div class="actions-inline" style="margin-top:16px;">
+            <span class="btn primary">Play</span>
+            <span class="btn">Edit results</span>
+            <span class="btn warning">Replay</span>
+          </div>
+          <div class="note" style="margin-top:16px;"><h4>UX-смысл</h4><p>Оператор по-прежнему видит таблицу, но решение принимает уже из понятного выбранного контекста, а не из россыпи мелких кнопок.</p></div>
+        </section>
+      </section>
+
+      <section class="main-grid two-col">
+        <section class="card">
+          <h3 style="font-family:Sora, Inter, sans-serif;">Панель действий</h3>
+          <p>Те же действия, что и сейчас, но собранные в более ясную hierarchy кнопок.</p>
+          <div class="actions-inline">
+            <span class="btn primary">Activate</span>
+            <span class="btn warning">Stop</span>
+            <span class="btn">Next round</span>
+            <span class="btn">Back</span>
+          </div>
+          <div class="type-scale">
+            <div class="type-sample"><small>Section heading / Sora</small><div style="font:700 26px/1.1 Sora, Inter, sans-serif;">Selected run</div></div>
+            <div class="type-sample"><small>Context copy / Manrope</small><div style="font:500 16px/1.55 Manrope, Inter, sans-serif;">Structured operational notes and helper copy.</div></div>
+            <div class="type-sample"><small>Timing / IBM Plex Mono</small><div style="font:700 22px/1 'IBM Plex Mono', monospace;">005.261</div></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3 style="font-family:Sora, Inter, sans-serif;">Навигация внутри Concept A</h3>
+          <p>Этот экран — вторая локальная страница Concept A для просмотра и согласования.</p>
+          <div class="actions-inline" style="margin-top:16px;">
+            <a class="btn" href="./concept-a-main-screen.html" style="text-decoration:none;">Открыть главный экран</a>
+            <a class="btn" href="./concept-a-evolutionary.html" style="text-decoration:none;">Назад к обзору</a>
+          </div>
+        </section>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

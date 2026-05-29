@@ -33,7 +33,7 @@ const NavigationBlock = (props) => {
     } else {
       outlineTournaments();
       props.onChangeContent("tournamentsList");
-      props.changeBlockTitle("Tournaments");
+      props.changeBlockTitle("Турниры");
     }
   };
 
@@ -44,27 +44,26 @@ const NavigationBlock = (props) => {
     } else {
       outlineHistory();
       props.onChangeContent("history");
-      props.changeBlockTitle("History");
+      props.changeBlockTitle("История");
     }
   };
 
   return (
     <div className={classes.navigationBlock}>
       <div className={classes.upperNavBlock}>
-        <h3>Navigation</h3>
         <div className={classes.navBlock}>
           <button
             onClick={tournamentsButtonHandler}
             className={`${classes.navBtn} ${selectedFirst ? classes.navBtn_selected : ""}`}
           >
-            Tournaments
+            Турниры
           </button>
           <Divider />
           <button
             onClick={historyButtonHandler}
             className={`${classes.navBtn} ${selectedSecond ? classes.navBtn_selected : ""}`}
           >
-            History
+            История
           </button>
 
           <ExitBackdrop

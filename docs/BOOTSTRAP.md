@@ -139,6 +139,17 @@ export SENSOR_POWER_ACTIVE=true
 
 ## Подтверждено на 2026-05-29
 - `Operator` и `Spectator` подключаются напрямую к Raspberry `core` по LAN.
+- `Operator` tournament-flow переведен на новый shell в стиле `Concept A`:
+  - локальные шрифты `Sora`, `Manrope`, `IBM Plex Mono`
+  - единый центральный shell для `Tournament list` и `Tournament management`
+  - правая drawer-панель для `Create / Edit tournament`
+- `Tournament management` переведен в `single-round view`:
+  - в центре показывается только один выбранный раунд/этап
+  - левое меню на этом экране временно заменяется stage-tabs из `currentTour.stages`
+  - возврат к `Tournament list` остается через `Back`
+- Для локального старта текущей точки разработки `Operator` используются launcher-скрипты:
+  - `.\scripts\run_operator.ps1`
+  - `.\scripts\run_operator.ps1 -Tauri`
 - `Spectator` собран как Tauri desktop app и штатно закрывается через пункт `Выход`.
 - `STOP` на судейской панели теперь сохраняет результат заезда в SQLite (`time_result`, `time_real`, `round_start`).
 - `NEXT ROUND` в судейской панели:

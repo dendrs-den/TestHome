@@ -54,6 +54,7 @@ const buildRounds = (teams, stages) => {
 const NewTournamentForm = (props) => {
   const { setChangesMade, preFilledData, editing, setFooterActions } = props;
   const formId = editing ? "edit-tournament-form" : "new-tournament-form";
+  const useInlineFooter = props.useInlineFooter === true;
 
   const [enteredTitle, setEnteredTitle] = useState(preFilledData?.title || "");
   const [enteredDiscipline, setEnteredDiscipline] = useState(
@@ -183,19 +184,19 @@ const NewTournamentForm = (props) => {
     event.preventDefault();
 
     const validationErrors = [];
-    if (!tourTitleIsValid) validationErrors.push("Название турнира");
-    if (!tourDisciplineIsValid) validationErrors.push("Имя дисциплины");
+    if (!tourTitleIsValid) validationErrors.push("Tournament name");
+    if (!tourDisciplineIsValid) validationErrors.push("Discipline name");
     if (!bustValueInputIsValid) validationErrors.push("Bust value");
     if (!skipValueIsValid) validationErrors.push("Skip value");
-    if (validTeamsCount < 1) validationErrors.push("Минимум 1 участник с номером");
-    if (validStagesCount < 1) validationErrors.push("Минимум 1 раунд");
+    if (validTeamsCount < 1) validationErrors.push("Minimum 1 participant with number");
+    if (validStagesCount < 1) validationErrors.push("Minimum 1 round");
 
     if (validationErrors.length > 0) {
       setTourTitleInputIsTouched(true);
       setTourDisciplineIsTouched(true);
       setMistakeFineInputIsTouched(true);
       setSkipFineInputTouched(true);
-      alert(`Заполните обязательные поля:\n- ${validationErrors.join("\n- ")}`);
+      alert(`Fill required fields:\n- ${validationErrors.join("\n- ")}`);
       return;
     }
 
@@ -226,10 +227,14 @@ const NewTournamentForm = (props) => {
       }
 
       setChangesMade(false);
-      props.changeCurrentMainContent("tournamentsList");
+      if (props.onClose) {
+        props.onClose();
+      } else {
+        props.changeCurrentMainContent("tournamentsList");
+      }
     } catch (error) {
       console.log("Tournament save failed", error);
-      alert(`Не удалось сохранить турнир: ${error?.message || "unknown error"}`);
+      alert(`Failed to save tournament: ${error?.message || "unknown error"}`);
     } finally {
       setIsLoading(false);
     }
@@ -256,12 +261,16 @@ const NewTournamentForm = (props) => {
   ]);
 
   useEffect(() => {
+    if (useInlineFooter || !setFooterActions) {
+      return undefined;
+    }
     setFooterActions(
       <Box component="section" className={classes.buttonRow}>
         <BackButton
           isModified={isModified}
           changeContent={props.onContentChange}
           setChangesMade={setChangesMade}
+          onClose={props.onClose}
         />
         <SubmitButton
           formId={formId}
@@ -278,8 +287,10 @@ const NewTournamentForm = (props) => {
     isModified,
     props.editing,
     props.onContentChange,
+    props.onClose,
     setChangesMade,
     setFooterActions,
+    useInlineFooter,
   ]);
 
   return (
@@ -317,7 +328,7 @@ const NewTournamentForm = (props) => {
                 slotProps={{ htmlInput: { maxLength: 20 } }}
                 className={classes.option}
                 variant="outlined"
-                label="Disciplines Name"
+                label="Discipline Name"
                 placeholder={!enteredDiscipline.name ? "max length - 20" : ""}
                 onChange={disciplineChangeHandler}
                 onBlur={() => setTourDisciplineIsTouched(true)}
@@ -390,6 +401,21 @@ const NewTournamentForm = (props) => {
             />
           </div>
         </section>
+        {useInlineFooter && (
+          <Box component="section" className={classes.drawerFooter}>
+            <BackButton
+              isModified={isModified}
+              changeContent={props.onContentChange}
+              setChangesMade={setChangesMade}
+              onClose={props.onClose}
+            />
+            <SubmitButton
+              formId={formId}
+              isEnabled={createBtnEnabled}
+              editing={props.editing}
+            />
+          </Box>
+        )}
       </form>
     </Fragment>
   );

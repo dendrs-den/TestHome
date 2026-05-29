@@ -21,7 +21,7 @@ const BackButton = (props) => {
         onClick={
           props.isModified
             ? handleToggle
-            : () => props.changeContent("tournamentsList")
+            : () => (props.onClose ? props.onClose() : props.changeContent("tournamentsList"))
         }
       >
         Cancel

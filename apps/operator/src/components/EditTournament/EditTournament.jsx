@@ -65,7 +65,7 @@ export default function EditTournament(props) {
       };
       setPrefilledData(tempData);
     }
-  }, []);
+  }, [props.selectedId]);
 
   async function addTournamentHandler(item) {
     await createTournament(item);
@@ -73,7 +73,7 @@ export default function EditTournament(props) {
 
   useEffect(() => {
     fetchDataHandler();
-  }, []);
+  }, [fetchDataHandler]);
 
   return (
     <div className={classes.editTournament_Block}>
@@ -87,6 +87,8 @@ export default function EditTournament(props) {
             changeCurrentMainContent={props.onContentChange}
             onContentChange={props.onContentChange}
             createTournamentHandler={addTournamentHandler}
+            useInlineFooter={props.useInlineFooter}
+            onClose={props.onClose}
           />
         )}
       </div>

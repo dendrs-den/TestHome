@@ -1,0 +1,55 @@
+﻿<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Concept A — Главный экран</title>
+  <link rel="stylesheet" href="./preview.css" />
+</head>
+<body>
+  <div class="preview-shell">
+    <div class="board board--split">
+      <aside class="sidebar">
+        <div class="logo-wrap"><img src="./assets/flow-logo.png" alt="Flow Moscow" /></div>
+        <div class="nav-stack">
+          <div class="nav-item active">Турниры</div>
+          <div class="nav-item">История</div>
+          <div class="nav-item">Статус сервера</div>
+        </div>
+      </aside>
+
+      <main class="content" style="font-family: Manrope, Inter, sans-serif;">
+        <header class="header-bar">
+          <div class="header-main">
+            <h2 style="font-family:Sora, Inter, sans-serif;">Tournament list</h2>
+          </div>
+          <div class="status-strip">
+            <span class="status-pill ok">Core online</span>
+            <span class="status-pill ok">Sensor ready</span>
+          </div>
+        </header>
+
+        <section class="main-grid">
+          <section class="card" style="min-height: calc(100vh - 210px); display:flex; flex-direction:column;">
+            <h3 style="font-family:Sora, Inter, sans-serif;">Турниры</h3>
+            <div class="table-mock" style="flex:1 1 auto; display:flex; flex-direction:column; min-height:0;">
+              <div class="table-head">
+                <div>#</div><div>Name</div><div>Discipline</div><div>Bust value</div><div>Skip value</div><div>Status</div><div>Actions</div>
+              </div>
+              <div style="flex:1 1 auto; display:flex; flex-direction:column; justify-content:flex-start;">
+                <div class="table-row active"><div>1</div><div>FlowCUP Moscow</div><div>Solo Speed</div><div>1.0 sec</div><div>1.0 sec</div><div>Current</div><div><div class="actions-inline"><span class="btn primary">Open</span><span class="btn secondary">Edit</span></div></div></div>
+                <div class="table-row"><div>2</div><div>Junior Cup</div><div>Solo Speed</div><div>0.5 sec</div><div>1.0 sec</div><div>Draft</div><div><div class="actions-inline"><span class="btn">Open</span><span class="btn secondary">Edit</span></div></div></div>
+                <div class="table-row"><div>3</div><div>Night Finals</div><div>Solo Speed</div><div>1.0 sec</div><div>2.0 sec</div><div>Archived</div><div><div class="actions-inline"><span class="btn">Open</span><span class="btn secondary">Edit</span></div></div></div>
+              </div>
+            </div>
+            <div class="actions-inline" style="margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06);">
+              <span class="btn primary">Создать турнир</span>
+              <span class="btn">Импорт</span>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

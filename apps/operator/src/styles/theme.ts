@@ -12,7 +12,13 @@ declare module "@mui/material/Chip" {
 
 const theme = createTheme({
   typography: {
-    fontFamily: "Rubik, Segoe UI, sans-serif",
+    fontFamily: "Manrope, Segoe UI, sans-serif",
+    h1: { fontFamily: "Sora, Manrope, sans-serif" },
+    h2: { fontFamily: "Sora, Manrope, sans-serif" },
+    h3: { fontFamily: "Sora, Manrope, sans-serif" },
+    h4: { fontFamily: "Sora, Manrope, sans-serif" },
+    h5: { fontFamily: "Sora, Manrope, sans-serif" },
+    h6: { fontFamily: "Sora, Manrope, sans-serif" },
   },
   palette: {
     mode: "dark",
@@ -81,6 +87,7 @@ const theme = createTheme({
           minHeight: "42px",
           minWidth: "120px",
           padding: "10px 24px",
+          fontFamily: "Manrope, Segoe UI, sans-serif",
         },
       },
     },

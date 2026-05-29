@@ -12,7 +12,7 @@ const LoginPage = lazy(() =>
 );
 
 function App() {
-  const [blockTitle, setBlockTitle] = useState("Tournaments");
+  const [blockTitle, setBlockTitle] = useState("Tournament list");
   const [user, setUser] = useState({ login: "dev", password: "dev" });
   const [ctxMenu, setCtxMenu] = useState(null);
   const [serverDialogOpen, setServerDialogOpen] = useState(false);
@@ -72,7 +72,7 @@ function App() {
 
   return (
     <React.Fragment>
-      <Suspense fallback={<div style={{ padding: "24px", color: "#e6ebff" }}>Loading...</div>}>
+      <Suspense fallback={<div style={{ padding: "24px", color: "#e6ebff", fontFamily: "Manrope, Segoe UI, sans-serif" }}>Loading...</div>}>
         <Routes>
           <Route
             path="/"
@@ -123,7 +123,7 @@ function App() {
               window.location.reload();
             }}
           >
-            Обновить
+            Reload
           </button>
           <button
             type="button"
@@ -133,7 +133,7 @@ function App() {
               openServerSettings();
             }}
           >
-            Сервер
+            Server
           </button>
           <button
             type="button"
@@ -143,7 +143,7 @@ function App() {
               window.close();
             }}
           >
-            Выход
+            Exit
           </button>
         </div>
       )}

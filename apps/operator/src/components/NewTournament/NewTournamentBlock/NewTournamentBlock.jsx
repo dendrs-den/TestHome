@@ -18,6 +18,8 @@ const NewTournamentBlock = (props) => {
         changeCurrentMainContent={props.onContentChange}
         createTournamentHandler={addTournamentHandler}
         onContentChange={props.onContentChange}
+        useInlineFooter={props.useInlineFooter}
+        onClose={props.onClose}
       />
     </div>
   );

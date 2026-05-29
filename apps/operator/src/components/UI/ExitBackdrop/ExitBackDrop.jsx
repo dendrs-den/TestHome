@@ -8,7 +8,7 @@ const ExitBackdrop = (props) => {
     if (props.content) {
       if (props.content === "tournamentsList") {
         props.outlineTournaments(true);
-        props.changeTitle("Tournaments");
+        props.changeTitle("Tournament list");
       } else if (props.content === "history") {
         props.outlineHistory();
         props.changeTitle("History");
@@ -26,7 +26,7 @@ const ExitBackdrop = (props) => {
       <div className={classes["submitDeletion__window"]}>
         <h5 className={classes["submitDeletion__header"]}>Discard changes</h5>
         <p className={classes["submitDeletion__text"]}>
-          Do you really want to discard changes
+          Do you really want to close the form without saving changes?
         </p>
         <div className={classes["submitDeletion_btnRow"]}>
           <Button color="primary" onClick={props.handleClose}>

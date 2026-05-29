@@ -1,19 +1,22 @@
 .navigationBlock {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   height: calc(100vh - 92px);
+  min-height: 0;
   padding: 22px 18px;
   background: transparent;
+}
+
+.scrollArea {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .navBlock {
   display: grid;
   gap: 10px;
-}
-
-.navBlock :global(.MuiDivider-root) {
-  display: none;
 }
 
 .navBtn {

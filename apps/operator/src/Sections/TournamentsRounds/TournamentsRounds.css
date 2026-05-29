@@ -1,29 +1,97 @@
+.rounds-page-shell {
+  width: min(1400px, 100%) !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100%;
+  padding: 0 !important;
+}
+
+.rounds-page-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #28324a;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(19, 26, 40, 0.96), rgba(12, 17, 28, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+  padding: 18px 18px 18px;
+}
+
+.rounds-page-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.rounds-stage-grid {
+  display: grid;
+  gap: 18px;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.rounds-stage-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: rgba(255, 255, 255, 0.01) !important;
+  overflow: hidden;
+  padding: 18px 0 0;
+}
+
+.rounds-stage-title {
+  margin: 0 0 14px !important;
+  padding: 0 18px !important;
+  font-family: "Sora", Inter, sans-serif;
+  font-size: 20px !important;
+  line-height: 1.1 !important;
+  color: #edf2ff !important;
+  letter-spacing: -0.02em;
+}
+
 .rounds_table.MuiDataGrid-root {
-  background-color: #050b1a !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  background-color: transparent !important;
   color: #dbe3ff !important;
-  border: 1px solid #2b3551 !important;
-  --DataGrid-bg: #050b1a !important;
-  --DataGrid-containerBackground: #141c2d !important;
-  --DataGrid-t-header-background-base: #141c2d !important;
+  border: none !important;
+  border-radius: 0 !important;
+  --DataGrid-bg: transparent !important;
+  --DataGrid-containerBackground: #172133 !important;
+  --DataGrid-t-header-background-base: #172133 !important;
+  width: 100% !important;
 }
 
 .rounds_table .MuiDataGrid-columnHeaders,
 .rounds_table .MuiDataGrid-topContainer {
-  background-color: #141c2d !important;
+  background-color: #172133 !important;
   border-bottom: 1px solid #2b3551 !important;
 }
 
 .rounds_table .MuiDataGrid-columnHeader,
 .rounds_table .MuiDataGrid-columnHeaderTitleContainer,
 .rounds_table .MuiDataGrid-columnHeaderTitleContainerContent {
-  background-color: #141c2d !important;
+  background-color: #172133 !important;
 }
 
 .rounds_table .MuiDataGrid-columnHeaderTitle {
-  color: #dbe3ff !important;
-  font-size: 17px !important;
-  font-weight: 500 !important;
-  text-transform: capitalize !important;
+  color: #dce4ff !important;
+  font-family: "Sora", Inter, sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
 }
 
 .rounds_table .MuiDataGrid-footerContainer {
@@ -35,24 +103,44 @@
 .rounds_table .MuiDataGrid-filler,
 .rounds_table .MuiDataGrid-overlay,
 .rounds_table .MuiDataGrid-overlayWrapper {
-  background-color: #050b1a !important;
+  background-color: transparent !important;
 }
 
 .rounds_table .MuiDataGrid-row {
-  background-color: #050b1a !important;
+  background-color: rgba(255, 255, 255, 0.01) !important;
+}
+
+.rounds_table .MuiDataGrid-row:hover {
+  background-color: rgba(92, 108, 255, 0.08) !important;
+}
+
+.rounds_table .MuiDataGrid-row.selected-true {
+  background-color: rgba(92, 108, 255, 0.14) !important;
+}
+
+.rounds_table .MuiDataGrid-cell {
+  font-size: 16px !important;
+  color: #edf2ff !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
 }
 
 .rounds_table .MuiDataGrid-cell.actions {
   overflow: visible !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .round-actions {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 18px;
   width: 100%;
-  min-height: 32px;
+  height: 100%;
+  min-height: 40px;
   min-width: 0;
 }
 
@@ -91,16 +179,20 @@
   align-items: center;
   gap: 14px;
   min-width: 0;
-  flex: 1 1 auto;
-  justify-content: flex-start;
+  flex: 0 1 auto;
+  justify-content: center;
 }
 
 .round-actions__action-btn {
-  min-width: 88px !important;
-  padding: 5px 12px !important;
+  min-width: 84px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 10px 14px !important;
   font-size: 13px !important;
-  line-height: 1.2 !important;
+  line-height: 1 !important;
   white-space: nowrap !important;
+  text-transform: none !important;
+  border-radius: 12px !important;
 }
 
 .round-actions__action-btn--play:hover,
@@ -112,4 +204,34 @@
 
 .round-actions__action-btn--edit {
   min-width: 122px !important;
+}
+
+.roundsCellMono {
+  font-family: var(--if-font-family-mono) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em;
+}
+
+.rounds-page-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  margin-top: auto;
+  padding: 18px 18px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.rounds-footer-btn {
+  min-width: 140px !important;
+  height: 42px !important;
+  padding: 10px 22px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: #edf2ff !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em;
+  text-transform: none !important;
 }
