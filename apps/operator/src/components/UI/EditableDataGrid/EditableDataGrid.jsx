@@ -80,6 +80,7 @@ EditToolbar.propTypes = {
 export default function EditableDataGrid(props) {
   const [rows, setRows] = React.useState(props.data);
   const { tableHeader, toggleRowsValid, setChangesMade, setIsModified } = props;
+  const isPageMode = props.pageMode === true;
 
   React.useEffect(() => {
     setRows(props.data);
@@ -209,9 +210,10 @@ export default function EditableDataGrid(props) {
         "--DataGrid-bg": "#050b1a",
         "--DataGrid-containerBackground": "#141c2d",
         height: props.gridHeight || 350,
-        padding: "15px",
-        border: "1px solid #d3d3d3",
-        backgroundColor: "#050b1a",
+        padding: isPageMode ? "0" : "15px",
+        border: isPageMode ? "none" : "1px solid #28324a",
+        borderRadius: isPageMode ? "0" : "16px",
+        backgroundColor: isPageMode ? "transparent" : "#050b1a",
         width: "100%",
         "& .actions": {
           color: "text.secondary",
@@ -220,25 +222,25 @@ export default function EditableDataGrid(props) {
           color: "text.primary",
         },
         "& .MuiDataGrid-main": {
-          backgroundColor: "#050b1a !important",
+          backgroundColor: `${isPageMode ? "transparent" : "#050b1a"} !important`,
           overflow: "hidden",
         },
         "& .MuiDataGrid-virtualScroller": {
-          backgroundColor: "#050b1a !important",
+          backgroundColor: `${isPageMode ? "transparent" : "#050b1a"} !important`,
           marginTop: "0 !important",
         },
         "& .MuiDataGrid-filler": {
-          backgroundColor: "#050b1a !important",
+          backgroundColor: `${isPageMode ? "transparent" : "#050b1a"} !important`,
         },
         "& .MuiDataGrid-row": {
-          backgroundColor: "#050b1a !important",
+          backgroundColor: `${isPageMode ? "rgba(255, 255, 255, 0.01)" : "#050b1a"} !important`,
         },
         "& .MuiDataGrid-footerContainer": {
-          backgroundColor: "#050b1a !important",
+          backgroundColor: `${isPageMode ? "transparent" : "#050b1a"} !important`,
           borderTop: "1px solid #242d44 !important",
         },
         "& .MuiDataGrid-toolbarContainer": {
-          backgroundColor: "#050b1a !important",
+          backgroundColor: "transparent !important",
         },
         "& .MuiDataGrid-columnHeaders": {
           position: "relative",
@@ -251,8 +253,9 @@ export default function EditableDataGrid(props) {
         },
         "& .MuiDataGrid-columnHeaderTitle": {
           color: "#dbe3ff !important",
-          fontWeight: 500,
-          fontSize: "17px",
+          fontFamily: "\"Sora\", Inter, sans-serif",
+          fontWeight: 700,
+          fontSize: "16px",
         },
         "& .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within": {
           outline: "none !important",
@@ -273,6 +276,11 @@ export default function EditableDataGrid(props) {
         },
         "& .MuiDataGrid-overlayWrapper": {
           backgroundColor: "transparent !important",
+        },
+        "& .MuiDataGrid-cell": {
+          color: "#edf2ff !important",
+          fontSize: "16px !important",
+          borderColor: "rgba(255, 255, 255, 0.05) !important",
         },
         "& .MuiDataGrid-actionsCell .MuiButtonBase-root": {
           minWidth: "0 !important",

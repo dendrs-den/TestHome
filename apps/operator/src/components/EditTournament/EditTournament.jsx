@@ -77,7 +77,13 @@ export default function EditTournament(props) {
 
   return (
     <div className={classes.editTournament_Block}>
-      <div className={classes.newTournament}>
+      <div
+        className={
+          props.pageMode
+            ? classes.editTournamentPage
+            : classes.editTournament_Block
+        }
+      >
         {preFilledData.isLoaded > 0 && (
           <NewTournamentForm
             editing={true}
@@ -89,6 +95,7 @@ export default function EditTournament(props) {
             createTournamentHandler={addTournamentHandler}
             useInlineFooter={props.useInlineFooter}
             onClose={props.onClose}
+            pageMode={props.pageMode}
           />
         )}
       </div>

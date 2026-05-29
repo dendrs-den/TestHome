@@ -1,10 +1,16 @@
 .backBtn{
-  width: 110px;
-  min-width: 110px;
-  padding: 12px 35px;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 17px;
+  min-width: 140px !important;
+  height: 42px !important;
+  padding: 10px 22px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: #edf2ff !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  letter-spacing: 0.02em;
+  text-transform: none !important;
 }
 
 

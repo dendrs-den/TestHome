@@ -1,5 +1,10 @@
 import classes from "./RoundStageNavigation.module.css";
 
+const formatStageLabel = (stage, index) => {
+  const baseLabel = stage?.name || `Stage ${index + 1}`;
+  return stage?.battle ? `${baseLabel} (battle)` : baseLabel;
+};
+
 const RoundStageNavigation = ({ stages = [], activeStageId, onSelectStage }) => {
   return (
     <div className={classes.navigationBlock}>
@@ -17,7 +22,7 @@ const RoundStageNavigation = ({ stages = [], activeStageId, onSelectStage }) => 
                 }`.trim()}
                 onClick={() => onSelectStage?.(stage?.id)}
               >
-                {stage?.name || `Stage ${index + 1}`}
+                {formatStageLabel(stage, index)}
               </button>
             );
           })}

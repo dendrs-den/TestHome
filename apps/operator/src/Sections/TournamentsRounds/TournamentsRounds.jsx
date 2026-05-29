@@ -38,6 +38,9 @@ const hasSavedResult = (round) =>
   ![null, undefined].includes(round?.time_result) ||
   ![null, undefined].includes(round?.time_real);
 
+const formatStageLabel = (stageName, battle) =>
+  battle ? `${stageName} (battle)` : stageName;
+
 function EditToolbar(props) {
   const { currentTour, stageId, fetchCurrentTournament } = props;
 
@@ -560,7 +563,7 @@ const TournamentsRounds = (props) => {
                   return (
                     <Box key={stageId} className="rounds-stage-card">
                       <h5 className="rounds-stage-title">
-                        {stageName} ({battle ? "BATTLE" : "NO-BATTLE"})
+                        {formatStageLabel(stageName, battle)}
                       </h5>
                       {battle === false && (
                         <BaseDataGrid

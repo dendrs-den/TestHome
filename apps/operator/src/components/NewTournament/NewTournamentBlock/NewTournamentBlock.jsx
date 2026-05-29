@@ -11,16 +11,23 @@ async function addTournamentHandler(item) {
 const NewTournamentBlock = (props) => {
   return (
     <div className={classes.newTournament}>
-      <NewTournamentForm
-        setChangesMade={props.setChangesMade}
-        setFooterActions={props.setFooterActions}
-        preFilledData={null}
-        changeCurrentMainContent={props.onContentChange}
-        createTournamentHandler={addTournamentHandler}
-        onContentChange={props.onContentChange}
-        useInlineFooter={props.useInlineFooter}
-        onClose={props.onClose}
-      />
+      <div
+        className={
+          props.pageMode ? classes.newTournamentPage : classes.newTournament
+        }
+      >
+        <NewTournamentForm
+          setChangesMade={props.setChangesMade}
+          setFooterActions={props.setFooterActions}
+          preFilledData={null}
+          changeCurrentMainContent={props.onContentChange}
+          createTournamentHandler={addTournamentHandler}
+          onContentChange={props.onContentChange}
+          useInlineFooter={props.useInlineFooter}
+          onClose={props.onClose}
+          pageMode={props.pageMode}
+        />
+      </div>
     </div>
   );
 };

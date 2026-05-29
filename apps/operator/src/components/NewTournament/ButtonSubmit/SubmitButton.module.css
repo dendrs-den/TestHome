@@ -1,9 +1,20 @@
 .submit-btn{
-  width: 110px;
-  min-width: 110px;
-  padding: 12px 35px;
-  background: #3C2BFE;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 17px;
+  min-width: 140px !important;
+  height: 42px !important;
+  padding: 10px 22px !important;
+  border-radius: 12px !important;
+  background: rgba(92, 108, 255, 0.18) !important;
+  border: 1px solid rgba(92, 108, 255, 0.34) !important;
+  color: #eef2ff !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  letter-spacing: 0.02em;
+  text-transform: none !important;
+  box-shadow: none !important;
+}
+
+.submit-btn:hover {
+  background: rgba(92, 108, 255, 0.26) !important;
+  box-shadow: none !important;
 }

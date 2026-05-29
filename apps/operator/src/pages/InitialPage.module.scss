@@ -150,11 +150,15 @@
 }
 
 .main.tournamentsList,
-.main.history {
+.main.history,
+.main.NewTournamentBlock,
+.main.editTournament {
   padding-bottom: 20px;
 }
 
-.main.tournamentsList {
+.main.tournamentsList,
+.main.NewTournamentBlock,
+.main.editTournament {
   overflow: hidden;
 }
 

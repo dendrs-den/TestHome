@@ -55,6 +55,7 @@ const NewTournamentForm = (props) => {
   const { setChangesMade, preFilledData, editing, setFooterActions } = props;
   const formId = editing ? "edit-tournament-form" : "new-tournament-form";
   const useInlineFooter = props.useInlineFooter === true;
+  const isPageMode = props.pageMode === true;
 
   const [enteredTitle, setEnteredTitle] = useState(preFilledData?.title || "");
   const [enteredDiscipline, setEnteredDiscipline] = useState(
@@ -301,7 +302,7 @@ const NewTournamentForm = (props) => {
         method="POST"
         autoComplete="off"
         onSubmit={formSubmitHandler}
-        className="customForm"
+        className={`${classes.customForm} ${isPageMode ? classes.pageForm : ""}`}
       >
         <section className={classes.settings}>
           <div className={classes["settings__options"]}>
@@ -371,34 +372,48 @@ const NewTournamentForm = (props) => {
         </section>
 
         <section className={classes["table-parameters"]}>
-          <div>
+          <div className={classes.tableSection}>
             <h4>Teams</h4>
-            <EditableDataGrid
-              tableHeader="Teams"
-              data={teamsList}
-              gridHeight="clamp(500px, calc(100vh - 430px), 700px)"
-              setItemsList={setTeamsList}
-              deleteItem={deleteTeam}
-              updateItem={updateTeam}
-              toggleRowsValid={setTeamsAreValid}
-              setChangesMade={setChangesMade}
-              setIsModified={setIsModified}
-            />
+            <div className={classes.tableGridWrap}>
+              <EditableDataGrid
+                tableHeader="Teams"
+                data={teamsList}
+                gridHeight={
+                  isPageMode
+                    ? "clamp(300px, calc(100vh - 520px), 420px)"
+                    : "clamp(500px, calc(100vh - 430px), 700px)"
+                }
+                setItemsList={setTeamsList}
+                deleteItem={deleteTeam}
+                updateItem={updateTeam}
+                toggleRowsValid={setTeamsAreValid}
+                setChangesMade={setChangesMade}
+                setIsModified={setIsModified}
+                pageMode={isPageMode}
+              />
+            </div>
           </div>
-          <div>
+          <div className={classes.tableSection}>
             <h4>Stages</h4>
-            <EditableDataGrid
-              editing={props.editing}
-              tableHeader="Stages"
-              data={stageList}
-              gridHeight="clamp(500px, calc(100vh - 430px), 700px)"
-              setItemsList={setStageList}
-              deleteItem={deleteStage}
-              updateItem={updateStage}
-              toggleRowsValid={setStagesAreValid}
-              setChangesMade={setChangesMade}
-              setIsModified={setIsModified}
-            />
+            <div className={classes.tableGridWrap}>
+              <EditableDataGrid
+                editing={props.editing}
+                tableHeader="Stages"
+                data={stageList}
+                gridHeight={
+                  isPageMode
+                    ? "clamp(300px, calc(100vh - 520px), 420px)"
+                    : "clamp(500px, calc(100vh - 430px), 700px)"
+                }
+                setItemsList={setStageList}
+                deleteItem={deleteStage}
+                updateItem={updateStage}
+                toggleRowsValid={setStagesAreValid}
+                setChangesMade={setChangesMade}
+                setIsModified={setIsModified}
+                pageMode={isPageMode}
+              />
+            </div>
           </div>
         </section>
         {useInlineFooter && (

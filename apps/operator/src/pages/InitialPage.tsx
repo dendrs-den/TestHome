@@ -9,12 +9,15 @@ import getAllTournaments from "../Api_requests/tournaments/getAllTournaments";
 import infoscreenLogo from "../images/infoscreen_logo3.png";
 import EditTournament from "../Components/EditTournament/EditTournament";
 import BaseDrawer from "../Components/UI/BaseDrawer/BaseDrawer";
-import { Box, Button, Drawer } from "@mui/material";
+import { Box } from "@mui/material";
 import TournamentsList from "../Sections/TournamentsList/TournamentsList";
 import TournamentsRounds from "../Sections/TournamentsRounds/TournamentsRounds";
 
-const OVERLAY_CONTENT = new Set(["NewTournamentBlock", "editTournament"]);
-const PRIMARY_CONTENT = new Set(["tournamentsList", "tournamentsRounds", "history"]);
+const PRIMARY_CONTENT = new Set([
+  "tournamentsList",
+  "tournamentsRounds",
+  "history",
+]);
 
 const InitialPage = (props) => {
   const { changeBlockTitle, onOpenServerSettings } = props;
@@ -42,18 +45,9 @@ const InitialPage = (props) => {
   }, []);
 
   const renderConditions = {
-    tournamentList:
-      (OVERLAY_CONTENT.has(currentMainContent)
-        ? lastPrimaryContent
-        : currentMainContent) === "tournamentsList",
-    tournamentsRounds:
-      (OVERLAY_CONTENT.has(currentMainContent)
-        ? lastPrimaryContent
-        : currentMainContent) === "tournamentsRounds",
-    historyList:
-      (OVERLAY_CONTENT.has(currentMainContent)
-        ? lastPrimaryContent
-        : currentMainContent) === "history",
+    tournamentList: currentMainContent === "tournamentsList",
+    tournamentsRounds: currentMainContent === "tournamentsRounds",
+    historyList: currentMainContent === "history",
     newTournamentForm: currentMainContent === "NewTournamentBlock",
     editTournament: currentMainContent === "editTournament",
   };
@@ -231,6 +225,30 @@ const InitialPage = (props) => {
                     onStageTabsChange={setRoundTabs}
                   />
                 )}
+
+                {renderConditions.newTournamentForm && (
+                  <NewTournamentBlock
+                    setChangesMade={setChangesMade}
+                    onContentChange={changeCurrentMainContentHandler}
+                    setFooterActions={setFooterActions}
+                    changeBlockTitle={changeBlockTitle}
+                    useInlineFooter={true}
+                    onClose={closeTournamentEditor}
+                    pageMode={true}
+                  />
+                )}
+
+                {renderConditions.editTournament && (
+                  <EditTournament
+                    selectedId={selectedId}
+                    setChangesMade={setChangesMade}
+                    setFooterActions={setFooterActions}
+                    onContentChange={changeCurrentMainContentHandler}
+                    useInlineFooter={true}
+                    onClose={closeTournamentEditor}
+                    pageMode={true}
+                  />
+                )}
               </section>
             </Box>
             <footer
@@ -242,58 +260,6 @@ const InitialPage = (props) => {
             </footer>
           </Box>
         </Box>
-
-        <Drawer
-          anchor="right"
-          open={renderConditions.newTournamentForm || renderConditions.editTournament}
-          onClose={closeTournamentEditor}
-          slotProps={{ paper: { className: classes.editorDrawerPaper } }}
-          ModalProps={{ keepMounted: true }}
-        >
-          <Box className={classes.editorDrawer}>
-            <Box className={classes.editorDrawerHeader}>
-              <div>
-                <h3 className={classes.editorDrawerTitle}>{currentHeaderTitle}</h3>
-                <p className={classes.editorDrawerSubtitle}>
-                  {renderConditions.editTournament
-                    ? "Adjust tournament parameters and participants"
-                    : "Create a new tournament and configure parameters"}
-                </p>
-              </div>
-              <Button
-                variant="outlined"
-                color="inherit"
-                className={classes.editorDrawerClose}
-                onClick={closeTournamentEditor}
-              >
-                Close
-              </Button>
-            </Box>
-            <Box className={classes.editorDrawerBody}>
-              {renderConditions.newTournamentForm && (
-                <NewTournamentBlock
-                  setChangesMade={setChangesMade}
-                  onContentChange={changeCurrentMainContentHandler}
-                  setFooterActions={setFooterActions}
-                  changeBlockTitle={changeBlockTitle}
-                  useInlineFooter={true}
-                  onClose={closeTournamentEditor}
-                />
-              )}
-
-              {renderConditions.editTournament && (
-                <EditTournament
-                  selectedId={selectedId}
-                  setChangesMade={setChangesMade}
-                  setFooterActions={setFooterActions}
-                  onContentChange={changeCurrentMainContentHandler}
-                  useInlineFooter={true}
-                  onClose={closeTournamentEditor}
-                />
-              )}
-            </Box>
-          </Box>
-        </Drawer>
       </Box>
     </React.Fragment>
   );
