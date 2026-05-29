@@ -18,6 +18,7 @@ type DomainState = {
   RoundID: string;
   RoundState: RoundState;
   Crossings: number;
+  RoundStartedAt: number;
   RoundResultMs: number;
 };
 
@@ -78,7 +79,6 @@ export default function App() {
   const [closingApp, setClosingApp] = React.useState(false);
   const [runningSince, setRunningSince] = React.useState<number | null>(null);
   const [tickMs, setTickMs] = React.useState(0);
-  const receivedInitialRealtimeRef = React.useRef(false);
 
   const coreBase = React.useMemo(() => buildCoreBaseUrl(serverIp, DEFAULT_CORE_PORT), [serverIp]);
 
@@ -93,7 +93,7 @@ export default function App() {
         localStorage.setItem(STORAGE_KEY, serverIp);
         localStorage.setItem(PASSWORD_KEY, serverPassword);
       } else {
-        setServerDialogError("Сервер не найден или отклонил пароль. Укажи Raspberry в этой сети.");
+        setServerDialogError("РЎРµСЂРІРµСЂ РЅРµ РЅР°Р№РґРµРЅ РёР»Рё РѕС‚РєР»РѕРЅРёР» РїР°СЂРѕР»СЊ. РЈРєР°Р¶Рё Raspberry РІ СЌС‚РѕР№ СЃРµС‚Рё.");
       }
       setCheckingServer(false);
     });
@@ -106,7 +106,7 @@ export default function App() {
     const candidate = inputIp.trim();
     const password = inputPassword.trim();
     if (!isIPv4(candidate)) {
-      setServerDialogError("Введите корректный IP в формате 192.168.0.177");
+      setServerDialogError("Р’РІРµРґРёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ IP РІ С„РѕСЂРјР°С‚Рµ 192.168.0.177");
       return;
     }
 
@@ -116,7 +116,7 @@ export default function App() {
     setCheckingServer(false);
 
     if (!ok) {
-      setServerDialogError("По этому IP core недоступен или отклонил пароль.");
+      setServerDialogError("РџРѕ СЌС‚РѕРјСѓ IP core РЅРµРґРѕСЃС‚СѓРїРµРЅ РёР»Рё РѕС‚РєР»РѕРЅРёР» РїР°СЂРѕР»СЊ.");
       return;
     }
 
@@ -146,7 +146,7 @@ export default function App() {
 
     window.setTimeout(() => {
       if (!document.hidden) {
-        setError("???????????? ??????????. ?????? ???? ???????.");
+        setError("РђРІС‚РѕР·Р°РєСЂС‹С‚РёРµ РЅРµРґРѕСЃС‚СѓРїРЅРѕ. Р—Р°РєСЂРѕР№ РѕРєРЅРѕ РІСЂСѓС‡РЅСѓСЋ.");
         setClosingApp(false);
       }
     }, 160);
@@ -204,14 +204,16 @@ export default function App() {
           if (!next) return;
 
           setDomain((prev) => {
-            const isInitialRealtimeFrame = !receivedInitialRealtimeRef.current;
-            receivedInitialRealtimeRef.current = true;
-
             if (next.RoundState === "running") {
-              const becameRunning = !!prev && (prev.RoundState !== "running" || prev.RoundID !== next.RoundID);
-              if (becameRunning && !isInitialRealtimeFrame) {
-                setRunningSince(Date.now());
-                setTickMs(0);
+              const sameRunningRound =
+                prev?.RoundState === "running" &&
+                prev.RoundID === next.RoundID &&
+                prev.RoundStartedAt === next.RoundStartedAt;
+
+              if (!sameRunningRound) {
+                const startedAt = next.RoundStartedAt > 0 ? next.RoundStartedAt : Date.now();
+                setRunningSince(startedAt);
+                setTickMs(Math.max(0, Date.now() - startedAt));
               }
             } else {
               setRunningSince(null);
@@ -253,10 +255,10 @@ export default function App() {
 
   React.useEffect(() => {
     if (!runningSince) return;
-    const t = setInterval(() => {
+    const t = window.setInterval(() => {
       setTickMs(Date.now() - runningSince);
     }, 33);
-    return () => clearInterval(t);
+    return () => window.clearInterval(t);
   }, [runningSince]);
 
   const state = domain?.RoundState ?? "idle";
@@ -321,7 +323,7 @@ export default function App() {
           <div className={`timer-main state-${state}`}>{fmt(liveMs)}</div>
         </section>
 
-        <section className="right-panel" aria-label="Штрафы">
+        <section className="right-panel" aria-label="РЁС‚СЂР°С„С‹">
           <div className="stats-line">
             <span>Busts: {bustCount}</span>
             <span>Skips: {skipCount}</span>
@@ -335,13 +337,13 @@ export default function App() {
       </section>
 
       {error ? <div className="error-banner">core unavailable: {error}</div> : null}
-      {closingApp ? <div className="error-banner">Закрытие окна...</div> : null}
+      {closingApp ? <div className="error-banner">Р—Р°РєСЂС‹С‚РёРµ РѕРєРЅР°...</div> : null}
 
       {(showServerDialog || checkingServer) && (
         <div className="server-dialog-backdrop">
           <div className="server-dialog">
-            <h3>Подключение к серверу</h3>
-            <p>Введите IP Raspberry без порта. Порт используется автоматически: {DEFAULT_CORE_PORT}.</p>
+            <h3>РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє СЃРµСЂРІРµСЂСѓ</h3>
+            <p>Р’РІРµРґРёС‚Рµ IP Raspberry Р±РµР· РїРѕСЂС‚Р°. РџРѕСЂС‚ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё: {DEFAULT_CORE_PORT}.</p>
             <input
               className="server-dialog-input"
               type="text"
@@ -354,14 +356,14 @@ export default function App() {
             <input
               className="server-dialog-input"
               type="password"
-              placeholder="Пароль оператора, если включен"
+              placeholder="РџР°СЂРѕР»СЊ РѕРїРµСЂР°С‚РѕСЂР°, РµСЃР»Рё РІРєР»СЋС‡РµРЅ"
               value={inputPassword}
               onChange={(e) => setInputPassword(e.target.value)}
               disabled={checkingServer}
             />
             {serverDialogError ? <div className="server-dialog-error">{serverDialogError}</div> : null}
             <button className="server-dialog-btn" onClick={submitServerIp} disabled={checkingServer}>
-              {checkingServer ? "Проверка..." : "Сохранить"}
+              {checkingServer ? "РџСЂРѕРІРµСЂРєР°..." : "РЎРѕС…СЂР°РЅРёС‚СЊ"}
             </button>
           </div>
         </div>
@@ -381,7 +383,7 @@ export default function App() {
               window.location.reload();
             }}
           >
-            Обновить
+            РћР±РЅРѕРІРёС‚СЊ
           </button>
           <button
             type="button"
@@ -395,7 +397,7 @@ export default function App() {
               setShowServerDialog(true);
             }}
           >
-            Сервер
+            РЎРµСЂРІРµСЂ
           </button>
           <button
             type="button"
@@ -404,7 +406,7 @@ export default function App() {
               void handleExit();
             }}
           >
-            Выход
+            Р’С‹С…РѕРґ
           </button>
         </div>
       )}
