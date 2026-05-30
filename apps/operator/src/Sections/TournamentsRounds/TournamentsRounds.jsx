@@ -41,6 +41,11 @@ const hasSavedResult = (round) =>
 const formatStageLabel = (stageName, battle) =>
   battle ? `${stageName} (battle)` : stageName;
 
+const countFaultsByType = (faults, type) =>
+  Array.isArray(faults)
+    ? faults.filter((fault) => fault?.type === type && fault?.valid !== false).length
+    : 0;
+
 function EditToolbar(props) {
   const { currentTour, stageId, fetchCurrentTournament } = props;
 
@@ -289,18 +294,50 @@ const TournamentsRounds = (props) => {
       flex: 2.4,
     },
     {
-      field: "time",
-      headerName: "Time",
-      maxWidth: 100,
+      field: "number",
+      headerName: "Number",
+      minWidth: 100,
+      maxWidth: 110,
+      flex: 0.9,
+      align: "center",
+      headerAlign: "center",
+      cellClassName: "roundsCellMono",
+    },
+    {
+      field: "resultTime",
+      headerName: "Real time",
+      minWidth: 124,
+      maxWidth: 136,
       flex: 1,
       align: "center",
       headerAlign: "center",
       cellClassName: "roundsCellMono",
     },
     {
-      field: "number",
-      headerName: "Number",
-      maxWidth: 100,
+      field: "bust",
+      headerName: "Bust",
+      minWidth: 76,
+      maxWidth: 84,
+      flex: 0.8,
+      align: "center",
+      headerAlign: "center",
+      cellClassName: "roundsCellMono",
+    },
+    {
+      field: "skip",
+      headerName: "Skip",
+      minWidth: 76,
+      maxWidth: 84,
+      flex: 0.8,
+      align: "center",
+      headerAlign: "center",
+      cellClassName: "roundsCellMono",
+    },
+    {
+      field: "finalTime",
+      headerName: "Final time",
+      minWidth: 128,
+      maxWidth: 142,
       flex: 1,
       align: "center",
       headerAlign: "center",
@@ -309,8 +346,9 @@ const TournamentsRounds = (props) => {
     {
       field: "rank",
       headerName: "Rank",
-      maxWidth: 100,
-      flex: 2,
+      minWidth: 76,
+      maxWidth: 84,
+      flex: 0.8,
       align: "center",
       headerAlign: "center",
       cellClassName: "roundsCellMono",
@@ -320,9 +358,9 @@ const TournamentsRounds = (props) => {
       sortable: false,
       type: "actions",
       headerName: "Actions",
-      minWidth: 410,
-      maxWidth: 430,
-      flex: 3.2,
+      minWidth: 332,
+      maxWidth: 352,
+      flex: 2.2,
       cellClassName: "actions",
       align: "center",
       headerAlign: "center",
@@ -551,7 +589,12 @@ const TournamentsRounds = (props) => {
                       number: [null, undefined].includes(team?.number)
                         ? "-"
                         : team?.number,
-                      time: [null, undefined].includes(time_result)
+                      resultTime: [null, undefined].includes(rest.time_real)
+                        ? "-"
+                        : formatTime(rest.time_real).fullTime(),
+                      bust: countFaultsByType(rest.faults, "bust"),
+                      skip: countFaultsByType(rest.faults, "skip"),
+                      finalTime: [null, undefined].includes(time_result)
                         ? "-"
                         : formatTime(time_result).fullTime(),
                       rank: [null, undefined].includes(stage_rank)

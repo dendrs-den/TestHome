@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"inflightflow/apps/core/internal/config"
@@ -602,6 +603,88 @@ func Run() error {
 	return http.ListenAndServe(addr, withCORS(mux))
 }
 
+func numericInt64(value any) int64 {
+	switch v := value.(type) {
+	case int:
+		return int64(v)
+	case int8:
+		return int64(v)
+	case int16:
+		return int64(v)
+	case int32:
+		return int64(v)
+	case int64:
+		return v
+	case uint:
+		return int64(v)
+	case uint8:
+		return int64(v)
+	case uint16:
+		return int64(v)
+	case uint32:
+		return int64(v)
+	case uint64:
+		return int64(v)
+	case float32:
+		return int64(v)
+	case float64:
+		return int64(v)
+	case json.Number:
+		if parsed, err := v.Int64(); err == nil {
+			return parsed
+		}
+		if parsed, err := v.Float64(); err == nil {
+			return int64(parsed)
+		}
+	case string:
+		if parsed, err := strconv.ParseInt(v, 10, 64); err == nil {
+			return parsed
+		}
+		if parsed, err := strconv.ParseFloat(v, 64); err == nil {
+			return int64(parsed)
+		}
+	}
+
+	return 0
+}
+
+func countValidFaultsByType(rawFaults any, faultType string) int64 {
+	faults, ok := rawFaults.([]any)
+	if !ok {
+		return 0
+	}
+
+	var count int64
+	for _, item := range faults {
+		fault, ok := item.(map[string]any)
+		if !ok {
+			continue
+		}
+		if fmt.Sprint(fault["type"]) != faultType {
+			continue
+		}
+		if valid, exists := fault["valid"]; exists && valid == false {
+			continue
+		}
+		count++
+	}
+
+	return count
+}
+
+func computeFinalTimeMs(realTimeMs int64, round map[string]any, current tournaments.Tournament) int64 {
+	if realTimeMs <= 0 {
+		return 0
+	}
+
+	bustCount := countValidFaultsByType(round["faults"], "bust")
+	skipCount := countValidFaultsByType(round["faults"], "skip")
+	bustValue := numericInt64(current.BustValue)
+	skipValue := numericInt64(current.SkipValue)
+
+	return realTimeMs + bustValue*bustCount + skipValue*skipCount
+}
+
 func resolveHardwareMode(mode string) string {
 	if mode == real.Name() {
 		return real.Name()
@@ -698,7 +781,7 @@ func syncTournamentRoundAfterCommand(store *tournaments.Store, state engine.Stat
 			return err
 		}
 		updated, changed, err := current.UpdateRound(state.RoundID, func(round map[string]any) {
-			round["time_result"] = state.RoundResultMs
+			round["time_result"] = computeFinalTimeMs(state.RoundResultMs, round, current)
 			if _, exists := round["time_real"]; exists {
 				round["time_real"] = state.RoundResultMs
 			}
