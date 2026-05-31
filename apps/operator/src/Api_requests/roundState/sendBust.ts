@@ -1,10 +1,10 @@
+import coreBaseUrl, { operatorJsonHeaders } from "../coreBaseUrl";
+
 const sendBust = async (timeStamp = null) => {
   try {
-    const response = await fetch(`/actions/sendbust`, {
+    const response = await fetch(`${coreBaseUrl}/actions/sendbust`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: operatorJsonHeaders(),
       body: JSON.stringify(
         timeStamp
           ? {

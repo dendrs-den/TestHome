@@ -20,6 +20,13 @@ type DomainState = {
   Crossings: number;
   RoundStartedAt: number;
   RoundResultMs: number;
+  RoundFaults?: Array<{ type?: string; valid?: boolean }>;
+  BustCount?: number;
+  SkipCount?: number;
+  RoundTimeRealMs?: number | null;
+  RoundTimeResultMs?: number | null;
+  StageName?: string;
+  TeamName?: string;
 };
 
 type TournamentRound = {
@@ -266,21 +273,41 @@ export default function App() {
     () => findCurrentRound(domain?.RoundID || "", currentTournament),
     [currentTournament, domain?.RoundID]
   );
+  const liveFaults = React.useMemo(
+    () => (Array.isArray(domain?.RoundFaults) ? domain.RoundFaults.filter((fault) => fault?.valid !== false) : []),
+    [domain?.RoundFaults]
+  );
   const validFaults = React.useMemo(
-    () => (Array.isArray(currentRound?.faults) ? currentRound.faults.filter((fault) => fault?.valid === true) : []),
-    [currentRound]
+    () =>
+      liveFaults.length > 0
+        ? liveFaults
+        : Array.isArray(currentRound?.faults)
+          ? currentRound.faults.filter((fault) => fault?.valid === true)
+          : [],
+    [currentRound, liveFaults]
   );
   const bustCount = React.useMemo(
-    () => validFaults.filter((fault) => String(fault?.type || "").toLowerCase() === "bust").length,
-    [validFaults]
+    () =>
+      typeof domain?.BustCount === "number"
+        ? domain.BustCount
+        : validFaults.filter((fault) => String(fault?.type || "").toLowerCase() === "bust").length,
+    [domain?.BustCount, validFaults]
   );
   const skipCount = React.useMemo(
-    () => validFaults.filter((fault) => String(fault?.type || "").toLowerCase() === "skip").length,
-    [validFaults]
+    () =>
+      typeof domain?.SkipCount === "number"
+        ? domain.SkipCount
+        : validFaults.filter((fault) => String(fault?.type || "").toLowerCase() === "skip").length,
+    [domain?.SkipCount, validFaults]
   );
-  const liveMs = state === "running" ? tickMs : (domain?.RoundResultMs ?? 0);
-  const roundLabel = deriveRoundLabel(domain?.RoundID || "", currentTournament);
-  const pilotLabel = derivePilotLabel(domain?.RoundID || "", currentTournament);
+  const liveMs =
+    state === "running"
+      ? tickMs
+      : typeof domain?.RoundTimeResultMs === "number"
+        ? domain.RoundTimeResultMs
+        : (domain?.RoundResultMs ?? 0);
+  const roundLabel = domain?.StageName || deriveRoundLabel(domain?.RoundID || "", currentTournament);
+  const pilotLabel = domain?.TeamName || derivePilotLabel(domain?.RoundID || "", currentTournament);
   const tournamentLabel = currentTournament?.name || "Flow CUP";
 
   React.useEffect(() => {
@@ -323,13 +350,13 @@ export default function App() {
           <div className={`timer-main state-${state}`}>{fmt(liveMs)}</div>
         </section>
 
-        <section className="right-panel" aria-label="РЁС‚СЂР°С„С‹">
+        <section className="right-panel" aria-label="Penalties">
           <div className="stats-line">
             <span>Busts: {bustCount}</span>
             <span>Skips: {skipCount}</span>
           </div>
           <div className="dots-line">
-            {Array.from({ length: Math.min(validFaults.length, 8) }).map((_, index) => (
+            {Array.from({ length: Math.min(bustCount, 8) }).map((_, index) => (
               <span className="dot" key={index} />
             ))}
           </div>
@@ -337,13 +364,13 @@ export default function App() {
       </section>
 
       {error ? <div className="error-banner">core unavailable: {error}</div> : null}
-      {closingApp ? <div className="error-banner">Р—Р°РєСЂС‹С‚РёРµ РѕРєРЅР°...</div> : null}
+      {closingApp ? <div className="error-banner">Closing window...</div> : null}
 
       {(showServerDialog || checkingServer) && (
         <div className="server-dialog-backdrop">
           <div className="server-dialog">
-            <h3>РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє СЃРµСЂРІРµСЂСѓ</h3>
-            <p>Р’РІРµРґРёС‚Рµ IP Raspberry Р±РµР· РїРѕСЂС‚Р°. РџРѕСЂС‚ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё: {DEFAULT_CORE_PORT}.</p>
+            <h3>Server connection</h3>
+            <p>Enter Raspberry IP without port. Port is added automatically: {DEFAULT_CORE_PORT}.</p>
             <input
               className="server-dialog-input"
               type="text"
@@ -356,14 +383,14 @@ export default function App() {
             <input
               className="server-dialog-input"
               type="password"
-              placeholder="РџР°СЂРѕР»СЊ РѕРїРµСЂР°С‚РѕСЂР°, РµСЃР»Рё РІРєР»СЋС‡РµРЅ"
+              placeholder="Operator password, if enabled"
               value={inputPassword}
               onChange={(e) => setInputPassword(e.target.value)}
               disabled={checkingServer}
             />
             {serverDialogError ? <div className="server-dialog-error">{serverDialogError}</div> : null}
             <button className="server-dialog-btn" onClick={submitServerIp} disabled={checkingServer}>
-              {checkingServer ? "РџСЂРѕРІРµСЂРєР°..." : "РЎРѕС…СЂР°РЅРёС‚СЊ"}
+              {checkingServer ? "Checking..." : "Save"}
             </button>
           </div>
         </div>
@@ -383,7 +410,7 @@ export default function App() {
               window.location.reload();
             }}
           >
-            РћР±РЅРѕРІРёС‚СЊ
+            Refresh
           </button>
           <button
             type="button"
@@ -397,7 +424,7 @@ export default function App() {
               setShowServerDialog(true);
             }}
           >
-            РЎРµСЂРІРµСЂ
+            Server
           </button>
           <button
             type="button"
@@ -406,7 +433,7 @@ export default function App() {
               void handleExit();
             }}
           >
-            Р’С‹С…РѕРґ
+            Exit
           </button>
         </div>
       )}

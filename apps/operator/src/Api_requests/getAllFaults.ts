@@ -1,10 +1,10 @@
+import coreBaseUrl, { operatorJsonHeaders } from "./coreBaseUrl";
+
 const getAllFaults = async () => {
   try {
-    const response = await fetch(`/actions/getallfaults`, {
+    const response = await fetch(`${coreBaseUrl}/actions/getallfaults`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: operatorJsonHeaders(),
     });
     const data = await response.json();
     return data;

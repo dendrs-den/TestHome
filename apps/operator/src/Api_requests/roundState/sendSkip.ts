@@ -1,11 +1,11 @@
+import coreBaseUrl, { operatorJsonHeaders } from "../coreBaseUrl";
+
 // const sendSkip = async (timeStamp)=>{
 const sendSkip = async (timeStamp = null) => {
   try {
-    const response = await fetch(`/actions/sendskip`, {
+    const response = await fetch(`${coreBaseUrl}/actions/sendskip`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: operatorJsonHeaders(),
       body: JSON.stringify(
         timeStamp
           ? {

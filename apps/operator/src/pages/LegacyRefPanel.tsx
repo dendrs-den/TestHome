@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import coreBaseUrl from "../Api_requests/coreBaseUrl";
 import { operatorJsonHeaders } from "../Api_requests/coreBaseUrl";
+import sendBust from "../Api_requests/roundState/sendBust";
+import sendSkip from "../Api_requests/roundState/sendSkip";
 import { useOperatorState } from "../hooks/useOperatorState";
 import CustomizedSnackbar from "./CustomizedSnackbar";
 import "./LegacyRefPanel.css";
@@ -117,8 +119,8 @@ export default function LegacyRefPanel() {
   const canActivate = isStage1;
   const canStop = isStage2 || isStage3;
   const canExit = true;
-  const supportsFaultCommands = false;
-  const canBustSkip = false;
+  const supportsFaultCommands = true;
+  const canBustSkip = effectiveState === "running";
 
   const stageLabel = legacyContext.stageName || domain?.RoundState || "-";
   const teamLabel = legacyContext.teamName || legacyContext.tournamentName || domain?.TournamentID || commandTournamentId;
@@ -128,6 +130,21 @@ export default function LegacyRefPanel() {
     sessionStorage.setItem("legacyRefReturn", "1");
     window.location.assign("/terminal");
   };
+
+  const addFault = useCallback(async (type: "bust" | "skip") => {
+    try {
+      const response = type === "bust" ? await sendBust() : await sendSkip();
+      if (response?.error) {
+        throw new Error(response.error);
+      }
+    } catch (faultError) {
+      console.log(`failed to add ${type}`, faultError);
+      setNotice({
+        severity: "error",
+        message: type === "bust" ? "Не удалось добавить Bust" : "Не удалось добавить Skip",
+      });
+    }
+  }, []);
 
   const startNextRound = async () => {
     const rounds = Array.isArray(currentTournament?.round) ? currentTournament.round : [];
@@ -239,10 +256,22 @@ export default function LegacyRefPanel() {
           >
             STOP
           </button>
-          <button className={supportsFaultCommands && isStage3 ? "btn-danger-solid" : "btn-muted"} disabled={busy || !canBustSkip}>
+          <button
+            className={supportsFaultCommands && effectiveState === "running" ? "btn-danger-solid" : "btn-muted"}
+            disabled={busy || !canBustSkip}
+            onClick={() => {
+              void addFault("bust");
+            }}
+          >
             BUST
           </button>
-          <button className={supportsFaultCommands && isStage3 ? "btn-danger-solid" : "btn-muted"} disabled={busy || !canBustSkip}>
+          <button
+            className={supportsFaultCommands && effectiveState === "running" ? "btn-danger-solid" : "btn-muted"}
+            disabled={busy || !canBustSkip}
+            onClick={() => {
+              void addFault("skip");
+            }}
+          >
             SKIP
           </button>
         </section>

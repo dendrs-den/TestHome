@@ -1,10 +1,10 @@
+import coreBaseUrl, { operatorJsonHeaders } from "./coreBaseUrl";
+
 const editFaults = async (faultData) => {
   try {
-    await fetch(`/actions/editfaults`, {
+    await fetch(`${coreBaseUrl}/actions/editfaults`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: operatorJsonHeaders(),
       body: JSON.stringify(faultData),
     }).then((response) => {
       if (!response.ok) {

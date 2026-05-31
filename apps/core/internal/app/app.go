@@ -121,7 +121,7 @@ func Run() error {
 		healthStatus := computeHealth()
 		return realtimePayload{
 			Core:      health.Response{Status: "ok", Service: "inflightflow-core", HardwareMode: hardware},
-			Domain:    domainRuntime.State(),
+			Domain:    buildDomainPayload(tourStore, domainRuntime.State()),
 			Sensor:    map[string]any{"enabled": sensorWatchdog != nil, "health": healthStatus},
 			Readiness: map[string]any{"canStartRound": healthStatus.Level != sensor.HealthCritical, "health": healthStatus},
 			Preflight: preflightMgr.Status(),
@@ -350,6 +350,126 @@ func Run() error {
 	}
 	mux.HandleFunc("/actions/setadministration", setAdministrationHandler)
 	mux.HandleFunc("/actions/setAdministration", setAdministrationHandler)
+	appendFaultHandler := func(faultType string) http.HandlerFunc {
+		return gate(func(w http.ResponseWriter, r *http.Request) {
+			if r.Method != http.MethodPost {
+				writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+				return
+			}
+
+			state := domainRuntime.State()
+			if state.RoundID == "" {
+				writeJSON(w, http.StatusConflict, map[string]string{"error": "round_not_selected"})
+				return
+			}
+			if state.RoundState != engine.RoundRunning {
+				writeJSON(w, http.StatusConflict, map[string]string{"error": "round_not_running"})
+				return
+			}
+
+			body := map[string]any{}
+			if r.Body != nil {
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil && !errors.Is(err, io.EOF) {
+					writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_json"})
+					return
+				}
+			}
+			if body["device_type"] == nil || fmt.Sprint(body["device_type"]) == "" {
+				body["device_type"] = "terminal"
+			}
+
+			current, ok, err := tourStore.Current()
+			if err != nil || !ok {
+				writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "tournaments_read_failed"})
+				return
+			}
+
+			updated, changed, err := current.UpdateRound(state.RoundID, func(round map[string]any) {
+				appendRoundFault(round, faultType, state, body)
+			})
+			if err != nil || !changed {
+				writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "round_fault_update_failed"})
+				return
+			}
+			if _, err := tourStore.Update(updated); err != nil {
+				writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "tournament_update_failed"})
+				return
+			}
+
+			payload := buildDomainPayload(tourStore, state)
+			writeJSON(w, http.StatusOK, map[string]any{
+				"ok":    true,
+				"type":  faultType,
+				"state": payload,
+			})
+		})
+	}
+	mux.HandleFunc("/actions/sendbust", appendFaultHandler("bust"))
+	mux.HandleFunc("/actions/sendskip", appendFaultHandler("skip"))
+	mux.HandleFunc("/actions/getallfaults", gate(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		state := domainRuntime.State()
+		if state.RoundID == "" {
+			writeJSON(w, http.StatusOK, []any{})
+			return
+		}
+		payload := buildDomainPayload(tourStore, state)
+		if domain, ok := payload.(map[string]any); ok {
+			if faults, exists := domain["RoundFaults"]; exists {
+				writeJSON(w, http.StatusOK, faults)
+				return
+			}
+		}
+		writeJSON(w, http.StatusOK, []any{})
+	}))
+	mux.HandleFunc("/actions/editfaults", gate(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		state := domainRuntime.State()
+		if state.RoundID == "" {
+			writeJSON(w, http.StatusConflict, map[string]string{"error": "round_not_selected"})
+			return
+		}
+
+		var faults []map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&faults); err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_json"})
+			return
+		}
+
+		current, ok, err := tourStore.Current()
+		if err != nil || !ok {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "tournaments_read_failed"})
+			return
+		}
+
+		updated, changed, err := current.UpdateRound(state.RoundID, func(round map[string]any) {
+			round["faults"] = faultListToAny(faults)
+			realTime := numericInt64(round["time_real"])
+			if realTime > 0 {
+				round["time_result"] = computeFinalTimeMs(realTime, round, current)
+			}
+		})
+		if err != nil || !changed {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "round_fault_update_failed"})
+			return
+		}
+		if _, err := tourStore.Update(updated); err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "tournament_update_failed"})
+			return
+		}
+
+		payload := buildDomainPayload(tourStore, state)
+		writeJSON(w, http.StatusOK, map[string]any{
+			"ok":    true,
+			"state": payload,
+		})
+	}))
 
 	// Placeholder protected route for operator control APIs.
 	mux.HandleFunc("/v1/control/ping", gate(func(w http.ResponseWriter, _ *http.Request) {
@@ -363,7 +483,7 @@ func Run() error {
 		realtime.HandleWS(w, r)
 	})
 	mux.HandleFunc("/v1/domain/state", gate(func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(w, http.StatusOK, domainRuntime.State())
+		writeJSON(w, http.StatusOK, buildDomainPayload(tourStore, domainRuntime.State()))
 	}))
 	mux.HandleFunc("/v1/domain/command", gate(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -408,7 +528,7 @@ func Run() error {
 			return
 		}
 		writeJSON(w, http.StatusOK, map[string]any{
-			"state":  domainRuntime.State(),
+			"state":  buildDomainPayload(tourStore, domainRuntime.State()),
 			"events": evs,
 		})
 	}))
@@ -648,6 +768,54 @@ func numericInt64(value any) int64 {
 	return 0
 }
 
+func numericFloat64(value any) float64 {
+	switch v := value.(type) {
+	case int:
+		return float64(v)
+	case int8:
+		return float64(v)
+	case int16:
+		return float64(v)
+	case int32:
+		return float64(v)
+	case int64:
+		return float64(v)
+	case uint:
+		return float64(v)
+	case uint8:
+		return float64(v)
+	case uint16:
+		return float64(v)
+	case uint32:
+		return float64(v)
+	case uint64:
+		return float64(v)
+	case float32:
+		return float64(v)
+	case float64:
+		return v
+	case json.Number:
+		if parsed, err := v.Float64(); err == nil {
+			return parsed
+		}
+	case string:
+		if parsed, err := strconv.ParseFloat(v, 64); err == nil {
+			return parsed
+		}
+	}
+
+	return 0
+}
+
+func nullableInt64(value any) any {
+	switch value.(type) {
+	case nil:
+		return nil
+	default:
+		return numericInt64(value)
+	}
+}
+
 func countValidFaultsByType(rawFaults any, faultType string) int64 {
 	faults, ok := rawFaults.([]any)
 	if !ok {
@@ -672,6 +840,53 @@ func countValidFaultsByType(rawFaults any, faultType string) int64 {
 	return count
 }
 
+func normalizeFaultList(rawFaults any) []map[string]any {
+	faults, ok := rawFaults.([]any)
+	if !ok {
+		return []map[string]any{}
+	}
+
+	normalized := make([]map[string]any, 0, len(faults))
+	for _, item := range faults {
+		fault, ok := item.(map[string]any)
+		if !ok {
+			continue
+		}
+		normalized = append(normalized, fault)
+	}
+
+	return normalized
+}
+
+func faultListToAny(faults []map[string]any) []any {
+	items := make([]any, 0, len(faults))
+	for _, fault := range faults {
+		items = append(items, fault)
+	}
+	return items
+}
+
+func appendRoundFault(round map[string]any, faultType string, state engine.State, payload map[string]any) {
+	faultTime := numericInt64(payload["time"])
+	if faultTime <= 0 && state.RoundStartedAt > 0 {
+		faultTime = time.Now().UnixMilli() - state.RoundStartedAt
+	}
+	if faultTime < 0 {
+		faultTime = 0
+	}
+
+	faults := normalizeFaultList(round["faults"])
+	faults = append(faults, map[string]any{
+		"id":          fmt.Sprintf("fault-%d", time.Now().UnixNano()),
+		"type":        faultType,
+		"time":        faultTime,
+		"device_type": fmt.Sprint(payload["device_type"]),
+		"device_id":   numericInt64(payload["device_id"]),
+		"valid":       true,
+	})
+	round["faults"] = faultListToAny(faults)
+}
+
 func computeFinalTimeMs(realTimeMs int64, round map[string]any, current tournaments.Tournament) int64 {
 	if realTimeMs <= 0 {
 		return 0
@@ -679,10 +894,59 @@ func computeFinalTimeMs(realTimeMs int64, round map[string]any, current tourname
 
 	bustCount := countValidFaultsByType(round["faults"], "bust")
 	skipCount := countValidFaultsByType(round["faults"], "skip")
-	bustValue := numericInt64(current.BustValue)
-	skipValue := numericInt64(current.SkipValue)
+	bustValueMs := int64(numericFloat64(current.BustValue) * 1000)
+	skipValueMs := int64(numericFloat64(current.SkipValue) * 1000)
 
-	return realTimeMs + bustValue*bustCount + skipValue*skipCount
+	return realTimeMs + bustValueMs*bustCount + skipValueMs*skipCount
+}
+
+func buildDomainPayload(store *tournaments.Store, state engine.State) any {
+	payload := map[string]any{
+		"TournamentID":      state.TournamentID,
+		"RoundID":           state.RoundID,
+		"RoundState":        state.RoundState,
+		"Crossings":         state.Crossings,
+		"FirstCrossAt":      state.FirstCrossAt,
+		"LastCrossAt":       state.LastCrossAt,
+		"RoundStartedAt":    state.RoundStartedAt,
+		"RoundEndedAt":      state.RoundEndedAt,
+		"RoundResultMs":     state.RoundResultMs,
+		"RoundFaults":       []any{},
+		"BustCount":         0,
+		"SkipCount":         0,
+		"RoundTimeRealMs":   nil,
+		"RoundTimeResultMs": nil,
+	}
+
+	if state.RoundID == "" {
+		return payload
+	}
+
+	current, ok, err := store.Current()
+	if err != nil || !ok {
+		return payload
+	}
+
+	updated, changed, err := current.UpdateRound(state.RoundID, func(round map[string]any) {
+		faults := faultListToAny(normalizeFaultList(round["faults"]))
+		payload["RoundFaults"] = faults
+		payload["BustCount"] = countValidFaultsByType(faults, "bust")
+		payload["SkipCount"] = countValidFaultsByType(faults, "skip")
+		payload["RoundTimeRealMs"] = nullableInt64(round["time_real"])
+		payload["RoundTimeResultMs"] = nullableInt64(round["time_result"])
+		if stage, ok := round["stage"].(map[string]any); ok {
+			payload["StageName"] = fmt.Sprint(stage["name"])
+		}
+		if team, ok := round["team"].(map[string]any); ok {
+			payload["TeamName"] = fmt.Sprint(team["name"])
+		}
+	})
+	if err != nil || !changed {
+		_ = updated
+		return payload
+	}
+
+	return payload
 }
 
 func resolveHardwareMode(mode string) string {
@@ -772,6 +1036,28 @@ func syncTournamentRoundAfterCommand(store *tournaments.Store, state engine.Stat
 	}
 
 	switch cmdType {
+	case commands.CmdPrepareRound:
+		if state.RoundID == "" {
+			return nil
+		}
+		current, ok, err := store.Current()
+		if err != nil || !ok {
+			return err
+		}
+		updated, changed, err := current.UpdateRound(state.RoundID, func(round map[string]any) {
+			round["faults"] = []any{}
+			round["crossings"] = []any{}
+			round["time_real"] = nil
+			round["time_result"] = nil
+			round["round_start"] = nil
+			round["stage_rank"] = nil
+			round["tournament_rank"] = nil
+		})
+		if err != nil || !changed {
+			return err
+		}
+		_, err = store.Update(updated)
+		return err
 	case commands.CmdFinishRound:
 		if state.RoundID == "" {
 			return nil

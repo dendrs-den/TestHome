@@ -37,10 +37,21 @@ const getInfo = async (): Promise<RoundInfo> => {
     const roundId = domain?.RoundID || "round-live";
     const tournamentId = domain?.TournamentID || "tournament-live";
     const resultMs = Number(domain?.RoundResultMs || 0);
+    const realTimeMs =
+      domain?.RoundTimeRealMs !== null && typeof domain?.RoundTimeRealMs !== "undefined"
+        ? Number(domain.RoundTimeRealMs || 0)
+        : resultMs;
+    const finalTimeMs =
+      domain?.RoundTimeResultMs !== null && typeof domain?.RoundTimeResultMs !== "undefined"
+        ? Number(domain.RoundTimeResultMs || 0)
+        : resultMs;
     const roundStart =
       Number(domain?.RoundStartedAt || 0) ||
       Number(domain?.FirstCrossAt || 0) ||
       0;
+    const faults = Array.isArray(domain?.RoundFaults) ? domain.RoundFaults : [];
+    const stageName = domain?.StageName || "Live run";
+    const teamName = domain?.TeamName || roundId;
 
     return {
       state: roundState,
@@ -58,21 +69,21 @@ const getInfo = async (): Promise<RoundInfo> => {
         crossings: [],
         stage_rank: null,
         tournament_rank: null,
-        faults: [],
+        faults,
         stage: {
           id: "live-stage",
-          name: "Live run",
+          name: stageName,
           battle: false,
         },
         team: {
           id: roundId,
-          name: roundId,
+          name: teamName,
           number: "",
           totalRank: 0,
           totalResult: 0,
         },
-        time_real: resultMs || null,
-        time_result: resultMs || null,
+        time_real: realTimeMs || null,
+        time_result: finalTimeMs || null,
         round_start: roundStart || undefined,
       },
     };

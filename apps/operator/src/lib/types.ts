@@ -11,7 +11,22 @@ export type DomainState = {
   RoundID: string;
   RoundState: RoundState;
   Crossings: number;
+  RoundStartedAt?: number;
   RoundResultMs: number;
+  RoundFaults?: Array<{
+    id?: string;
+    type?: string;
+    time?: number;
+    device_type?: string;
+    device_id?: number;
+    valid?: boolean;
+  }>;
+  BustCount?: number;
+  SkipCount?: number;
+  RoundTimeRealMs?: number | null;
+  RoundTimeResultMs?: number | null;
+  StageName?: string;
+  TeamName?: string;
 };
 
 export type SensorHealthPayload = {
