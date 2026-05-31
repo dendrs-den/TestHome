@@ -1058,6 +1058,32 @@ func syncTournamentRoundAfterCommand(store *tournaments.Store, state engine.Stat
 		}
 		_, err = store.Update(updated)
 		return err
+	case commands.CmdAcceptCrossing:
+		if state.RoundID == "" || state.LastCrossAt <= 0 {
+			return nil
+		}
+		current, ok, err := store.Current()
+		if err != nil || !ok {
+			return err
+		}
+		updated, changed, err := current.UpdateRound(state.RoundID, func(round map[string]any) {
+			crossings := normalizeCrossings(round["crossings"])
+			entry := map[string]any{
+				"id":       fmt.Sprintf("crossing-%d-%d", state.Crossings, state.LastCrossAt),
+				"at":       state.LastCrossAt,
+				"accepted": true,
+			}
+			if crossingExists(crossings, entry["id"], state.LastCrossAt) {
+				round["crossings"] = crossings
+				return
+			}
+			round["crossings"] = append(crossings, entry)
+		})
+		if err != nil || !changed {
+			return err
+		}
+		_, err = store.Update(updated)
+		return err
 	case commands.CmdFinishRound:
 		if state.RoundID == "" {
 			return nil
@@ -1083,6 +1109,49 @@ func syncTournamentRoundAfterCommand(store *tournaments.Store, state engine.Stat
 	default:
 		return nil
 	}
+}
+
+func normalizeCrossings(raw any) []any {
+	switch value := raw.(type) {
+	case nil:
+		return []any{}
+	case []any:
+		return append([]any{}, value...)
+	case []map[string]any:
+		out := make([]any, 0, len(value))
+		for _, item := range value {
+			out = append(out, item)
+		}
+		return out
+	default:
+		return []any{}
+	}
+}
+
+func crossingExists(crossings []any, targetID any, targetAt int64) bool {
+	id, _ := targetID.(string)
+	for _, raw := range crossings {
+		item, ok := raw.(map[string]any)
+		if !ok {
+			continue
+		}
+		if id != "" {
+			if existingID, _ := item["id"].(string); existingID == id {
+				return true
+			}
+		}
+		switch at := item["at"].(type) {
+		case int64:
+			if at == targetAt {
+				return true
+			}
+		case float64:
+			if int64(at) == targetAt {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 const sensorDebugHTML = `<!doctype html>

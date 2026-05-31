@@ -137,3 +137,80 @@ func TestSyncTournamentRoundAfterPrepareClearsReplayData(t *testing.T) {
 		}
 	}
 }
+
+func TestSyncTournamentRoundAfterAcceptCrossingPersistsCrossings(t *testing.T) {
+	dir := t.TempDir()
+	store, err := tournaments.Open(filepath.Join(dir, "tournaments.db"))
+	if err != nil {
+		t.Fatalf("open store: %v", err)
+	}
+	defer store.Close()
+
+	current := tournaments.Tournament{
+		ID:   "t-1",
+		Name: "Cup One",
+		Round: []map[string]any{
+			{
+				"id":        "r-1",
+				"crossings": []any{},
+			},
+		},
+	}
+
+	if _, err := store.Add(current); err != nil {
+		t.Fatalf("add tournament: %v", err)
+	}
+	if err := store.SetCurrent(current.ID); err != nil {
+		t.Fatalf("set current: %v", err)
+	}
+
+	state := engine.State{
+		RoundID:     "r-1",
+		Crossings:   1,
+		LastCrossAt: 1710000000123,
+	}
+	if err := syncTournamentRoundAfterCommand(store, state, commands.CmdAcceptCrossing); err != nil {
+		t.Fatalf("sync after first crossing: %v", err)
+	}
+
+	state.Crossings = 2
+	state.LastCrossAt = 1710000000456
+	if err := syncTournamentRoundAfterCommand(store, state, commands.CmdAcceptCrossing); err != nil {
+		t.Fatalf("sync after second crossing: %v", err)
+	}
+
+	updated, ok, err := store.Current()
+	if err != nil || !ok {
+		t.Fatalf("read current: ok=%v err=%v", ok, err)
+	}
+
+	raw, err := json.Marshal(updated.Round)
+	if err != nil {
+		t.Fatalf("marshal rounds: %v", err)
+	}
+	var rounds []map[string]any
+	if err := json.Unmarshal(raw, &rounds); err != nil {
+		t.Fatalf("unmarshal rounds: %v", err)
+	}
+	crossings, ok := rounds[0]["crossings"].([]any)
+	if !ok {
+		t.Fatalf("expected crossings slice, got %#v", rounds[0]["crossings"])
+	}
+	if len(crossings) != 2 {
+		t.Fatalf("expected 2 crossings, got %#v", crossings)
+	}
+	first, _ := crossings[0].(map[string]any)
+	second, _ := crossings[1].(map[string]any)
+	if int64(first["at"].(float64)) != 1710000000123 {
+		t.Fatalf("unexpected first crossing at: %#v", first)
+	}
+	if int64(second["at"].(float64)) != 1710000000456 {
+		t.Fatalf("unexpected second crossing at: %#v", second)
+	}
+	if accepted, _ := first["accepted"].(bool); !accepted {
+		t.Fatalf("expected first crossing accepted=true, got %#v", first)
+	}
+	if accepted, _ := second["accepted"].(bool); !accepted {
+		t.Fatalf("expected second crossing accepted=true, got %#v", second)
+	}
+}

@@ -137,7 +137,7 @@ export SENSOR_POWER_ACTIVE=true
 
 Операционные детали и systemd-путь см. в [SENSOR_RUNBOOK.md](./SENSOR_RUNBOOK.md).
 
-## Подтверждено на 2026-05-29
+## Подтверждено на 2026-05-31
 - `Operator` и `Spectator` подключаются напрямую к Raspberry `core` по LAN.
 - `Operator` tournament-flow переведен на новый shell в стиле `Concept A`:
   - локальные шрифты `Sora`, `Manrope`, `IBM Plex Mono`
@@ -152,6 +152,13 @@ export SENSOR_POWER_ACTIVE=true
   - `.\scripts\run_operator.ps1 -Tauri`
 - `Spectator` собран как Tauri desktop app и штатно закрывается через пункт `Выход`.
 - `STOP` на судейской панели теперь сохраняет результат заезда в SQLite (`time_result`, `time_real`, `round_start`).
+- При каждом accepted crossing `core` теперь сразу сохраняет запись в `round.crossings[]` текущего раунда в SQLite:
+  - `id`
+  - `at`
+  - `accepted`
+- `journal.log` остаётся отдельным низкоуровневым event log и не заменяется записью в `round.crossings[]`.
+- `Final time` считается только после `STOP` по формуле:
+  - `time_real + bust_value * bust_count + skip_value * skip_count`
 - `NEXT ROUND` в судейской панели:
   - переводит на следующего участника в пределах текущего этапа
   - пропускает уже завершенные заезды с сохраненным результатом

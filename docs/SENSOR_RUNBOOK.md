@@ -28,6 +28,7 @@
 - физические crossing-события доходят до `core`
 - `Operator` и `Spectator` получают realtime-обновления от Raspberry
 - `STOP` сохраняет результат заезда в SQLite
+- accepted crossings теперь сразу дублируются в `round.crossings[]` текущего раунда в SQLite для postmortem-разбора
 
 ## Core env (режим real)
 Используй эти значения в `/etc/inflightflow/inflightflow-core.env`:
@@ -112,6 +113,9 @@ curl -H "X-Operator-Password: <pass>" http://<pi-ip>:18080/v1/instructor/preflig
 2. `ACTIVATE` переводит заезд в подготовленное состояние и ожидает crossing.
 3. Первый физический crossing переводит заезд в `running`.
 4. `STOP` завершает заезд и сохраняет результат в SQLite.
+   - `time_real` фиксируется только в момент `STOP`
+   - `time_result` (`Final time`) считается только в момент `STOP`
+   - `crossings[]` при этом уже должны быть накоплены в раунде по ходу пролёта
 5. `NEXT ROUND`:
    - берёт следующего участника в текущем этапе
    - пропускает заезды, где уже сохранён `time_result` или `time_real`
