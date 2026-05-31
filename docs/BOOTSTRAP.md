@@ -111,6 +111,9 @@ npm run dev
   - `TOURNAMENTS_DB_PATH=./data/tournaments.db`
 - Event journal остается отдельным:
   - `JOURNAL_PATH=./data/journal.log`
+- `journal.log` теперь ротируется автоматически:
+  - порог текущего файла: `10 MB`
+  - сохраняются последние `3` архива: `journal.log.1` ... `journal.log.3`
 - При первом старте новый `core` автоматически импортирует legacy-данные из `tournaments.json`, если БД еще пуста.
 
 ## Настройка реального датчика

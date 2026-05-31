@@ -29,6 +29,9 @@
 - `Operator` и `Spectator` получают realtime-обновления от Raspberry
 - `STOP` сохраняет результат заезда в SQLite
 - accepted crossings теперь сразу дублируются в `round.crossings[]` текущего раунда в SQLite для postmortem-разбора
+- `journal.log` ротируется автоматически:
+  - активный файл ограничен `10 MB`
+  - сохраняются `3` последних архива (`journal.log.1` ... `journal.log.3`)
 
 ## Core env (режим real)
 Используй эти значения в `/etc/inflightflow/inflightflow-core.env`:
