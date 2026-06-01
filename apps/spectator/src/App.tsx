@@ -49,7 +49,7 @@ function fmt(ms: number): string {
   const safe = Math.max(0, Math.floor(ms));
   const sec = Math.floor(safe / 1000);
   const milli = safe % 1000;
-  return `${String(sec).padStart(4, "0")}:${String(milli).padStart(3, "0")}`;
+  return `${String(sec).padStart(3, "0")}:${String(milli).padStart(3, "0")}`;
 }
 
 function findCurrentRound(roundId: string, tournament: Tournament | null): TournamentRound | null {
@@ -100,7 +100,7 @@ export default function App() {
         localStorage.setItem(STORAGE_KEY, serverIp);
         localStorage.setItem(PASSWORD_KEY, serverPassword);
       } else {
-        setServerDialogError("РЎРµСЂРІРµСЂ РЅРµ РЅР°Р№РґРµРЅ РёР»Рё РѕС‚РєР»РѕРЅРёР» РїР°СЂРѕР»СЊ. РЈРєР°Р¶Рё Raspberry РІ СЌС‚РѕР№ СЃРµС‚Рё.");
+        setServerDialogError("Server was not found or rejected the password. Enter Raspberry IP in this network.");
       }
       setCheckingServer(false);
     });
@@ -113,7 +113,7 @@ export default function App() {
     const candidate = inputIp.trim();
     const password = inputPassword.trim();
     if (!isIPv4(candidate)) {
-      setServerDialogError("Р’РІРµРґРёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ IP РІ С„РѕСЂРјР°С‚Рµ 192.168.0.177");
+      setServerDialogError("Enter a valid IP in the format 192.168.0.177");
       return;
     }
 
@@ -123,7 +123,7 @@ export default function App() {
     setCheckingServer(false);
 
     if (!ok) {
-      setServerDialogError("РџРѕ СЌС‚РѕРјСѓ IP core РЅРµРґРѕСЃС‚СѓРїРµРЅ РёР»Рё РѕС‚РєР»РѕРЅРёР» РїР°СЂРѕР»СЊ.");
+      setServerDialogError("Core is unavailable at this IP or rejected the password.");
       return;
     }
 
@@ -153,7 +153,7 @@ export default function App() {
 
     window.setTimeout(() => {
       if (!document.hidden) {
-        setError("РђРІС‚РѕР·Р°РєСЂС‹С‚РёРµ РЅРµРґРѕСЃС‚СѓРїРЅРѕ. Р—Р°РєСЂРѕР№ РѕРєРЅРѕ РІСЂСѓС‡РЅСѓСЋ.");
+        setError("Automatic close is unavailable. Close the window manually.");
         setClosingApp(false);
       }
     }, 160);
@@ -308,7 +308,11 @@ export default function App() {
         : (domain?.RoundResultMs ?? 0);
   const roundLabel = domain?.StageName || deriveRoundLabel(domain?.RoundID || "", currentTournament);
   const pilotLabel = domain?.TeamName || derivePilotLabel(domain?.RoundID || "", currentTournament);
-  const tournamentLabel = currentTournament?.name || "Flow CUP";
+  const showFinalTimeLabel = state !== "running" && liveMs > 0;
+  const visibleBustDots = Math.max(0, Math.min(10, Math.floor(bustCount)));
+  const showBustDots = visibleBustDots > 0 && bustCount <= 10;
+  const showBustValue = bustCount > 10;
+  const showSkips = skipCount > 0;
 
   React.useEffect(() => {
     const onContextMenu = (event: MouseEvent) => {
@@ -340,28 +344,40 @@ export default function App() {
 
   return (
     <main className="spectator-screen">
-      <img className="flow-logo-image" src={logo} alt="Flow Moscow" />
-      <div className="brand-mark">{tournamentLabel}</div>
+      <header className="stage-header">
+        <img className="brand-logo" src={logo} alt="Flow Moscow" />
+        <div className="round-info">{roundLabel}</div>
+      </header>
 
-      <section className="spectator-content">
-        <section className="left-panel">
-          <div className="round-label">{roundLabel}</div>
-          <div className="pilot-label">{pilotLabel}</div>
-          <div className={`timer-main state-${state}`}>{fmt(liveMs)}</div>
+      <section className="central-info" aria-label="Flight result">
+        <section className="timer-section" aria-label="Timer section">
+          <div className={`timer-label ${showFinalTimeLabel ? "" : "timer-label--hidden"}`}>Final time</div>
+          <div className={`timer-value state-${state}`}>{fmt(liveMs)}</div>
         </section>
 
-        <section className="right-panel" aria-label="Penalties">
-          <div className="stats-line">
-            <span>Busts: {bustCount}</span>
-            <span>Skips: {skipCount}</span>
+        <section className="penalty-section" aria-label="Penalties">
+          <div className="busts-row">
+            <span className="penalty-label">Busts:</span>
+            {showBustDots ? (
+              <div className="bust-dots" aria-label={`${bustCount} busts`}>
+                {Array.from({ length: visibleBustDots }).map((_, index) => (
+                  <span className="bust-dot" key={index} />
+                ))}
+              </div>
+            ) : null}
+            {showBustValue ? <span className="bust-count-value">{bustCount}</span> : null}
           </div>
-          <div className="dots-line">
-            {Array.from({ length: Math.min(bustCount, 8) }).map((_, index) => (
-              <span className="dot" key={index} />
-            ))}
-          </div>
+
+          {showSkips ? (
+            <div className="skips-row">
+              <span className="penalty-label">Skips:</span>
+              <span className="skip-value">{skipCount}</span>
+            </div>
+          ) : null}
         </section>
       </section>
+
+      <div className="participant-name">{pilotLabel}</div>
 
       {error ? <div className="error-banner">core unavailable: {error}</div> : null}
       {closingApp ? <div className="error-banner">Closing window...</div> : null}

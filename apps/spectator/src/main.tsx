@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "@fontsource/dseg7-classic/400.css";
+import "@fontsource/dseg7-classic/700.css";
 import App from "./App";
 import "./styles.css";
 

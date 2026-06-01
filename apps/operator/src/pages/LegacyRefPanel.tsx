@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import coreBaseUrl from "../Api_requests/coreBaseUrl";
 import { operatorJsonHeaders } from "../Api_requests/coreBaseUrl";
 import sendBust from "../Api_requests/roundState/sendBust";
@@ -66,6 +66,7 @@ export default function LegacyRefPanel() {
     bootstrap,
     sendCommand,
     prepareRound,
+    selectRound,
   } = useOperatorState(trimmedBase);
 
   const state = domain?.RoundState ?? "idle";
@@ -111,6 +112,16 @@ export default function LegacyRefPanel() {
     (legacyContext.tournamentId ? domain?.TournamentID === legacyContext.tournamentId : true) &&
     (legacyContext.roundId ? domain?.RoundID === String(legacyContext.roundId) : true);
   const effectiveState = matchesCurrentContext ? state : "idle";
+  const selectedRoundKeyRef = useRef("");
+
+  useEffect(() => {
+    if (!legacyContext.tournamentId || !legacyContext.roundId) return;
+    if (state === "running" || state === "prepared") return;
+    const key = `${legacyContext.tournamentId}:${legacyContext.roundId}`;
+    if (selectedRoundKeyRef.current === key) return;
+    selectedRoundKeyRef.current = key;
+    void selectRound(legacyContext.tournamentId, String(legacyContext.roundId));
+  }, [legacyContext.roundId, legacyContext.tournamentId, selectRound, state]);
 
   const isStage1 =
     effectiveState === "idle" || effectiveState === "completed" || effectiveState === "cancelled";
@@ -124,7 +135,6 @@ export default function LegacyRefPanel() {
 
   const stageLabel = legacyContext.stageName || domain?.RoundState || "-";
   const teamLabel = legacyContext.teamName || legacyContext.tournamentName || domain?.TournamentID || commandTournamentId;
-  const roundLabel = legacyContext.roundId || domain?.RoundID || commandRoundId;
 
   const exitToRounds = () => {
     sessionStorage.setItem("legacyRefReturn", "1");
@@ -223,10 +233,6 @@ export default function LegacyRefPanel() {
             <div className="grid-row">
               <span>Team:</span>
               <b>{teamLabel}</b>
-            </div>
-            <div className="grid-row">
-              <span>Round:</span>
-              <b>{roundLabel}</b>
             </div>
             <div className="grid-row">
               <span>Result:</span>

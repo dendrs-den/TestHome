@@ -73,6 +73,50 @@ func TestComputeFinalTimeMsHandlesFractionalPenaltyValues(t *testing.T) {
 	}
 }
 
+func TestRoundDisplaySelectionUsesSelectedIdleContextWithoutPreviousResult(t *testing.T) {
+	selection := &roundDisplaySelection{}
+	selection.Set("t-1", "r-current")
+
+	got := selection.Apply(engine.State{
+		TournamentID:   "t-1",
+		RoundID:        "r-previous",
+		RoundState:     engine.RoundCompleted,
+		RoundResultMs:  12345,
+		Crossings:      2,
+		LastCrossAt:    2000,
+		FirstCrossAt:   1000,
+		RoundStartedAt: 1000,
+		RoundEndedAt:   2000,
+	})
+
+	if got.TournamentID != "t-1" || got.RoundID != "r-current" {
+		t.Fatalf("expected selected context t-1/r-current, got %+v", got)
+	}
+	if got.RoundState != engine.RoundIdle {
+		t.Fatalf("expected selected display state idle, got %s", got.RoundState)
+	}
+	if got.RoundResultMs != 0 || got.Crossings != 0 {
+		t.Fatalf("expected previous result/crossings to be hidden, got %+v", got)
+	}
+}
+
+func TestRoundDisplaySelectionDoesNotOverridePreparedOrRunningRound(t *testing.T) {
+	for _, state := range []engine.RoundState{engine.RoundPrepared, engine.RoundRunning} {
+		selection := &roundDisplaySelection{}
+		selection.Set("t-1", "r-selected")
+
+		got := selection.Apply(engine.State{
+			TournamentID: "t-1",
+			RoundID:      "r-active",
+			RoundState:   state,
+		})
+
+		if got.RoundID != "r-active" || got.RoundState != state {
+			t.Fatalf("expected active %s round to stay authoritative, got %+v", state, got)
+		}
+	}
+}
+
 func TestSyncTournamentRoundAfterPrepareClearsReplayData(t *testing.T) {
 	dir := t.TempDir()
 	store, err := tournaments.Open(filepath.Join(dir, "tournaments.db"))

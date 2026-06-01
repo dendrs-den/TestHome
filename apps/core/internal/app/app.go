@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"sync"
 	"time"
 
 	"inflightflow/apps/core/internal/config"
@@ -109,6 +110,10 @@ func Run() error {
 
 	mux := http.NewServeMux()
 	gate := passwordGate(cfg.RequireOperatorPassword, cfg.SensorStreamPassword)
+	displaySelection := &roundDisplaySelection{}
+	displayState := func() engine.State {
+		return displaySelection.Apply(domainRuntime.State())
+	}
 	computeHealth := func() sensor.HealthStatus {
 		snap := sensor.GPIOWatchdogSnapshot{}
 		if sensorWatchdog != nil {
@@ -121,7 +126,7 @@ func Run() error {
 		healthStatus := computeHealth()
 		return realtimePayload{
 			Core:      health.Response{Status: "ok", Service: "inflightflow-core", HardwareMode: hardware},
-			Domain:    buildDomainPayload(tourStore, domainRuntime.State()),
+			Domain:    buildDomainPayload(tourStore, displayState()),
 			Sensor:    map[string]any{"enabled": sensorWatchdog != nil, "health": healthStatus},
 			Readiness: map[string]any{"canStartRound": healthStatus.Level != sensor.HealthCritical, "health": healthStatus},
 			Preflight: preflightMgr.Status(),
@@ -483,7 +488,29 @@ func Run() error {
 		realtime.HandleWS(w, r)
 	})
 	mux.HandleFunc("/v1/domain/state", gate(func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(w, http.StatusOK, buildDomainPayload(tourStore, domainRuntime.State()))
+		writeJSON(w, http.StatusOK, buildDomainPayload(tourStore, displayState()))
+	}))
+	mux.HandleFunc("/v1/domain/select-round", gate(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method_not_allowed"})
+			return
+		}
+		var body struct {
+			TournamentID string `json:"tournamentId"`
+			RoundID      string `json:"roundId"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid_json"})
+			return
+		}
+		if body.TournamentID == "" || body.RoundID == "" {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "tournamentId and roundId are required"})
+			return
+		}
+		displaySelection.Set(body.TournamentID, body.RoundID)
+		writeJSON(w, http.StatusOK, map[string]any{
+			"state": buildDomainPayload(tourStore, displayState()),
+		})
 	}))
 	mux.HandleFunc("/v1/domain/command", gate(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -885,6 +912,45 @@ func appendRoundFault(round map[string]any, faultType string, state engine.State
 		"valid":       true,
 	})
 	round["faults"] = faultListToAny(faults)
+}
+
+type roundDisplaySelection struct {
+	mu           sync.RWMutex
+	tournamentID string
+	roundID      string
+}
+
+func (s *roundDisplaySelection) Set(tournamentID, roundID string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.tournamentID = tournamentID
+	s.roundID = roundID
+}
+
+func (s *roundDisplaySelection) Apply(state engine.State) engine.State {
+	s.mu.RLock()
+	tournamentID := s.tournamentID
+	roundID := s.roundID
+	s.mu.RUnlock()
+
+	if roundID == "" {
+		return state
+	}
+	if state.RoundID == roundID && (tournamentID == "" || state.TournamentID == tournamentID) {
+		return state
+	}
+	if state.RoundState == engine.RoundPrepared || state.RoundState == engine.RoundRunning {
+		return state
+	}
+	if tournamentID == "" {
+		tournamentID = state.TournamentID
+	}
+
+	return engine.State{
+		TournamentID: tournamentID,
+		RoundID:      roundID,
+		RoundState:   engine.RoundIdle,
+	}
 }
 
 func computeFinalTimeMs(realTimeMs int64, round map[string]any, current tournaments.Tournament) int64 {

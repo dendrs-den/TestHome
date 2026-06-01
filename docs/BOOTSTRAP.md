@@ -140,7 +140,7 @@ export SENSOR_POWER_ACTIVE=true
 
 Операционные детали и systemd-путь см. в [SENSOR_RUNBOOK.md](./SENSOR_RUNBOOK.md).
 
-## Подтверждено на 2026-05-31
+## Подтверждено на 2026-06-02
 - `Operator` и `Spectator` подключаются напрямую к Raspberry `core` по LAN.
 - `Operator` tournament-flow переведен на новый shell в стиле `Concept A`:
   - локальные шрифты `Sora`, `Manrope`, `IBM Plex Mono`
@@ -167,3 +167,19 @@ export SENSOR_POWER_ACTIVE=true
   - пропускает уже завершенные заезды с сохраненным результатом
   - показывает сообщение `Раунд завершен`, если участников больше нет
 - В списке заездов `Replay` показывается по факту сохраненного результата, а не по `crossings`.
+- `Spectator` переведен на новый полноэкранный scoreboard layout:
+  - черный фон
+  - логотип сверху слева
+  - `Round NN` сверху справа
+  - крупный таймер `DSEG7 Classic Bold`
+  - ФИО участника по центру нижней зоны
+  - `Final time` появляется без сдвига таймера
+  - `Skip` показывается только если значение больше `0`
+  - `Bust` показывает до `10` кругов, затем числовое значение
+- Для release `.exe` Spectator добавлены WebView2 флаги рендера, чтобы убрать тонкие артефакты на крупном `DSEG7`.
+- `Referee Panel` при открытии сразу выбирает текущий полет для отображения на `Spectator`, но не делает `prepare/reset` до нажатия `ACTIVATE`.
+- Из `Referee Panel` убран внутренний `RoundID` вида `round-*`; судья видит только полезный контекст.
+- Последний Core был развернут на Raspberry через:
+  - `.\scripts\deploy_core_to_pi.ps1 -Upload -Install`
+  - проверка: `http://192.168.0.177:18080/health`
+  - systemd: `inflightflow-core.service active (running)`

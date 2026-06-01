@@ -57,6 +57,9 @@ export function createOperatorApi(baseUrl: string, password = "") {
     bootstrap: (tournamentId: string, roundId: string, keyPrefix: string) =>
       postJSON(`${base}/v1/domain/bootstrap`, { tournamentId, roundId, keyPrefix }, password),
 
+    selectRound: (tournamentId: string, roundId: string) =>
+      postJSON(`${base}/v1/domain/select-round`, { tournamentId, roundId }, password),
+
     command: (type: string, data: Record<string, unknown>, idempotencyKey: string) =>
       postJSON(`${base}/v1/domain/command`, { type, data, idempotencyKey }, password),
   };

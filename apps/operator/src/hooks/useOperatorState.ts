@@ -95,6 +95,21 @@ export function useOperatorState(baseUrl: string, password = "") {
     }
   }
 
+  async function selectRound(tournamentId: string, roundId: string) {
+    try {
+      const response = await api.selectRound(tournamentId, roundId);
+      const selectedDomain = (response as { state?: DomainState }).state;
+      if (selectedDomain) {
+        setDomain(selectedDomain);
+      } else {
+        await refresh();
+      }
+      setError("");
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+
   useEffect(() => {
     let stopped = false;
     let ws: WebSocket | null = null;
@@ -165,5 +180,6 @@ export function useOperatorState(baseUrl: string, password = "") {
     bootstrap,
     sendCommand,
     prepareRound,
+    selectRound,
   };
 }
